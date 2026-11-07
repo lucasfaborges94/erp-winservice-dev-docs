@@ -1,6 +1,6 @@
 # ERP Winservice — Base oficial de documentação
 
-**Versão do pacote:** 0.3.0  
+**Versão do pacote:** 0.4.0  
 **Data de consolidação:** 2026-11-07  
 **Estado:** baseline documental em evolução  
 **Projeto:** ERP Winservice
@@ -26,6 +26,7 @@ Esta documentação é a referência persistente para planejar, especificar, des
     ├── 06_STATUS_E_RELATORIOS.md
     ├── 07_GOVERNANCA_DOCUMENTAL.md
     ├── 08_CONTINUIDADE_E_TRANSFERENCIA.md
+    ├── MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md
     ├── RASCUNHO.md
     └── decisoes/
         ├── ADR-TEMPLATE.md
@@ -44,7 +45,8 @@ Esta documentação é a referência persistente para planejar, especificar, des
 8. [Status e relatórios](06_STATUS_E_RELATORIOS.md) — situação consolidada, entregas, riscos, pendências e relatórios.
 9. [Governança documental](07_GOVERNANCA_DOCUMENTAL.md) — regras de aprovação, atualização e versionamento.
 10. [Continuidade e transferência](08_CONTINUIDADE_E_TRANSFERENCIA.md) — encerramento e retomada de trabalho entre pessoas e ferramentas.
-11. [Rascunho](RASCUNHO.md) — ideias e propostas ainda não aprovadas.
+11. [Modelo de autorização e isolamento multiempresa](MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md) — proposta técnica para discussão; não aprovada.
+12. [Rascunho](RASCUNHO.md) — ideias e propostas ainda não aprovadas.
 
 ## Regras essenciais
 
@@ -65,6 +67,8 @@ Esta documentação é a referência persistente para planejar, especificar, des
 Esses arquivos são fotografias técnicas daquela data, não garantia de que o ambiente continua idêntico.
 
 ## Histórico deste arquivo
+
+- 2026-11-07 — v0.4.0: inclusão da proposta de modelo de autorização e isolamento multiempresa no mapa documental.
 
 - 2026-11-07 — v0.3.0: inclusão do protocolo universal de fonte da verdade e do procedimento de continuidade e transferência entre contas, ferramentas e profissionais.
 - 2026-11-07 — v0.2.0: inclusão da estrutura de ADRs individuais.
