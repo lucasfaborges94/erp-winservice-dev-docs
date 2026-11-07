@@ -70,7 +70,7 @@ Essas convenções devem ser verificadas contra o esquema existente antes de qua
 - Atualização: somente registros criados pela própria Isa.
 - A interface ou prompt do agente não substitui autorização no backend, RLS ou API.
 
-Consultar a ficha ADR-0012 quando individualizada. Até lá, esta síntese mantém o conteúdo aprovado no baseline.
+Consultar a ficha [ADR-0012](decisoes/ADR-0012-autonomia-isa-operacoes-permitidas.md), que individualiza esta política.
 
 ## 5. Catálogo de permissões versionado — síntese
 
@@ -81,7 +81,7 @@ Consultar a ficha ADR-0012 quando individualizada. Até lá, esta síntese mant�
 - Personalizações locais precisam ser preservadas.
 - Mudanças devem ter histórico e permitir restauração dos padrões.
 
-Consultar a ficha ADR-0011 quando individualizada.
+Consultar a ficha [ADR-0011](decisoes/ADR-0011-catalogo-permissoes-global-versionado.md), que individualiza esta política.
 
 ## 6. Questões abertas — não presumir como aprovadas
 
@@ -95,7 +95,9 @@ Consultar a ficha ADR-0011 quando individualizada.
 - Estratégia final de autenticação, MFA e gestão de segredos.
 - Política de retenção além dos backups diários.
 
-- **2026-11-07:** ADR-0003 a ADR-0014 individualizados em fichas próprias; estados aprovados preservados do baseline legado. Lacunas históricas mantidas como não documentadas.\n\n## 7. Registro de alteração
+## 7. Registro de alteração
+
+- **2026-11-07 — v0.3.0:** ADR-0003 a ADR-0014 individualizados em fichas próprias; estados aprovados preservados do baseline legado. Lacunas históricas mantidas como não documentadas.
 
 - **2026-11-07 — v0.2.0:** índice preparado para fichas ADR individuais; identificadores legados normalizados para quatro dígitos; template e governança documental associados. Nenhuma nova decisão de produto ou arquitetura foi criada nesta atualização.
 - **2026-11-07:** ADR-0001 individualizado em `documentacao/decisoes/ADR-0001-direcao-do-produto.md`; estado aprovado preservado do baseline legado.
