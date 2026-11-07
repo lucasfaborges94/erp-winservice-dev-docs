@@ -162,6 +162,78 @@ Fazer uma auditoria de consistência documental do repositório: validar links r
 
 ## 8. Histórico de sessões
 
+### 2026-11-07 — Proposta do modelo de autorização e isolamento multiempresa
+
+**Responsável/agente:** ChatGPT, com autorização do responsável para elaborar a proposta  
+**Ferramenta/ambiente:** GitHub e integração Supabase; projeto Winservice, PostgreSQL 17.6  
+**Branch:** main (repositório documental)  
+**Commit inicial:** não registrado nesta sessão  
+**Commit final:** será registrado após a atualização deste documento  
+**Etapa do roadmap:** Etapa 1 — auditoria/fundação de dados; preparação das Etapas 2 e 3  
+**Módulo/processo:** núcleo da plataforma, identidade, autorização e isolamento multiempresa  
+**Estado:** EM_ANDAMENTO — proposta criada; decisões do responsável pendentes
+
+#### 1. Objetivo
+Elaborar uma primeira proposta documentada de autorização e isolamento multiempresa, confrontando as decisões aprovadas com a estrutura real do Supabase, sem alterar o banco.
+
+#### 2. Contexto consultado
+- `00_FONTE_DA_VERDADE.md`, Project Charter, índice de ADRs, roadmap, mapa de módulos, stack, governança e continuidade.
+- ADR-0001, ADR-0002, ADR-0011 e ADR-0012.
+- Relatório `documentacao/relatorios/2026-11-07-auditoria-tecnica-supabase.md`.
+- Projeto Supabase `voaovwphncwbrwtcqnsc`, PostgreSQL 17.6, schema `public`.
+- Metadados de tabelas/colunas, constraints, FKs e policies RLS relevantes; somente consultas de leitura.
+
+#### 3. Trabalho realizado
+- Identificadas as estruturas atuais de empresas, usuários, vínculos usuário–empresa, papéis, permissões, módulos e telas.
+- Confrontadas as estruturas com as ADRs-0011 e 0012.
+- Registradas divergências e pontos que exigem confirmação, incluindo a relação entre `users.identifier`, `users.auth_user_identifier`, `company_users.user_identifier` e `auth.uid()`.
+- Elaborada proposta com princípios de autorização, fluxo lógico, tenancy, identidade técnica, escopo da Isa, testes mínimos e decisões pendentes.
+
+#### 4. Decisões
+- Decisões aprovadas: nenhuma nova decisão arquitetural nesta sessão.
+- Propostas ainda não aprovadas: modelo de autorização e isolamento multiempresa v0.1.0.
+- Decisões pendentes: estratégia de tenancy; usuários em múltiplas empresas; transporte/validação do contexto de empresa; semântica de múltiplos papéis e exceções; papel administrativo; classificação de dados globais; identidades técnicas; vínculo Auth–ERP.
+
+#### 5. Artefatos alterados
+| Arquivo/objeto | Tipo de alteração | Referência |
+|---|---|---|
+| `documentacao/MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md` | Criado documento de proposta v0.1.0 | Commit `0846fe9c1626c2705e954bba01eae445448dd59d` |
+| `documentacao/00_LEIA-ME.md` | Atualizado índice documental para v0.4.0 | Commit registrado após gravação |
+| `documentacao/08_CONTINUIDADE_E_TRANSFERENCIA.md` | Registro desta sessão | Commit desta atualização |
+
+#### 6. Verificações e testes
+| Verificação/teste | Ambiente/versão | Resultado | Evidência |
+|---|---|---|---|
+| Leitura dos documentos de autoridade e decisões | GitHub / main | Executada | Arquivos consultados nesta sessão |
+| Inspeção de metadados e policies | Supabase / PostgreSQL 17.6 | Executada somente leitura | Consultas de catálogo e relatório técnico |
+| Alterações no banco | Supabase Winservice | Não realizadas | Nenhum DDL/DML ou execução de função |
+| Testes funcionais de autorização | Não executados | Pendentes | Dependem do modelo aprovado e ambiente controlado |
+
+#### 7. Estado ao encerrar
+- Concluído: proposta documental v0.1.0 criada e indexada.
+- Parcial: modelo conceitual e evidências estruturais identificados.
+- Não iniciado: aprovação das decisões pendentes, especificação normativa final, matriz por entidade, desenho final de RLS/constraints e implementação.
+- Não verificado: fluxo de autenticação/provisionamento completo, backend/API, n8n e comportamento efetivo em chamadas reais.
+
+#### 8. Pendências e bloqueios
+| Item | Impacto/prioridade | Dependência ou responsável | Próxima ação |
+|---|---|---|---|
+| Aprovar ou ajustar estratégia de tenancy | Crítica | Responsável pelo projeto | Deliberar sobre banco/schema compartilhado e isolamento por linha |
+| Definir semântica de usuário e vínculo multiempresa | Alta | Responsável pelo projeto | Confirmar múltiplos vínculos e seleção da empresa de contexto |
+| Definir semântica RBAC | Alta | Responsável pelo projeto | Deliberar agregação de papéis, negações e exceções individuais |
+| Confirmar vínculo Auth–ERP | Crítica | Responsável técnico | Inspecionar fluxo de criação e sincronização de usuários |
+| Classificar todas as tabelas | Alta | Depende do modelo aprovado | Elaborar matriz global/tenant/herdado |
+
+#### 9. Riscos e observações
+A proposta não é decisão aprovada e não autoriza alterações. Os achados estruturais não substituem testes funcionais nem comprovam, isoladamente, exploração de vulnerabilidade. O banco permaneceu inalterado.
+
+#### 10. Próxima atividade recomendada
+Revisar as decisões pendentes da seção 13 do modelo e obter deliberação explícita do responsável. Depois atualizar a proposta e, se necessário, preparar ADRs antes de especificar alterações no banco.
+
+#### 11. Instruções para quem assumir
+Ler primeiro `documentacao/MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md`, ADR-0001, ADR-0011 e ADR-0012, além do relatório de auditoria. Não aplicar migrations nem alterar policies até aprovação explícita do modelo e da estratégia de implementação.
+
+
 ### 2026-11-07 — Auditoria técnica somente leitura do Supabase
 
 **Responsável/agente:** ChatGPT, com autorização do responsável pelo projeto  
