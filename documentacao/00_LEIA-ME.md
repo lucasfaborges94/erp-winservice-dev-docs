@@ -1,6 +1,6 @@
 # ERP Winservice — Base oficial de documentação
 
-**Versão do pacote:** 0.1.0  
+**Versão do pacote:** 0.2.0
 **Data de consolidação:** 2026-11-07  
 **Estado:** baseline inicial — requer validação e complementação  
 **Projeto:** ERP Winservice
@@ -9,16 +9,35 @@
 
 Esta documentação é a referência persistente para planejar, desenvolver, auditar e evoluir o ERP Winservice. Ela reduz a dependência do histórico de conversas e deve ser mantida como base de conhecimento do Projeto no ChatGPT.
 
+## Estrutura documental
+
+```text
+documentacao/
+├── 00_LEIA-ME.md
+├── 01_PROJECT_CHARTER.md
+├── 02_DECISOES_ARQUITETURA.md
+├── 03_ROADMAP_ETAPAS.md
+├── 04_MODULOS_ESCOPO.md
+├── 05_STACK_RECURSOS.md
+├── 06_STATUS_E_RELATORIOS.md
+├── 07_GOVERNANCA_DOCUMENTAL.md
+├── RASCUNHO.md
+└── decisoes/
+    ├── ADR-TEMPLATE.md
+    └── ADR-NNNN-titulo-da-decisao.md
+```
+
 ## Hierarquia documental
 
 1. `01_PROJECT_CHARTER.md` — propósito, objetivos, limites e parâmetros aprovados do projeto.
-2. `02_DECISOES_ARQUITETURA.md` — decisões técnicas e arquiteturais aprovadas, com estado e justificativa.
-3. `03_ROADMAP_ETAPAS.md` — fases, etapas, dependências e critérios de conclusão.
-4. `04_MODULOS_ESCOPO.md` — mapa de módulos, funcionalidades, escopos e exclusões.
-5. `05_STACK_RECURSOS.md` — tecnologias, ferramentas, ambientes e recursos.
-6. `06_STATUS_E_RELATORIOS.md` — estado consolidado, entregas, riscos, pendências e relatórios periódicos.
-7. `07_GOVERNANCA_DOCUMENTAL.md` — regras para atualizar, aprovar e versionar a documentação.
-8. `RASCUNHO.md` — ideias e propostas ainda não aprovadas.
+2. `02_DECISOES_ARQUITETURA.md` — índice e visão consolidada das decisões; as fichas individuais ficam em `decisoes/`.
+3. `decisoes/ADR-NNNN-*.md` — registro individual, histórico e estado de cada decisão arquitetural.
+4. `03_ROADMAP_ETAPAS.md` — fases, etapas, dependências e critérios de conclusão.
+5. `04_MODULOS_ESCOPO.md` — mapa de módulos, funcionalidades, escopos e exclusões.
+6. `05_STACK_RECURSOS.md` — tecnologias, ferramentas, ambientes e recursos.
+7. `06_STATUS_E_RELATORIOS.md` — estado consolidado, entregas, riscos, pendências e relatórios periódicos.
+8. `07_GOVERNANCA_DOCUMENTAL.md` — regras para atualizar, aprovar e versionar a documentação.
+9. `RASCUNHO.md` — ideias e propostas ainda não aprovadas.
 
 ## Regras de autoridade
 
@@ -49,4 +68,4 @@ Esses arquivos são uma fotografia técnica daquela data, não uma garantia de q
 
 ## Histórico deste arquivo
 
-- 2026-11-07 — criação da estrutura documental inicial v0.1.0.
+- 2026-11-07 — atualização para v0.2.0: inclusão da estrutura de ADRs individuais e referência ao índice de decisões.

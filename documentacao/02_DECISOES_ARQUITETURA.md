@@ -1,30 +1,56 @@
-# Registro de decisões — Arquitetura e produto
+# Índice de decisões arquiteturais — ERP Winservice
 
-**Versão:** 0.1.0  
-**Data de consolidação:** 2026-11-07
+**Versão:** 0.2.0
+**Data de atualização:** 2026-11-07
 
-Este documento mantém decisões arquiteturais aprovadas separadas de propostas e questões abertas.
+Este documento é o índice consolidado das decisões arquiteturais e de produto aprovadas. Cada decisão deverá possuir uma ficha individual em `documentacao/decisoes/`, identificada por um código sequencial `ADR-NNNN`.
 
-## 1. Decisões aprovadas
+A existência de uma decisão neste índice registra seu estado consolidado no baseline. As decisões legadas abaixo ainda precisam ser convertidas em fichas individuais completas; não se deve presumir contexto, alternativas ou justificativas que não estejam documentados.
 
-| ID | Tema | Decisão | Estado |
+## 1. Como consultar as decisões
+
+- `documentacao/decisoes/ADR-TEMPLATE.md` — modelo oficial para novas fichas.
+- `documentacao/decisoes/ADR-NNNN-*.md` — fichas individuais de decisões.
+- Esta página — índice, estado atual e visão consolidada.
+- O histórico Git registra as alterações dos arquivos; não substitui o conteúdo das fichas.
+
+### Estados possíveis
+
+| Estado | Significado |
+|---|---|
+| `PROPOSTA` | Em avaliação; ainda não aprovada. |
+| `APROVADA` | Decisão explicitamente aprovada e vigente. |
+| `REJEITADA` | Proposta avaliada e rejeitada. |
+| `SUPERADA` | Decisão anteriormente aprovada, substituída por outra. |
+
+Uma decisão só pode ser marcada como `APROVADA` após aprovação explícita do responsável pelo projeto. A criação de uma ficha, por si só, não equivale a aprovação.
+
+## 2. Decisões aprovadas — baseline legado
+
+As decisões abaixo constavam como aprovadas na versão anterior deste documento. Os identificadores foram normalizados para quatro dígitos, preservando a ordem e a correspondência temática. As fichas individuais ainda não foram redigidas.
+
+| ID | Tema | Síntese da decisão | Estado documental |
 |---|---|---|---|
-| ADR-001 | Direção do produto | ERP preparado para SaaS multiempresa; implantação inicial na Winservice | Aprovada |
-| ADR-002 | Fonte de verdade | Supabase será a fonte central de verdade dos dados | Aprovada |
-| ADR-003 | Web administrativo | WeWeb para aplicação administrativa web, hospedada na VPS | Aprovada |
-| ADR-004 | Aplicativo técnico | FlutterFlow para aplicativo móvel técnico offline-first, com GPS persistente em background | Aprovada |
-| ADR-005 | Automação | n8n como plataforma de automação de workflows | Aprovada |
-| ADR-006 | Agente IA | Isa como agente de IA integrado aos processos, com autonomia limitada | Aprovada |
-| ADR-007 | Atendimento | Chatwoot é transitório; direção futura inclui módulo Chat omnichannel próprio | Aprovada |
-| ADR-008 | Auvo | Auvo não é dependência operacional; poderá existir integração opcional | Aprovada |
-| ADR-009 | Implantação | Prioridade da V1: Operação primeiro | Aprovada |
-| ADR-010 | Migração | Substituição gradual por módulos | Aprovada |
-| ADR-011 | Catálogo de permissões | Catálogo padrão global mantido pela plataforma e catálogos próprios por empresa; atualização global por versões, adesão voluntária por empresa, preservando customizações, com histórico e restauração dos padrões | Aprovada |
-| ADR-012 | Autonomia da Isa | Pode identificar cliente em atendimento e consultar apenas dados desse cliente; pode cadastrar clientes, equipamentos, OS e visitas; não pode excluir; só pode alterar registros que ela própria criou. Restrições devem ser aplicadas no backend/API e permissões | Aprovada |
-| ADR-013 | Módulo Jurídico | Módulo Jurídico será amplo; Gestão de Documentos e Instrumentos Jurídicos será uma de suas funcionalidades iniciais | Aprovada |
-| ADR-014 | Documentos legais | Documentos legais e versões serão armazenados no banco; páginas públicas consultam a versão vigente; histórico preservado; contratação deve registrar a versão apresentada/aceita | Aprovada |
+| ADR-0001 | Direção do produto | ERP preparado para SaaS multiempresa; implantação inicial na Winservice. | Aprovada — ficha individual pendente |
+| ADR-0002 | Fonte de verdade | Supabase como fonte central de verdade dos dados. | Aprovada — ficha individual pendente |
+| ADR-0003 | Web administrativo | WeWeb para aplicação administrativa web, hospedada na VPS. | Aprovada — ficha individual pendente |
+| ADR-0004 | Aplicativo técnico | FlutterFlow para aplicativo móvel técnico offline-first, com GPS persistente em background. | Aprovada — ficha individual pendente |
+| ADR-0005 | Automação | n8n como plataforma de automação de workflows. | Aprovada — ficha individual pendente |
+| ADR-0006 | Agente IA | Isa como agente de IA integrado aos processos, com autonomia limitada. | Aprovada — ficha individual pendente |
+| ADR-0007 | Atendimento | Chatwoot transitório; direção futura inclui módulo Chat omnichannel próprio. | Aprovada — ficha individual pendente |
+| ADR-0008 | Auvo | Auvo não é dependência operacional; poderá existir integração opcional. | Aprovada — ficha individual pendente |
+| ADR-0009 | Implantação | Prioridade da V1: Operação primeiro. | Aprovada — ficha individual pendente |
+| ADR-0010 | Migração | Substituição gradual por módulos. | Aprovada — ficha individual pendente |
+| ADR-0011 | Catálogo de permissões | Catálogo padrão global versionado, catálogos próprios por empresa, adesão voluntária às versões e preservação/restauração de customizações. | Aprovada — ficha individual pendente |
+| ADR-0012 | Autonomia da Isa | Consulta limitada ao cliente do atendimento; criação de clientes, equipamentos, OS e visitas; sem exclusão; alteração apenas de registros criados pela própria Isa; controles no backend/API e permissões. | Aprovada — ficha individual pendente |
+| ADR-0013 | Módulo Jurídico | Módulo Jurídico amplo; Gestão de Documentos e Instrumentos Jurídicos como funcionalidade inicial. | Aprovada — ficha individual pendente |
+| ADR-0014 | Documentos legais | Documentos e versões armazenados no banco; páginas públicas consultam a versão vigente; contratação registra a versão apresentada/aceita. | Aprovada — ficha individual pendente |
 
-## 2. Convenções e preferências de modelagem
+**Nota de rastreabilidade:** os IDs antigos `ADR-001` a `ADR-014` foram renumerados neste índice para `ADR-0001` a `ADR-0014`. A numeração nova é a referência canônica daqui em diante. O histórico Git preserva a versão anterior do índice.
+
+## 3. Convenções e preferências de modelagem
+
+Estas convenções constavam no baseline. Quando ainda não estiverem formalizadas em ADR individual, devem ser tratadas como diretrizes registradas, sem ampliar seu alcance por inferência.
 
 - Nomes de tabelas e campos em inglês.
 - Arquitetura multiempresa com `company_identifier` nas entidades aplicáveis.
@@ -35,9 +61,8 @@ Este documento mantém decisões arquiteturais aprovadas separadas de propostas 
 
 Essas convenções devem ser verificadas contra o esquema existente antes de qualquer migração; não presumir que todas as tabelas atuais já seguem integralmente o padrão.
 
-## 3. Política de permissões da Isa
+## 4. Política de permissões da Isa — síntese
 
-A política de autonomia da Isa é uma regra de segurança de backend:
 - Identificação do cliente deve ser validada.
 - Consultas devem ficar limitadas ao cliente do atendimento atual.
 - Criação permitida: clientes, equipamentos, ordens de serviço e visitas.
@@ -45,7 +70,9 @@ A política de autonomia da Isa é uma regra de segurança de backend:
 - Atualização: somente registros criados pela própria Isa.
 - A interface ou prompt do agente não substitui autorização no backend, RLS ou API.
 
-## 4. Catálogo de permissões versionado
+Consultar a ficha ADR-0012 quando individualizada. Até lá, esta síntese mantém o conteúdo aprovado no baseline.
+
+## 5. Catálogo de permissões versionado — síntese
 
 - A plataforma mantém o catálogo padrão global.
 - Cada empresa pode manter catálogo próprio.
@@ -54,7 +81,9 @@ A política de autonomia da Isa é uma regra de segurança de backend:
 - Personalizações locais precisam ser preservadas.
 - Mudanças devem ter histórico e permitir restauração dos padrões.
 
-## 5. Questões abertas / não presumir como aprovadas
+Consultar a ficha ADR-0011 quando individualizada.
+
+## 6. Questões abertas — não presumir como aprovadas
 
 - Estratégia exata de tenancy: shared schema, schema-per-tenant ou outra.
 - Matriz definitiva de papéis e permissões.
@@ -66,6 +95,6 @@ A política de autonomia da Isa é uma regra de segurança de backend:
 - Estratégia final de autenticação, MFA e gestão de segredos.
 - Política de retenção além dos backups diários.
 
-## 6. Registro de alteração
+## 7. Registro de alteração
 
-Toda nova decisão deverá receber ID sequencial `ADR-NNN`, data, contexto, decisão, alternativas consideradas, consequências e estado. Decisões substituídas não devem ser apagadas; devem ser marcadas como superseded e apontar para a decisão sucessora.
+- **2026-11-07 — v0.2.0:** índice preparado para fichas ADR individuais; identificadores legados normalizados para quatro dígitos; template e governança documental associados. Nenhuma nova decisão de produto ou arquitetura foi criada nesta atualização.
