@@ -53,7 +53,7 @@ Esses artefatos devem acompanhar a base do Projeto como evidência técnica. Ant
 - Modelo de registro de sessão com commits, artefatos, testes, pendências e próximos passos.
 - Integração dos procedimentos ao leia-me e à governança documental.
 
-**Nota:** a publicação efetiva dos documentos deve ser confirmada pelo histórico Git e pelo commit correspondente. Este relatório não substitui essa evidência.
+**Evidência Git:** a atualização documental foi publicada na branch main. O último commit desta iniciativa é cd5ac9d39d6d3600e10977387bcb4e24768fe389. Os commits individuais dos cinco arquivos iniciais estão relacionados em documentacao/08_CONTINUIDADE_E_TRANSFERENCIA.md.
 
 ### Pendências prioritárias
 1. Conferir links relativos e presença de todos os 14 ADRs individuais.
@@ -62,7 +62,7 @@ Esses artefatos devem acompanhar a base do Projeto como evidência técnica. Ant
 4. Produzir matriz de conformidade do banco: requisito × objeto existente × situação × ação.
 5. Consolidar mapa de processos operacionais e máquina de estados.
 6. Fechar escopo da primeira entrega operacional.
-7. Registrar commits e evidências efetivas desta iniciativa no histórico de continuidade.
+7. Executar auditoria de consistência documental e registrar os achados.
 
 ### Riscos e observações
 - A existência de tabelas ou políticas no banco não comprova, isoladamente, que o requisito esteja correto ou seguro.
