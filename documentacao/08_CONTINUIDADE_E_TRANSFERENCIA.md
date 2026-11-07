@@ -162,6 +162,90 @@ Fazer uma auditoria de consistência documental do repositório: validar links r
 
 ## 8. Histórico de sessões
 
+### 2026-11-07 — Auditoria técnica somente leitura do Supabase
+
+**Responsável/agente:** ChatGPT, com autorização do responsável pelo projeto  
+**Ferramenta/ambiente:** integração Supabase conectada; projeto Winservice, PostgreSQL 17.6  
+**Branch:** main (repositório documental)  
+**Commit inicial:** não registrado nesta sessão  
+**Commit final:** `13b3723e3d27fe7b65a487c4a59abf831157ae6c`  
+**Etapa do roadmap:** fundação de dados / auditoria técnica  
+**Módulo/processo:** segurança, RLS, tenancy, integridade e governança do banco  
+**Estado:** CONCLUÍDA para a inspeção e registro documental; correções não iniciadas
+
+#### 1. Objetivo
+Registrar o estado observado do projeto Supabase Winservice em 07/11/2026 sem alterar o banco, identificando problemas confirmados, riscos e itens não verificados.
+
+#### 2. Contexto consultado
+- Projeto Supabase Winservice: `voaovwphncwbrwtcqnsc`.
+- PostgreSQL 17.6; schema `public`.
+- Índice arquitetural `documentacao/02_DECISOES_ARQUITETURA.md`.
+- Status anterior `documentacao/06_STATUS_E_RELATORIOS.md`.
+- Governança documental e procedimento de continuidade.
+- Decisões ADR-0002, ADR-0008, ADR-0011, ADR-0012 e ADR-0014 conforme índice e contexto arquitetural.
+
+#### 3. Trabalho realizado
+- Inspecionados metadados de tabelas, RLS, policies, grants, funções, triggers, foreign keys e índices.
+- Consultados alertas do Security Advisor e Performance Advisor.
+- Avaliadas evidências estruturais relacionadas ao isolamento multiempresa e às decisões arquiteturais.
+- Criado relatório técnico datado, separando achados confirmados, riscos, recomendações e limitações.
+- Atualizado o status do projeto com referência ao relatório.
+
+#### 4. Decisões
+- Decisões aprovadas e seus IDs ADR: nenhuma nova decisão arquitetural foi tomada.
+- Propostas ainda não aprovadas: nenhuma formalizada nesta sessão.
+- Decisões pendentes do responsável: autorizar ou não futuras correções, após análise do relatório.
+
+#### 5. Artefatos alterados
+
+| Arquivo/objeto | Tipo de alteração | Referência |
+|---|---|---|
+| `documentacao/relatorios/2026-11-07-auditoria-tecnica-supabase.md` | Criado relatório de auditoria | Commit `a7ceb8aaf068457bad7302873734cdc5aabb17af` |
+| `documentacao/06_STATUS_E_RELATORIOS.md` | Atualizado estado conhecido e referência ao relatório | Commit `13b3723e3d27fe7b65a487c4a59abf831157ae6c` |
+| `documentacao/08_CONTINUIDADE_E_TRANSFERENCIA.md` | Registro desta sessão | Commit desta atualização |
+
+#### 6. Verificações e testes
+
+| Verificação/teste | Ambiente/versão | Resultado | Evidência |
+|---|---|---|---|
+| Inspeção de metadados do schema | Supabase Winservice / PostgreSQL 17.6 | Executada por consultas de leitura | Relatório técnico |
+| Inspeção de policies e grants | Supabase Winservice | Achados registrados | Relatório técnico |
+| Inspeção de funções e triggers | Supabase Winservice | Definições inspecionadas; funções de negócio não executadas | Relatório técnico |
+| Inspeção de alertas | Security Advisor e Performance Advisor | Alertas registrados | Relatório técnico |
+| Testes funcionais/exploração | Não executados | Não verificados | Fora do escopo somente leitura |
+
+#### 7. Estado ao encerrar
+- Concluído: inspeção de leitura e documentação dos achados disponíveis.
+- Parcial: análise de segurança e integridade limitada ao banco; camadas externas não auditadas.
+- Não iniciado: correções, testes funcionais, testes de autorização e migrações.
+- Não verificado: uso efetivo da integração Auvo, proteções de backend externo, migrations versionadas e consistência dos dados existentes.
+
+#### 8. Pendências e bloqueios
+
+| Item | Impacto/prioridade | Dependência ou responsável | Próxima ação |
+|---|---|---|---|
+| Revisar função de ingestão de eventos | Crítica | Responsável pelo projeto | Avaliar fluxo externo e estratégia de autenticação |
+| Revisar policies RLS e grants | Crítica | Responsável pelo projeto | Definir matriz de acesso por empresa, usuário e operação |
+| Reforçar integridade multiempresa | Alta | Depende da definição formal de tenancy | Modelar constraints e validações |
+| Revisar trigger de snapshot de endereço | Alta | Responsável técnico | Corrigir em mudança futura e criar teste |
+| Comprovar autonomia da Isa | Alta | Depende da inspeção de backend/n8n | Auditar enforcement externo |
+| Comparar migrations com schema | Alta | Repositório de implementação | Localizar histórico e verificar divergências |
+
+#### 9. Riscos e observações
+- Há policies permissivas sem filtro por empresa em entidades relevantes.
+- Há privilégios amplos concedidos a `anon` e `authenticated`; o impacto efetivo depende de RLS e dos caminhos privilegiados.
+- A função `authorize_integration_sync_event` é `SECURITY DEFINER`, executável por papéis públicos e não apresentou validação de autenticidade do remetente no corpo inspecionado.
+- Há lacunas de integridade referencial entre entidades relacionadas a empresas.
+- Foi identificada incompatibilidade entre `set_visit_address_snapshot` e o schema atual de `addresses`.
+- Nenhuma alteração foi realizada no Supabase.
+
+#### 10. Próxima atividade recomendada
+Fazer uma revisão técnica do relatório e decidir a ordem de correção. Antes de qualquer alteração no banco, definir o modelo de tenancy e a matriz de autorização esperada; depois elaborar mudanças isoladas, revisáveis e testáveis.
+
+#### 11. Instruções para quem assumir
+Ler primeiro `documentacao/relatorios/2026-11-07-auditoria-tecnica-supabase.md` e os ADRs relacionados. Não executar correções automaticamente. Confirmar o estado atual do banco antes de qualquer intervenção, pois este relatório é uma fotografia datada de 07/11/2026.
+
+
 ### 2026-11-07 — Protocolo de continuidade independente de plataforma
 
 **Estado:** CONCLUÍDA para a atualização documental desta iniciativa; arquivos verificados na branch main.  
