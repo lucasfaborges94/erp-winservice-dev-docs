@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 0.2.0  
+**Versão:** 0.3.0  
 **Data-base:** 2026-11-07
 
 ## 1. Resumo executivo
@@ -17,7 +17,7 @@ A documentação passou a incluir um protocolo de fonte da verdade e um procedim
 |---|---|---|
 | Project Charter | Decisões centrais registradas; pacote precisa de revisão formal | Aprovar baseline e completar lacunas |
 | Arquitetura SaaS | Direção multiempresa aprovada | Validar tenancy, isolamento e provisionamento |
-| Supabase | Inventário e auditoria estrutural gerados em 2026-11-06 | Revisar tabelas, FKs, constraints, funções, triggers, RLS e gaps |
+| Supabase | Auditoria técnica somente leitura realizada em 2026-11-07; relatório versionado | Priorizar revisão de RLS, grants, função de ingestão, integridade multiempresa e trigger de visitas |
 | Permissões | Catálogo global versionado e personalizações por empresa definidos | Auditar implementação e políticas |
 | Isa | Limites de autonomia definidos | Testar autorização no backend/API |
 | Operação | Prioridade V1 | Fechar processos, estados, requisitos e aceite |
@@ -28,14 +28,14 @@ A documentação passou a incluir um protocolo de fonte da verdade e um procedim
 | ADRs | Índice e fichas individuais em consolidação documental | Verificar integridade de todas as fichas e referências |
 | Continuidade | Protocolo universal e modelo de transferência registrados | Aplicar ao final de cada sessão relevante |
 
-## 3. Artefatos técnicos localizados
+## 3. Relatório de auditoria Supabase — 2026-11-07\n\nFoi realizada auditoria técnica somente leitura no projeto Supabase Winservice (`voaovwphncwbrwtcqnsc`), schema `public`. O relatório completo está em [Auditoria técnica do Supabase — 2026-11-07](relatorios/2026-11-07-auditoria-tecnica-supabase.md).\n\nPrincipais achados registrados:\n- policies RLS sem restrição por empresa em entidades relevantes;\n- privilégios de tabela amplos para `anon` e `authenticated`, cujo impacto efetivo depende de RLS e do papel;\n- função `authorize_integration_sync_event` como `SECURITY DEFINER`, executável por papéis públicos e sem validação de autenticidade identificada no corpo inspecionado;\n- lacunas de integridade referencial entre entidades multiempresa;\n- incompatibilidade entre a função `set_visit_address_snapshot` e as colunas existentes em `addresses`;\n- alertas de search_path, índices duplicados e FKs sem índice de cobertura.\n\nNenhuma alteração foi realizada no banco. O relatório separa achados confirmados, riscos e itens não verificados. As recomendações ainda não foram executadas.\n\n## 4. Artefatos técnicos localizados
 
 - inventario_supabase.json — criado em 2026-11-06.
 - auditoria_estrutural_supabase.json — criado em 2026-11-06.
 
 Esses artefatos devem acompanhar a base do Projeto como evidência técnica. Antes de gerar novas migrações, confirmar se representam o estado atual do ambiente.
 
-## 4. Registro periódico — 2026-11-07
+## 5. Registro periódico — 2026-11-07
 
 ### Trabalho consolidado anteriormente
 - Definição do ERP como SaaS multiempresa, inicialmente para Winservice.
@@ -70,7 +70,7 @@ Esses artefatos devem acompanhar a base do Projeto como evidência técnica. Ant
 - A documentação atual contém decisões e propostas; itens não confirmados estão marcados como pendentes.
 - Não iniciar mudanças estruturais com base apenas em nomes de tabelas ou snippets: consultar inventário e definições completas.
 
-## 5. Modelo para relatórios futuros
+## 6. Modelo para relatórios futuros
 
 Cada relatório deverá conter:
 - Período e data.
@@ -86,7 +86,7 @@ Cada relatório deverá conter:
 - Documentos oficiais atualizados.
 - Commits, PRs e evidências.
 
-## 6. Status por módulo
+## 7. Status por módulo
 
 Usar apenas estes estados:
 - NOT_STARTED
@@ -102,5 +102,5 @@ Não marcar DONE sem critérios de aceite e evidências.
 
 ## Histórico de alterações
 
-- 2026-11-07 — v0.2.0: registro do protocolo de fonte da verdade e da continuidade entre ferramentas e profissionais.
+- 2026-11-07 — v0.3.0: inclusão do relatório de auditoria técnica somente leitura do Supabase e atualização do estado conhecido.\n- 2026-11-07 — v0.2.0: registro do protocolo de fonte da verdade e da continuidade entre ferramentas e profissionais.
 - 2026-11-07 — v0.1.0: baseline inicial do status do projeto.
