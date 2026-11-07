@@ -164,9 +164,18 @@ Fazer uma auditoria de consistência documental do repositório: validar links r
 
 ### 2026-11-07 — Protocolo de continuidade independente de plataforma
 
-**Estado:** registro inicial preparado; publicação deve ser confirmada pelo histórico Git.  
+**Estado:** CONCLUÍDA para a atualização documental desta iniciativa; arquivos verificados na branch main.  
 **Objetivo:** tornar a continuidade do ERP independente de contas do ChatGPT, outros fornecedores de IA e profissionais específicos.
 
-**Escopo:** criação do protocolo geral de fonte da verdade e do procedimento de continuidade/transferência. A aplicação efetiva ao repositório deve ser confirmada pelo histórico Git e pelo commit correspondente.
+**Escopo:** criação do protocolo geral de fonte da verdade e do procedimento de continuidade/transferência, com atualização do leia-me, da governança e do status.
+
+**Arquivos publicados e verificados na branch main:**
+- 00_FONTE_DA_VERDADE.md — commit 64b15eccf148dc514f2451f250d6bab58cb17f42
+- documentacao/08_CONTINUIDADE_E_TRANSFERENCIA.md — commit e78dc802c1779c42d6598b901c8bc339537e576f
+- documentacao/00_LEIA-ME.md — commit 07340db94838ffea92dbef801a25f0bc01d8de90
+- documentacao/07_GOVERNANCA_DOCUMENTAL.md — commit 23707622b5954fda0c531d886f8b679877d7e77d
+- documentacao/06_STATUS_E_RELATORIOS.md — commit 12098f5f3abb78bfaeed9baa57d0a4a1017331bc
+
+**Verificação:** os cinco arquivos foram relidos com sucesso no GitHub após as gravações.
 
 **Próxima ação:** executar auditoria de consistência documental descrita na seção 7.
