@@ -1,6 +1,6 @@
 # Índice de decisões arquiteturais — ERP Winservice
 
-**Versão:** 0.2.0
+**Versão:** 0.3.0
 **Data de atualização:** 2026-11-07
 
 Este documento é o índice consolidado das decisões arquiteturais e de produto aprovadas. Cada decisão deverá possuir uma ficha individual em `documentacao/decisoes/`, identificada por um código sequencial `ADR-NNNN`.
@@ -33,18 +33,18 @@ As decisões abaixo constavam como aprovadas na versão anterior deste documento
 |---|---|---|---|
 | ADR-0001 | Direção do produto | ERP preparado para SaaS multiempresa; implantação inicial na Winservice. | Aprovada — [ficha individual](decisoes/ADR-0001-direcao-do-produto.md) |
 | ADR-0002 | Fonte de verdade | Supabase como fonte central de verdade dos dados. | Aprovada — [ficha individual](decisoes/ADR-0002-fonte-de-verdade.md) |
-| ADR-0003 | Web administrativo | WeWeb para aplicação administrativa web, hospedada na VPS. | Aprovada — ficha individual pendente |
-| ADR-0004 | Aplicativo técnico | FlutterFlow para aplicativo móvel técnico offline-first, com GPS persistente em background. | Aprovada — ficha individual pendente |
-| ADR-0005 | Automação | n8n como plataforma de automação de workflows. | Aprovada — ficha individual pendente |
-| ADR-0006 | Agente IA | Isa como agente de IA integrado aos processos, com autonomia limitada. | Aprovada — ficha individual pendente |
-| ADR-0007 | Atendimento | Chatwoot transitório; direção futura inclui módulo Chat omnichannel próprio. | Aprovada — ficha individual pendente |
-| ADR-0008 | Auvo | Auvo não é dependência operacional; poderá existir integração opcional. | Aprovada — ficha individual pendente |
-| ADR-0009 | Implantação | Prioridade da V1: Operação primeiro. | Aprovada — ficha individual pendente |
-| ADR-0010 | Migração | Substituição gradual por módulos. | Aprovada — ficha individual pendente |
-| ADR-0011 | Catálogo de permissões | Catálogo padrão global versionado, catálogos próprios por empresa, adesão voluntária às versões e preservação/restauração de customizações. | Aprovada — ficha individual pendente |
-| ADR-0012 | Autonomia da Isa | Consulta limitada ao cliente do atendimento; criação de clientes, equipamentos, OS e visitas; sem exclusão; alteração apenas de registros criados pela própria Isa; controles no backend/API e permissões. | Aprovada — ficha individual pendente |
-| ADR-0013 | Módulo Jurídico | Módulo Jurídico amplo; Gestão de Documentos e Instrumentos Jurídicos como funcionalidade inicial. | Aprovada — ficha individual pendente |
-| ADR-0014 | Documentos legais | Documentos e versões armazenados no banco; páginas públicas consultam a versão vigente; contratação registra a versão apresentada/aceita. | Aprovada — ficha individual pendente |
+| ADR-0003 | Web administrativo | WeWeb para aplicação administrativa web, hospedada na VPS. | Aprovada — [ficha individual](decisoes/ADR-0003-weweb-aplicacao-administrativa-web.md) |
+| ADR-0004 | Aplicativo técnico | FlutterFlow para aplicativo móvel técnico offline-first, com GPS persistente em background. | Aprovada — [ficha individual](decisoes/ADR-0004-flutterflow-aplicativo-tecnico-offline-first.md) |
+| ADR-0005 | Automação | n8n como plataforma de automação de workflows. | Aprovada — [ficha individual](decisoes/ADR-0005-n8n-automacao-workflows.md) |
+| ADR-0006 | Agente IA | Isa como agente de IA integrado aos processos, com autonomia limitada. | Aprovada — [ficha individual](decisoes/ADR-0006-isa-agente-ia-autonomia-limitada.md) |
+| ADR-0007 | Atendimento | Chatwoot transitório; direção futura inclui módulo Chat omnichannel próprio. | Aprovada — [ficha individual](decisoes/ADR-0007-chatwoot-transitorio-chat-proprio.md) |
+| ADR-0008 | Auvo | Auvo não é dependência operacional; poderá existir integração opcional. | Aprovada — [ficha individual](decisoes/ADR-0008-auvo-integracao-opcional.md) |
+| ADR-0009 | Implantação | Prioridade da V1: Operação primeiro. | Aprovada — [ficha individual](decisoes/ADR-0009-prioridade-v1-operacao-primeiro.md) |
+| ADR-0010 | Migração | Substituição gradual por módulos. | Aprovada — [ficha individual](decisoes/ADR-0010-substituicao-gradual-por-modulos.md) |
+| ADR-0011 | Catálogo de permissões | Catálogo padrão global versionado, catálogos próprios por empresa, adesão voluntária às versões e preservação/restauração de customizações. | Aprovada — [ficha individual](decisoes/ADR-0011-catalogo-permissoes-global-versionado.md) |
+| ADR-0012 | Autonomia da Isa | Consulta limitada ao cliente do atendimento; criação de clientes, equipamentos, OS e visitas; sem exclusão; alteração apenas de registros criados pela própria Isa; controles no backend/API e permissões. | Aprovada — [ficha individual](decisoes/ADR-0012-autonomia-isa-operacoes-permitidas.md) |
+| ADR-0013 | Módulo Jurídico | Módulo Jurídico amplo; Gestão de Documentos e Instrumentos Jurídicos como funcionalidade inicial. | Aprovada — [ficha individual](decisoes/ADR-0013-modulo-juridico-amplo.md) |
+| ADR-0014 | Documentos legais | Documentos e versões armazenados no banco; páginas públicas consultam a versão vigente; contratação registra a versão apresentada/aceita. | Aprovada — [ficha individual](decisoes/ADR-0014-documentos-legais-versoes-e-aceite.md) |
 
 **Nota de rastreabilidade:** os IDs antigos `ADR-001` a `ADR-014` foram renumerados neste índice para `ADR-0001` a `ADR-0014`. A numeração nova é a referência canônica daqui em diante. O histórico Git preserva a versão anterior do índice.
 
@@ -95,7 +95,7 @@ Consultar a ficha ADR-0011 quando individualizada.
 - Estratégia final de autenticação, MFA e gestão de segredos.
 - Política de retenção além dos backups diários.
 
-## 7. Registro de alteração
+- **2026-11-07:** ADR-0003 a ADR-0014 individualizados em fichas próprias; estados aprovados preservados do baseline legado. Lacunas históricas mantidas como não documentadas.\n\n## 7. Registro de alteração
 
 - **2026-11-07 — v0.2.0:** índice preparado para fichas ADR individuais; identificadores legados normalizados para quatro dígitos; template e governança documental associados. Nenhuma nova decisão de produto ou arquitetura foi criada nesta atualização.
 - **2026-11-07:** ADR-0001 individualizado em `documentacao/decisoes/ADR-0001-direcao-do-produto.md`; estado aprovado preservado do baseline legado.
