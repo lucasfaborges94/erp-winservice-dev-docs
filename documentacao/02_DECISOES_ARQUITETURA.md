@@ -32,7 +32,7 @@ As decisões abaixo constavam como aprovadas na versão anterior deste documento
 | ID | Tema | Síntese da decisão | Estado documental |
 |---|---|---|---|
 | ADR-0001 | Direção do produto | ERP preparado para SaaS multiempresa; implantação inicial na Winservice. | Aprovada — [ficha individual](decisoes/ADR-0001-direcao-do-produto.md) |
-| ADR-0002 | Fonte de verdade | Supabase como fonte central de verdade dos dados. | Aprovada — ficha individual pendente |
+| ADR-0002 | Fonte de verdade | Supabase como fonte central de verdade dos dados. | Aprovada — [ficha individual](decisoes/ADR-0002-fonte-de-verdade.md) |
 | ADR-0003 | Web administrativo | WeWeb para aplicação administrativa web, hospedada na VPS. | Aprovada — ficha individual pendente |
 | ADR-0004 | Aplicativo técnico | FlutterFlow para aplicativo móvel técnico offline-first, com GPS persistente em background. | Aprovada — ficha individual pendente |
 | ADR-0005 | Automação | n8n como plataforma de automação de workflows. | Aprovada — ficha individual pendente |
@@ -99,3 +99,4 @@ Consultar a ficha ADR-0011 quando individualizada.
 
 - **2026-11-07 — v0.2.0:** índice preparado para fichas ADR individuais; identificadores legados normalizados para quatro dígitos; template e governança documental associados. Nenhuma nova decisão de produto ou arquitetura foi criada nesta atualização.
 - **2026-11-07:** ADR-0001 individualizado em `documentacao/decisoes/ADR-0001-direcao-do-produto.md`; estado aprovado preservado do baseline legado.
+- **2026-11-07:** ADR-0002 individualizado em `documentacao/decisoes/ADR-0002-fonte-de-verdade.md`, após aprovação do responsável; estado aprovado preservado do baseline legado.
