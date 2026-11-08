@@ -16,7 +16,7 @@ Princípios:
 - Cada visita representa um comparecimento/atendimento em uma data e possui seu próprio conjunto de tarefas e relatos.
 - Uma tarefa representa uma atividade técnica registrada em uma visita; não é checklist de etapas nem uma entidade de execução que migra entre visitas.
 - A visita é a única entidade com ciclo de vida operacional. O tempo de execução é reconstruído a partir de eventos históricos append-only da própria visita; não existe máquina ou entidade independente de sessão no MVP.
-- Relatos e evidências preservam o que aconteceu; não se deve inferir conclusão técnica apenas pelo encerramento de uma sessão.
+- Relatos e evidências preservam o que aconteceu; não se deve inferir conclusão técnica apenas por um evento isolado de execução.
 - Alterações não apagam silenciosamente o passado: versões e eventos anteriores devem permanecer consultáveis.
 - O modelo deve permitir navegação tanto do cliente para seus equipamentos e OS quanto do equipamento para suas tarefas, visitas e OS.
 
@@ -472,8 +472,8 @@ Uma cópia deve ser enviada ao cliente após confirmação do aceite; se a colet
 | `addresses` | Endereço, coordenadas, cliente, empresa e autoria | Base presente; integridade empresa-cliente precisa de reforço |
 | `equipments` | Dados do equipamento e customer_identifier | Cadastro existente; não possui created_by/updated_by |
 | `work_orders` | identifier, status e customer_identifier | Base muito enxuta; não possui created_by/updated_by |
-| `visits` | OS, cliente, status, endereço, coordenadas, responsável, agendamento, check-in e checkout | Base de visita existente; não possui relatos/tarefas/sessões próprios no schema observado |
-| `work_order_equipment` | Associação entre OS e equipamento | Não substitui tarefa: não identifica atividade por visita, tipo, relato ou sessão |
+| `visits` | OS, cliente, status, endereço, coordenadas, responsável, agendamento, check-in e checkout | Base de visita existente; não possui relatos, tarefas ou trilha completa de eventos no schema observado |
+| `work_order_equipment` | Associação entre OS e equipamento | Não substitui tarefa: não identifica atividade por visita, tipo, relato ou evento de execução |
 | `task_types` | name, code e metadados de autoria | Catálogo básico de tipos existe, sem configuração de obrigatoriedades observada |
 | `visit_types` | name, description, estimated_time e code | Catálogo de tipos de visita, distinto de tipos de tarefa |
 | `visit_requirements` e `visit_type_requirement` | Requisitos associados a tipos de visita | Estrutura voltada a requisitos de visita; não comprova requisitos dinâmicos por tipo de tarefa |
@@ -492,7 +492,7 @@ Essa constatação significa apenas que não há tabelas com esses nomes na list
 1. **Entidade tarefa:** existe `task_types`, mas não foi encontrada uma entidade de tarefa vinculada à visita. O catálogo de tipos não registra atividades individuais.
 2. **Requisitos por tipo de tarefa:** `task_types` possui somente nome e código além dos metadados; não foi observada estrutura de campos/obrigatoriedades por tipo.
 3. **Relatos:** não foi encontrada estrutura dedicada para relatos gerais de visita e relatos de tarefa.
-4. **Sessões de execução:** não foi encontrada estrutura para múltiplos períodos de execução, pausas, retomadas, checkout e coordenadas por sessão.
+4. **Eventos operacionais:** não foi encontrada estrutura append-only para registrar transições, início, pausas, retomadas, checkout e revogação diretamente na visita.
 5. **Eventos GPS:** `visits` possui um conjunto único de colunas de check-in/checkout, insuficiente por si só para preservar vários ciclos de pausa e retomada.
 6. **Auditoria histórica:** campos de autoria/atualização não substituem um histórico append-only com valores anteriores e novos.
 7. **Autoria inconsistente:** `work_orders`, `equipments`, `phonenumbers` e `quotations` não apresentam `created_by`/`updated_by` no schema consultado. `task_types` utiliza `last_updated_by`; `work_order_equipment` possui defaults `gen_random_uuid()` nos campos de autoria, que precisam de revisão antes de serem considerados confiáveis.
@@ -504,7 +504,7 @@ Essa constatação significa apenas que não há tabelas com esses nomes na list
 
 ### 12.4 Conclusão técnica
 
-O Supabase possui uma fundação cadastral e relacionamentos iniciais para clientes, equipamentos, OS, visitas, tipos de tarefa, orçamentos e aprovações. Entretanto, o modelo consultado não demonstra a implementação do núcleo funcional agora definido para tarefas por visita, relatos, sessões de execução, múltiplos eventos GPS e histórico imutável de alterações.
+O Supabase possui uma fundação cadastral e relacionamentos iniciais para clientes, equipamentos, OS, visitas, tipos de tarefa, orçamentos e aprovações. Entretanto, o modelo consultado não demonstra a implementação do núcleo funcional agora definido para tarefas por visita, relatos, eventos operacionais/GPS e histórico imutável de alterações.
 
 A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de conformidade detalhada antes de qualquer DDL ou migração. Não adicionar tabelas/colunas por inferência nem adaptar `work_order_equipment` para representar tarefas.
 
