@@ -616,3 +616,53 @@ A proposta não é ADR nem modelo físico aprovado. Não foi gerado SQL de migra
 3. Decidir catálogo de tipos, requisitos por tipo e cardinalidade de orçamento ↔ tarefa.
 4. Fechar arquitetura de auditoria e integridade multiempresa.
 5. Após aprovação, elaborar modelo físico, plano de migração e testes — ainda sem aplicar ao Supabase até autorização explícita.
+
+
+### Sessão — 2026-11-08 — Revisão do modelo lógico: execução no nível da visita
+
+**Responsável/agente:** ChatGPT, sob orientação do responsável pelo projeto  
+**Repositório:** `lucasfaborges94/erp-winservice-dev-docs`, branch `main`  
+**Etapa:** especificação funcional/lógica da Operação MVP  
+**Estado:** atualização documental publicada; proposta ainda não aprovada como modelo físico
+
+#### 1. Definições recebidas
+
+- Tipos de tarefa partem de catálogo global e podem ser editados independentemente por cada empresa.
+- Um orçamento pertence a uma OS, a uma visita, a uma tarefa ou a nenhuma dessas entidades; o vínculo é opcional e exclusivo.
+- Ao iniciar uma nova visita, a visita anterior será finalizada mediante relato do técnico.
+- A execução é da visita. Tarefas não possuem sessões nem estados próprios de execução.
+- Afastamento a partir de 200 metros (configurável) pausa a execução da visita.
+- Aproximação a até 50 metros (configurável) permite retomar a execução pausada.
+- A máquina de estados reutilizável integra o módulo Chat; não deve ser tratada como máquina de estados da visita.
+
+#### 2. Revisões realizadas no modelo
+
+- Substituídas as entidades conceituais `task_execution_sessions` e `task_execution_events` por `visit_execution_sessions` e `visit_execution_events`.
+- Atualizado o diagrama ER, cardinalidades, fluxo de histórico, constraints, matriz de conformidade e ordem de implementação.
+- Removida a associação N:M proposta `quotation_tasks`; o orçamento passou a ter vínculo opcional exclusivo com OS, visita ou tarefa, ou nenhum.
+- Registrada a personalização independente por empresa do catálogo global, mantendo pendente a estratégia física.
+- Registrados os limiares GPS 200 m/50 m e a necessidade de definir precisão, frequência, perda de sinal e antifraude.
+- Registrada a finalização da visita anterior mediante relato para iniciar nova visita.
+- A arquitetura de histórico imutável por eventos append-only + revisões/snapshots foi incluída como recomendação técnica, ainda não aprovada.
+
+#### 3. Artefatos alterados
+
+- `documentacao/MODELO_LOGICO_DADOS_OPERACAO.md`: v0.2.0.
+- `documentacao/00_LEIA-ME.md`: v0.7.0.
+- `documentacao/06_STATUS_E_RELATORIOS.md`: v1.1.0.
+- Este registro de continuidade.
+
+#### 4. Limites e segurança
+
+A atualização é documental. Não houve geração ou execução de SQL, migration, DDL, DML, alteração de policies, funções, triggers, configurações ou dados no Supabase. A proposta não é modelo físico aprovado. Os estados operacionais completos da visita não foram definidos. A máquina de estados do módulo Chat permanece em escopo separado.
+
+#### 5. Pendências para a próxima sessão
+
+1. Confirmar se o check-in inicial ainda exige permanência de 5 minutos dentro de 50 metros.
+2. Definir precisão mínima, frequência GPS, tolerância, perda de sinal e proteção contra localização simulada.
+3. Especificar jornada e finalização automática de execução pausada.
+4. Definir relato mínimo/obrigatório para finalizar visita anterior ao iniciar uma nova.
+5. Validar ou revisar a recomendação de histórico imutável append-only + revisões/snapshots.
+6. Definir requisitos dinâmicos e versionamento dos tipos de tarefa.
+7. Especificar estados e transições operacionais da visita, sem confundir com a máquina de estados do módulo Chat.
+8. Detalhar como personalizações de tipos globais serão preservadas ao publicar novas versões globais.
