@@ -228,7 +228,7 @@ A leitura GPS será aceita inicialmente quando o raio de incerteza reportado pel
 
 Os limiares assimétricos de 200 m para pausa e 50 m para retomada estabelecem uma faixa de histerese para reduzir oscilações repetidas próximas a um único limite.
 
-### 4.6 Finalização por nova atividade, deslocamento ou jornada
+### 4.6 Finalização por deslocamento ou jornada
 
 A execução da visita atual será finalizada quando ocorrer qualquer um destes eventos:
 - início de um novo deslocamento;
@@ -454,7 +454,7 @@ A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de con
 4. Definir raio, precisão mínima e tempo de confirmação para pausa automática.
 5. Definir condições de permanência para retomada automática.
 6. Definir horário de corte da jornada e fuso horário por empresa.
-7. Confirmar quando o início de outra tarefa exige transição para fora da visita atual e como tratar sessão ativa no fim da jornada.
+7. Tratar sessão ativa no fim da jornada; tarefas não são iniciadas individualmente e não constituem gatilho de finalização da visita.
 8. Definir o critério de relato adequado exigido após finalização automática.
 9. Definir se e como a reabertura GPS poderá ser tentada quando o técnico já tiver outra visita ativa.
 10. Definir estrutura de auditoria, versionamento e snapshots históricos.
