@@ -181,7 +181,7 @@ Campos conceituais usuais:
 
 A aplicação dessa convenção deverá ser avaliada entidade por entidade. Usuários humanos e usuários autônomos/agentes de IA devem ser identificados por suas próprias identidades no ERP; o usuário que configurou um agente não deve ser confundido com o agente que executou a operação.
 
-Além dos metadados de criação/última alteração, deve existir histórico append-only de alterações relevantes, contendo:
+Recomendação técnica em avaliação: além dos metadados de criação/última alteração, manter histórico append-only de alterações relevantes, contendo:
 - entidade e identificador do registro;
 - tipo de evento/operação;
 - autor;
@@ -190,9 +190,9 @@ Além dos metadados de criação/última alteração, deve existir histórico ap
 - origem/canal da operação;
 - motivo, quando exigido.
 
-O histórico da visita deve manter versões anteriores de dados da visita e de seus registros relacionados, especialmente tarefas, relatos e associações de equipamentos. A implementação deverá evitar que uma edição destrua a evidência do conteúdo anteriormente registrado.
+O histórico da visita deverá preservar versões anteriores dos dados da visita e de seus registros relacionados, especialmente tarefas, relatos e associações de equipamentos. A proposta é que correções gerem novos eventos/revisões, sem destruir a evidência do conteúdo anteriormente registrado.
 
-A estrutura técnica de auditoria, retenção, proteção contra adulteração e granularidade dos snapshots ainda precisa ser projetada.
+A adoção formal do padrão append-only, assim como a estrutura técnica de auditoria, retenção, proteção contra adulteração e granularidade dos snapshots, ainda depende de validação do responsável pelo projeto.
 
 ## 7. Vínculo funcional dos orçamentos
 
