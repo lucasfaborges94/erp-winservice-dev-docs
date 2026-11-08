@@ -158,9 +158,9 @@ O fim da jornada é gatilho para finalizar a visita. O procedimento exato para e
 
 - O técnico poderá finalizar manualmente a execução da visita, registrando horário e coordenadas GPS do checkout.
 - O sistema não deve finalizar automaticamente uma execução que ainda esteja ativa.
-- Somente execuções pausadas poderão ser finalizadas pelo processo automático de limite da jornada.
-- O horário efetivo de finalização automática será o horário em que a execução foi pausada; o horário em que o sistema processou o fechamento será armazenado separadamente.
-- As coordenadas efetivas serão as registradas no evento de pausa; não fabricar coordenadas no momento posterior do processamento.
+- O fim da jornada é gatilho para finalizar a visita. Se a execução estiver pausada, poderá ser fechada automaticamente usando o instante e as coordenadas da pausa, registrando separadamente o instante do processamento.
+- Se a execução ainda estiver ativa no fim da jornada, o procedimento para encerrar a sessão permanece pendente; não assumir encerramento automático sem definir como registrar o evento e o relato do técnico.
+- Não fabricar coordenadas no momento posterior do processamento.
 
 ## 5. Reabertura e edição de visitas finalizadas
 
