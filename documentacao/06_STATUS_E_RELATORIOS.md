@@ -73,6 +73,8 @@ Esses artefatos devem acompanhar a base do Projeto como evidência técnica. Ant
 
 ## 6. Modelo funcional operacional do MVP — 2026-11-08
 
+> **Registro histórico:** esta seção descreve o primeiro baseline funcional (v0.1.0) e as constatações daquele momento. As regras vigentes de estados, execução, jornada e reabertura foram consolidadas e substituem os pontos divergentes no registro mais recente da seção 14 e no modelo funcional v0.6.0.
+
 Foi criado `documentacao/MODELO_FUNCIONAL_OPERACIONAL_MVP.md`, versão 0.1.0, consolidando os requisitos funcionais discutidos para clientes, equipamentos, OS, visitas, tarefas, relatos, sessões de execução, GPS, autoria, auditoria e continuidade do atendimento.
 
 **Pontos funcionais consolidados:**
