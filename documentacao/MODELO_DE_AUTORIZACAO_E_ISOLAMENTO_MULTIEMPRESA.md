@@ -412,8 +412,16 @@ O inventário estrutural do repositório não substitui a consulta dos dados rea
 ### 15.6 Estado desta seção
 Todos os itens acima são diretrizes, sugestões ou questões em avaliação. Não foram aprovados como especificação física, não alteram ADRs e não autorizam DDL, alterações de dados ou implantação.
 
+
+## 16. Resultado da auditoria inicial dos dados atuais — 2026-11-08
+
+Foi concluída auditoria somente leitura no Supabase do projeto documentado, schema public. A consolidação está em `documentacao/auditorias/AUDITORIA_DADOS_AUTORIZACAO_2026-11-08.md`.
+
+Resumo: 1 empresa; 5 usuários (1 ativo, 4 inativos); 1 vínculo empresarial; 3 papéis globais (`financial`, `superuser`, `technician`); 2 atribuições via `company_user_roles`; 1 permissão; nenhuma linha em `role_permissions` ou `user_permissions`. O vínculo existente tem `company_admin=true), `company_users.role_identifier` apontando para `superuser`, enquanto `company_user_roles` atribui `financial` e `technician`. Os achados não autorizam conversão automática; o mapeamento precisa de aprovação. Nenhum DDL ou dado foi alterado.
+
 ## Histórico de alterações
 
+- 2026-11-08 — v0.3.1: registra referência à auditoria somente leitura dos papéis, vínculos, administradores e permissões atuais. Nenhuma migração autorizada.
 - 2026-11-08 — v0.3.0: registra diretrizes em avaliação sobre sessões por aplicação, arquitetura extensível de catálogos, account_owner, papéis iniciais e levantamento de dados/dependências antes da migração. Não altera ADRs nem autoriza implementação.
 - 2026-11-08 — v0.2.0: consolida a união das permissões de múltiplos papéis para usuários comuns; define concessões e negações individuais, com negação prevalecendo para usuários comuns; define a imunidade do `superadmin` a negações individuais dentro do escopo empresarial; distingue `company_admin` de `superadmin`; formaliza os tipos conceituais `human` e `agent`; registra que o primeiro usuário humano provisionado recebe a designação `company_admin` e o papel `superadmin`; corrige a referência à tenancy para refletir a ADR-0017 aprovada; explicita questões técnicas ainda pendentes. Nenhuma alteração no Supabase.
 - 2026-11-07 — v0.1.6: define retry limitado para falhas temporárias, preservação da identidade da execução, estados terminais para falhas permanentes/timeouts e conclusão da drenagem por estados terminais.
