@@ -2,8 +2,8 @@
 
 **Projeto:** ERP Winservice  
 **Data:** 2026-11-08  
-**Versão:** 0.1.0  
-**Estado:** PROPOSTA TÉCNICA PARA APROVAÇÃO — NÃO IMPLEMENTADA  
+**Versão:** 0.3.0  
+**Estado:** APROVADA COMO MODELO FÍSICO — NÃO IMPLEMENTADA  
 **Base arquitetural:** ADR-0011, ADR-0017 e modelo de autorização multiempresa  
 **Banco avaliado:** Supabase PostgreSQL 17.6 — projeto `voaovwphncwbrwtcqnsc`
 
