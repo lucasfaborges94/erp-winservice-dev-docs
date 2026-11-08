@@ -1,6 +1,6 @@
 # Mapa de módulos e escopo — ERP Winservice
 
-**Versão:** 0.1.0  
+**Versão:** 0.1.1  
 **Data:** 2026-11-07  
 **Estado:** mapa macro inicial; detalhamento por módulo pendente
 
@@ -30,7 +30,11 @@
 | Jurídico | Gestão jurídica empresarial, contratos, documentos, ocorrências e prazos | Módulo amplo |
 | SaaS / administração da plataforma | Onboarding, planos, limites, faturamento SaaS e suporte multiempresa | Futuro |
 
-## 3. Módulo Jurídico — direção aprovada
+## 3. Controle do escopo do MVP
+
+O inventário incremental de tabelas, funcionalidades e estruturas fora do MVP, futuras ou obsoletas está em [CONTROLE_ESCOPO_MVP_IGNORADOS_E_OBSOLETOS.md](CONTROLE_ESCOPO_MVP_IGNORADOS_E_OBSOLETOS.md). Esse inventário deve ser consultado durante o detalhamento dos módulos e atualizado conforme novos itens forem identificados. A classificação não autoriza remoção física de estruturas existentes.
+
+## 4. Módulo Jurídico — direção aprovada
 
 O módulo Jurídico será amplo e não se limitará a documentos legais.
 
@@ -55,7 +59,7 @@ Decisões já registradas para documentos:
 
 Formato de conteúdo, workflow de aprovação, publicação programada e modelo de eventos ainda precisam de decisão formal.
 
-## 4. Fronteiras e integrações
+## 5. Fronteiras e integrações
 
 - A camada de plataforma deve fornecer identidade, autorização, auditoria, arquivos, notificações e serviços compartilhados.
 - A integração com Auvo será opcional e não pode ser requisito para operação do ERP.
