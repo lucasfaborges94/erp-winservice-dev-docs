@@ -1,6 +1,6 @@
 # Especificação física proposta — Fundação multiempresa e isolamento do MVP
 
-**Versão:** 0.2.0  
+**Versão:** 0.3.0  
 **Data:** 2026-11-08  
 **Estado:** APROVADA PELO RESPONSÁVEL — DIRETRIZ FÍSICA; DDL AINDA NÃO AUTORIZADO  
 **Escopo:** modelo físico lógico-relacional, tenancy, integridade, autorização, RLS, backend e migração  
@@ -258,7 +258,7 @@ Esta seção cobre tabelas existentes identificadas na auditoria e entidades nec
 
 ### 6.1 Regras específicas de integridade operacional
 
-- `customers`: unicidade de CPF/CNPJ precisa de deliberação explícita: global ou por empresa. Proposta de implementação segura e coerente com tenancy: UNIQUE por empresa, salvo requisito legal/comercial documentado para unicidade global.
+- `customers`: **decisão confirmada pelo responsável em 2026-11-08: CPF/CNPJ poderá se repetir entre empresas diferentes, mas deverá ser único dentro de cada empresa.** O contrato lógico é unicidade por `(company_identifier, cpf_cnpj)`, não unicidade global. A implementação deverá definir e validar a canonicalização do documento (por exemplo, remoção de pontuação e espaços, preservando zeros à esquerda) antes de criar o índice/constraint; diferenças de formatação não poderão permitir duplicidade semântica. Valores nulos/vazios e registros legados deverão ser tratados explicitamente na migration, sem preenchimento presumido.
 - `customer_contacts`: incluir tenant mesmo sendo possível inferi-lo pelo cliente; impedir contato de cliente de outra empresa.
 - `addresses`: incluir tenant e cliente; corrigir a função `set_visit_address_snapshot()` que, na fotografia auditada, referencia colunas inexistentes `addresses.address` e `addresses.address_identifier`. Corrigir apenas após teste de compatibilidade e autorização.
 - `work_orders`: remover default aleatório de `customer_identifier`; FK deve ser explícita e obrigatória conforme regra de OS.
@@ -516,5 +516,6 @@ Após aprovação:
 
 ## Histórico
 
+- 2026-11-08 — v0.3.0: decisão explícita do responsável de que CPF/CNPJ é único dentro de cada empresa e pode se repetir entre empresas; registrada a necessidade de canonicalização e tratamento de nulos/legados antes da constraint.
 - 2026-11-08 — v0.2.0: aprovação explícita do responsável para a direção física e os contratos desta especificação. DDL, migrations e alterações no Supabase permanecem não autorizados.
 - 2026-11-08 — v0.1.0: primeira consolidação da proposta física multiempresa, com classificação tenant por tabela, regras de integridade, identidade, autorização, RLS, backend, migração e critérios de aceite. Criada para revisão; não aprovada e não implementada.
