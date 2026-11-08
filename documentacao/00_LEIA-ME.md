@@ -1,6 +1,6 @@
 # ERP Winservice — Base oficial de documentação
 
-**Versão do pacote:** 0.6.0  
+**Versão do pacote:** 0.7.0  
 **Data de consolidação:** 2026-11-08  
 **Estado:** baseline documental em evolução  
 **Projeto:** ERP Winservice
@@ -70,6 +70,7 @@ Esses arquivos são fotografias técnicas daquela data, não garantia de que o a
 
 ## Histórico deste arquivo
 
+- 2026-11-08 — v0.7.0: atualização do modelo lógico com decisões funcionais sobre execução da visita, GPS, catálogo global editável por empresa e vínculo de orçamento.
 - 2026-11-08 — v0.6.0: inclusão do modelo lógico de dados e matriz de conformidade da Operação.\n- 2026-11-08 — v0.5.0: inclusão do modelo funcional operacional do MVP no mapa documental.
 - 2026-11-07 — v0.4.0: inclusão da proposta de modelo de autorização e isolamento multiempresa no mapa documental.
 
