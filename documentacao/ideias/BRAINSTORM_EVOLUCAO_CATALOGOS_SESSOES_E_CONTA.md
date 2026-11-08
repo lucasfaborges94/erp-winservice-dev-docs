@@ -29,13 +29,13 @@ Este documento reúne possibilidades levantadas durante a evolução do ERP Wins
 
 ## 3. Titularidade e administração da conta
 - Usar account_owner para titularidade da conta SaaS.
-- Manter titularidade independente dos papéis de autorização, especialmente superadmin.
+- Manter titularidade independente dos papéis de autorização, especialmente superuser.
 - Explorar titularidade única ou múltipla, transferência, sucessão e recuperação.
 - Trilha auditável para transferência e mudanças de titularidade.
 - Avaliar atributo no vínculo usuário–empresa ou entidade própria.
 
 ## 4. Papéis iniciais a explorar
-Lista mencionada: superadmin, gerente, supervisor, atendente, técnico, suporte e vendedor.
+Lista mencionada: superuser, gerente, supervisor, atendente, técnico, suporte e vendedor.
 Questões: matriz por papel/módulo; papéis padrão versus criados pela empresa; múltiplos papéis por vínculo; papéis temporários/delegados; rótulos em português e identificadores técnicos em inglês.
 A lista não estabelece hierarquia nem permissões.
 
@@ -47,6 +47,10 @@ A lista não estabelece hierarquia nem permissões.
 - Criar relatório origem/destino e reconciliação de contagens.
 - Planejar migração reversível e validar autorização antes de remover estruturas antigas.
 - Manter inventário de estruturas candidatas à descontinuação/obsolescência, sem remoção automática.
+
+## 5.1. Função legada do módulo Financeiro
+- `public.can_view_expense(uuid)` foi classificada como obsoleta e fora do escopo atual; reavaliar no contexto do futuro módulo Financeiro.
+- A classificação não implica remoção ou alteração da função, de grants ou de campos no banco.
 
 ## 6. Questões para exploração
 - Quais políticas são globais e quais configuráveis por empresa?
