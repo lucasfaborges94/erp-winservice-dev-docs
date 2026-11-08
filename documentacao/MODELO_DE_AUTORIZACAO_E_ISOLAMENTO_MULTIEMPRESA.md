@@ -1,9 +1,9 @@
 # Modelo de autorização e isolamento multiempresa — ERP Winservice
 
 **Documento:** Modelo de autorização e isolamento multiempresa  
-**Versão:** 0.2.0  
+**Versão:** 0.3.0  
 **Data:** 2026-11-08  
-**Estado:** PROPOSTA PARA DISCUSSÃO — consolidação funcional apresentada para aprovação documental; não substitui ADRs aprovadas nem autoriza implementação  
+**Estado:** PROPOSTA PARA DISCUSSÃO — inclui diretrizes e sugestões recentes ainda em avaliação; não substitui ADRs aprovadas nem autoriza implementação  
 **Projeto Supabase consultado:** Winservice (`voaovwphncwbrwtcqnsc`)  
 **Schema consultado:** `public`  
 **Base técnica:** estrutura e policies observadas em 2026-11-07; consultar novamente antes de implementar.
@@ -373,8 +373,48 @@ A forma física das tabelas, constraints, funções, policies e APIs não é apr
 - Não foram realizados testes de exploração nem testes de acesso cruzado.
 - A análise se baseia em metadados e definições estruturais observadas em 2026-11-07; consultar novamente antes de implementar.
 
+
+## 15. Novas diretrizes e propostas em avaliação — 2026-11-08
+
+Esta seção registra contexto recente para continuidade da análise. Seu conteúdo não constitui decisão arquitetural aprovada, não altera ADRs vigentes e não autoriza implementação no Supabase.
+
+### 15.1 Política de sessões por aplicação
+- O aplicativo móvel técnico deverá permitir somente um login operacional simultâneo por usuário e empresa.
+- O web app de atendimento poderá permitir múltiplas sessões simultâneas, sujeitas a limite configurável e tempo de expiração configurável.
+- Um futuro aplicativo de chat será avaliado posteriormente; sua política de sessões ainda não foi definida.
+- Recomendação em avaliação: separar sessão de autenticação e sessão/contexto operacional do aplicativo; aplicar exclusividade móvel no servidor sob controle transacional.
+- Interpretação preliminar: exclusividade por usuário + empresa + aplicação, permitindo sessões em empresas diferentes. Confirmar antes da especificação física.
+- Permanecem a definir: novo login invalida sessão anterior ou é rejeitado, identificação de dispositivo, tratamento offline, revogação, duração máxima e exceções administrativas.
+
+### 15.2 Arquitetura extensível de catálogos
+A solução deverá considerar outros catálogos personalizáveis além do catálogo de permissões, incluindo tipos de equipamentos, marcas de equipamentos e tipos de visitas com requisitos e configurações.
+Recomendação em avaliação: infraestrutura conceitual compartilhada para versionamento, publicação, adoção por empresa, personalizações, histórico e restauração quando aplicáveis, mantendo modelos de domínio específicos. Não presumir uma única tabela genérica para todos os catálogos. A ADR-0011 permanece restrita ao catálogo de permissões; ampliar seu escopo exigirá análise e eventual decisão formal separada.
+
+### 15.3 Titularidade da conta
+Nomenclatura solicitada para avaliação: account_owner em substituição a company_owner/company_admin como conceito de titularidade da conta. Grafia recomendada: account_owner (não accont_owner).
+Recomendação em avaliação: manter titularidade separada do papel superadmin e avaliar representação própria, sem transformá-la em role. Titular humano, titularidade única, transferência protegida e exigência de superadmin permanecem sujeitos a aprovação específica.
+
+### 15.4 Papéis iniciais sugeridos
+Papéis informados para avaliação: superadmin, gerente, supervisor, atendente, técnico, suporte e vendedor. A lista é preliminar e não define permissões, hierarquia, exclusividade, escopo por módulo, atribuição padrão ou se os papéis serão globais ou customizáveis por empresa. Recomenda-se identificadores técnicos em inglês e rótulos de apresentação em português.
+
+### 15.5 Levantamento obrigatório antes da migração
+Antes de qualquer migração de autorização, levantar em modo somente leitura:
+- papéis existentes, identificadores, nomes, escopo global/empresarial e duplicidades;
+- associações entre papéis e permissões;
+- vínculos usuário–empresa ativos, inativos ou suspensos;
+- valores e significado operacional de company_users.role_identifier e company_users.company_admin;
+- titulares/administradores atuais e usuários com superadmin ou equivalentes;
+- usuários sem vínculo, vínculos sem usuário correspondente e referências órfãs;
+- sessões existentes e mecanismos atuais de autenticação;
+- dependências em views, funções, triggers, policies RLS, APIs, workflows e aplicações.
+O inventário estrutural do repositório não substitui a consulta dos dados reais. A fotografia atual dos registros ainda não foi levantada. A migração deverá preservar identificadores, vínculos, papéis, permissões e responsabilidades, com relatório de mapeamento, reconciliação, contagens antes/depois e plano de reversão. Nenhuma linha deve ser descartada ou reinterpretada silenciosamente.
+
+### 15.6 Estado desta seção
+Todos os itens acima são diretrizes, sugestões ou questões em avaliação. Não foram aprovados como especificação física, não alteram ADRs e não autorizam DDL, alterações de dados ou implantação.
+
 ## Histórico de alterações
 
+- 2026-11-08 — v0.3.0: registra diretrizes em avaliação sobre sessões por aplicação, arquitetura extensível de catálogos, account_owner, papéis iniciais e levantamento de dados/dependências antes da migração. Não altera ADRs nem autoriza implementação.
 - 2026-11-08 — v0.2.0: consolida a união das permissões de múltiplos papéis para usuários comuns; define concessões e negações individuais, com negação prevalecendo para usuários comuns; define a imunidade do `superadmin` a negações individuais dentro do escopo empresarial; distingue `company_admin` de `superadmin`; formaliza os tipos conceituais `human` e `agent`; registra que o primeiro usuário humano provisionado recebe a designação `company_admin` e o papel `superadmin`; corrige a referência à tenancy para refletir a ADR-0017 aprovada; explicita questões técnicas ainda pendentes. Nenhuma alteração no Supabase.
 - 2026-11-07 — v0.1.6: define retry limitado para falhas temporárias, preservação da identidade da execução, estados terminais para falhas permanentes/timeouts e conclusão da drenagem por estados terminais.
 - 2026-11-07 — v0.1.5: define desativação com drenagem: bloquear novas admissões e enfileiramentos, concluir normalmente todas as execuções já aceitas e reabrir a entrada somente após reativação nos dois níveis.
