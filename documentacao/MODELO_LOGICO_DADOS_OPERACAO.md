@@ -529,6 +529,14 @@ flowchart TD
     S1 --> X1[Eventos GPS e execução]
     V1 --> RV1[Relatos da visita]
     T2 --> R2[Relatos da tarefa]
+    V1 --> RE[Requisitos da visita]
+    T1 --> TRE[Requisitos da tarefa]
+    RE --> EV[Avaliações por tentativa]
+    TRE --> EV
+    EV --> EI[Itens avaliados]
+    EI --> PR[Tratamento de pendências]
+    V1 --> EVR[Versões do resumo]
+    EVR --> DA[Assinaturas e aceites]
     T1 -.equipamento opcional.-> E
     T2 -.mesmo equipamento, quando identificado.-> E
 ```
@@ -604,7 +612,7 @@ Não executar essa sequência sem aprovação do modelo físico, plano de migra�
 3. **Check-in inicial:** confirmar se a regra de permanência de 5 minutos dentro de 50 metros continua válida para o primeiro início da visita.
 4. **GPS:** definir frequência de amostragem, idade máxima operacional, retenção, localização simulada/antifraude e tratamento de leituras inconsistentes.
 5. **Jornada:** definir horário de corte, fuso, dias úteis e exceções para finalização da visita e sua sessão de execução.
-6. **Visita:** definir estados e transições operacionais próprios, sem confundi-los com a máquina de estados reutilizável do módulo Chat.
+6. **Visita:** definir estados e transições operacionais próprios, sem confundi-los com a máquina de estados reutilizável do módulo Chat. Tarefas não têm início individual e não disparam finalização da visita.
 7. **Relato de transição:** definir status de destino, motivos padronizados e tratamento quando o técnico não consegue registrar o relato imediatamente.
 8. **Auditoria imutável:** detalhar retenção, correções, proteção contra UPDATE/DELETE e estratégia de integridade, conforme ADR-0016 aprovada.
 9. **Documentos:** definir relação e armazenamento de fotos/documentos por tarefa e visita.
