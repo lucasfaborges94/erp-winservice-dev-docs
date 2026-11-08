@@ -228,6 +228,7 @@ O status e a continuidade foram atualizados nesta publicação para refletir o f
 - Tarefas permanecem sem estados e sem sessões de execução.
 - Máquina A aprovada: pending, in_displacement, in_progress, paused, completed, interrupted, prevented, canceled, com transições documentadas no modelo funcional.
 - Revogação de autenticação: pending permanece; in_displacement retorna a pending; in_progress e paused passam a interrupted; estados terminais permanecem.
+- Estados terminais não podem ser reabertos; a regra anterior de reabertura por técnico dentro de 200 metros foi substituída. Continuidade exige nova visita.
 - Fim da jornada não encerra automaticamente visita nem execução. Início/check-in fora da jornada exige confirmação do técnico.
 - A arquitetura conceitual da Base de Conhecimento foi aprovada em quatro camadas: domínio, operação, contratos e guias por público. Guias devem derivar das fontes normativas, sem duplicar regras.
 - A autorização de humanos e agentes permanece imposta pelo backend/API/RLS; conhecimento de uma operação não concede autorização.
