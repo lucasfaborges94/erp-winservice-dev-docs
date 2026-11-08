@@ -162,6 +162,27 @@ Fazer uma auditoria de consistência documental do repositório: validar links r
 
 ## 8. Histórico de sessões
 
+### 2026-11-07 — Definição dos níveis de controle do Módulo de IA
+
+**Estado:** CONCLUÍDA para registro da definição conceitual; especificação operacional e implementação pendentes.  
+**Contexto:** o responsável definiu que o Módulo de Inteligência Artificial terá dois níveis de controle: disponibilidade global pela plataforma e ativação individual por empresa.
+
+**Definição registrada:**
+- A plataforma controla a disponibilidade global do módulo.
+- Cada empresa controla sua ativação individual, condicionada à disponibilidade global e às condições de contratação.
+- A utilização efetiva exige os dois controles habilitados.
+- A ativação do módulo não ativa automaticamente os agentes; cada agente mantém estado próprio e permissões próprias.
+- Desativar o módulo bloqueia novas execuções, sem apagar agentes, configurações, históricos ou registros anteriores.
+- Provedores de modelos e infraestrutura de execução não se confundem com o módulo funcional nem com os usuários autônomos.
+
+**Arquivo alterado:**
+- `documentacao/MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md` — versão 0.1.2.
+
+**Banco Supabase:** nenhuma alteração realizada.
+
+**Próxima ação:** especificar quem pode alterar cada nível, o tratamento de execuções em andamento e os requisitos de contratação, limites e retomada.
+
+
 ### 2026-11-07 — Esclarecimento do conceito de usuários autônomos de IA
 
 **Estado:** CONCLUÍDA para atualização da proposta documental; decisões de implementação ainda pendentes.  
