@@ -426,8 +426,14 @@ A auditoria identificou que `public.can_view_expense(uuid)` é `SECURITY DEFINER
 
 Nas sete tabelas de autorização examinadas, RLS está habilitado; policies foram encontradas somente em `users` e `company_users`. Não foram encontradas policies em `company_user_roles`, `roles`, `permissions`, `role_permissions` e `user_permissions`. Os cinco usuários têm `identifier = auth_user_identifier`; não foram encontrados triggers nas tabelas examinadas. Detalhes e limitações constam no relatório de auditoria. Nenhuma alteração foi feita no banco.
 
+
+## 18. Complemento de segurança da auditoria — 2026-11-08
+
+A auditoria de privilégios encontrou grants amplos para `anon`, `authenticated` e `service_role` nas sete tabelas de autorização examinadas. RLS é camada adicional, mas a combinação de grants amplos, ausência de policies em cinco tabelas e funções `SECURITY DEFINER` acessíveis exige revisão coordenada. Os Security Advisors retornaram 26 tabelas com RLS sem policies, 7 funções com `search_path` mutável, 2 funções `SECURITY DEFINER` executáveis por `anon`, 2 por `authenticated` e proteção contra senhas vazadas desabilitada. Views públicas examinadas não mostraram referências aos campos legados; a função `can_view_expense` permanece dependência confirmada de `company_users.role_identifier`. Nenhuma correção ou alteração de privilégios foi executada. Detalhes em `documentacao/auditorias/AUDITORIA_DADOS_AUTORIZACAO_2026-11-08.md`.
+
 ## Histórico de alterações
 
+- 2026-11-08 — v0.3.3: registra grants SQL e achados dos Security Advisors identificados na auditoria.
 - 2026-11-08 — v0.3.2: registra achados técnicos complementares da auditoria RLS e dependência da função can_view_expense no campo legado.
 - 2026-11-08 — v0.3.1: registra referência à auditoria somente leitura dos papéis, vínculos, administradores e permissões atuais. Nenhuma migração autorizada.
 - 2026-11-08 — v0.3.0: registra diretrizes em avaliação sobre sessões por aplicação, arquitetura extensível de catálogos, account_owner, papéis iniciais e levantamento de dados/dependências antes da migração. Não altera ADRs nem autoriza implementação.
