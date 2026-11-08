@@ -48,6 +48,8 @@ Uma ADR aprovada registra uma decisão, mas não prova que ela foi implementada.
 
 Antes de executar qualquer trabalho, consultar:
 
+0. [Protocolo de atuação da IA com o GitHub](documentacao/PROTOCOLO_DE_ATUACAO_IA_GITHUB.md) — consulta remota prioritária, auditoria e alterações no repositório.
+
 1. Este documento — regras de autoridade e protocolo.
 2. [Leia-me da documentação](documentacao/00_LEIA-ME.md) — mapa documental.
 3. [Project Charter](documentacao/01_PROJECT_CHARTER.md) — visão, objetivos e limites.
