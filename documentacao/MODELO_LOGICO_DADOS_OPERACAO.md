@@ -1,6 +1,6 @@
 # Modelo lógico de dados e matriz de conformidade — Operação MVP
 
-**Versão:** 0.4.0  
+**Versão:** 0.5.0  
 **Data:** 2026-11-08  
 **Estado:** proposta técnica para validação; não aprovada como modelo físico  
 **Projeto Supabase avaliado:** Winservice — `voaovwphncwbrwtcqnsc`  
@@ -16,7 +16,7 @@ O modelo deve:
 - registrar tarefas específicas dentro de cada visita, sem status de execução ou conclusão na tarefa;
 - relacionar opcionalmente cada tarefa a um equipamento identificado, ainda não identificado ou não aplicável;
 - registrar relatos gerais da visita e relatos próprios de cada tarefa;
-- registrar períodos de execução em sessões vinculadas à visita, com eventos GPS;
+- registrar o ciclo operacional e os intervalos de execução por eventos append-only vinculados diretamente à visita, sem entidade de sessão;
 - preservar autoria, versões anteriores e histórico de alterações;
 - permitir navegação cliente → equipamento/OS → visita → tarefa → relatos e execução da visita;
 - garantir coerência entre empresa, cliente, OS, visita, equipamento e usuários.
@@ -33,20 +33,20 @@ Fora do escopo desta proposta: DDL, migrações, políticas RLS, implementação
 6. Cada tipo de tarefa pode exigir campos, relatos e evidências próprios.
 7. A visita precisa ter pelo menos um relato geral ou um relato de alguma tarefa antes de ser encerrada.
 8. O equipamento da tarefa é opcional. Deve ser possível registrar equipamento ainda não identificado sem criar um equipamento fictício.
-9. A execução temporal é representada por sessões vinculadas à visita, nunca às tarefas. As tarefas não possuem sessão nem estado próprio de execução.
+9. A visita é a única máquina de estados operacional. A execução temporal é reconstruída a partir de eventos append-only vinculados diretamente à visita; não existe entidade nem máquina de estados de sessão no MVP.
 10. O técnico pode ter somente uma visita em execução por vez.
 11. O início de uma nova visita finaliza a visita anterior, desde que o técnico registre o relato exigido para a finalização.
 12. Ao se afastar 200 metros ou mais do endereço da visita (limiar configurável), a execução da visita é pausada automaticamente.
 13. Ao retornar para 50 metros ou menos do endereço da visita (limiar configurável), a execução pausada pode ser retomada automaticamente, desde que a visita ainda esteja apta a continuar.
 14. A regra anteriormente registrada de check-in inicial dentro de 50 metros por 5 minutos permanece como requisito a confirmar em conjunto com os novos limiares; não deve ser confundida com a regra de retomada.
-15. Somente sessões pausadas podem ser finalizadas automaticamente pelo limite da jornada. A hora efetiva de encerramento é a hora da pausa; coordenadas são as capturadas na pausa. O horário em que o sistema processou o fechamento deve ser armazenado separadamente.
+15. O fim da jornada não encerra automaticamente a visita nem a execução. Ao tentar iniciar/check-in fora da jornada, o aplicativo solicita confirmação explícita ao técnico.
 16. A visita finalizada automaticamente pode exigir relato posterior do técnico antes de ele prosseguir no aplicativo ou iniciar novo deslocamento/visita.
 17. Reabertura de visita finalizada é exclusiva do técnico dentro de 200 metros do endereço. Gestor e atendente não podem reabrir.
 18. Gestor pode editar visita finalizada. Edição por técnico e atendente é configurável pelo gestor.
 19. Tipos de tarefa partem de um catálogo global, mas cada empresa poderá editar sua própria versão sem alterar o catálogo global nem as versões das demais empresas.
 20. Um orçamento pode estar vinculado a, no máximo, uma entidade operacional: uma OS, uma visita, uma tarefa ou nenhuma delas.
-21. A máquina de estados reutilizável mencionada pelo responsável pertence ao módulo Chat. Ela não define nem substitui o ciclo operacional das visitas.
-22. Alterações devem preservar dados anteriores e registrar autoria e temporalidade. A arquitetura de histórico imutável descrita adiante é recomendação técnica ainda sujeita a validação.
+21. A visita possui máquina de estados operacional própria, distinta da máquina reutilizável do módulo Chat. A Máquina B/sessões independentes foi eliminada do MVP por aprovação do responsável.
+22. Alterações devem preservar dados anteriores e registrar autoria e temporalidade, conforme diretriz append-only aprovada na ADR-0016. A estrutura física permanece proposta.
 
 ## 3. Modelo conceitual e cardinalidades
 
@@ -65,8 +65,6 @@ erDiagram
     VISIT_TASKS o|--o{ VISIT_TASKS : previous_task
     VISITS ||--o{ VISIT_REPORTS : records
     VISIT_TASKS ||--o{ TASK_REPORTS : records
-    VISITS ||--o{ VISIT_EXECUTION_SESSIONS : executed_in
-    VISIT_EXECUTION_SESSIONS ||--o{ VISIT_EXECUTION_EVENTS : emits
     VISITS ||--o{ VISIT_EVENTS : emits
     WORK_ORDERS o|--o{ QUOTATIONS : context
     VISITS o|--o{ QUOTATIONS : context
@@ -89,8 +87,7 @@ O diagrama é conceitual. As relações opcionais e as restrições multiempresa
 | Tarefa → tarefa anterior | 0..1:N | Uma tarefa pode apontar para uma tarefa anterior; uma tarefa pode originar várias continuidades |
 | Visita → relatos | 1:N | Relato geral é opcional individualmente; conjunto deve satisfazer regra mínima de encerramento |
 | Tarefa → relatos | 1:N | Uma tarefa pode ter vários relatos |
-| Visita → sessões de execução | 1:N | A sessão pertence à visita; tarefas não possuem sessões |
-| Sessão da visita → eventos | 1:N | Eventos formam a trilha temporal/GPS da execução da visita |
+| Visita → eventos operacionais | 1:N | Eventos append-only registram transições, início, pausas, retomadas, encerramento, revogação e GPS; não há entidade de sessão |
 | OS/visita/tarefa → orçamento | 0..1:N | Cada orçamento pode apontar para no máximo uma dessas entidades, ou nenhuma |
 
 ## 4. Entidades lógicas propostas
@@ -289,52 +286,32 @@ Relatos devem ser append-only: correções geram novo registro ou revisão vincu
 
 Mesma lógica de `visit_reports`, com `task_identifier` obrigatório. Deve suportar relatos de orçamento, coleta, cobrança, retorno/garantia, vistoria e outros tipos. Os requisitos aplicáveis dependem do tipo da tarefa.
 
-#### `visit_execution_sessions` — sessões de execução da visita
+#### visit_events — eventos operacionais da visita
 
-Representa um período contínuo de execução de uma visita. A sessão pertence à visita, nunca a uma tarefa. Uma visita pode acumular sessões ao longo de ciclos de início, pausa e retomada, conforme a política operacional que vier a ser especificada.
-
-Campos conceituais:
-- `identifier`, `company_identifier`;
-- `visit_identifier`;
-- `state`: `active`, `paused`, `closed`;
-- `started_at`, `paused_at`, `closed_at` como projeções do estado atual;
-- `effective_closed_at`: horário efetivo do encerramento;
-- `recorded_closed_at`: horário em que o sistema registrou o encerramento;
-- `closure_reason`: manual, limite_jornada, finalizacao_visita etc.;
-- `created_at`, `created_by`, `updated_at`, `updated_by`.
-
-A sessão poderá ter vários ciclos de pausa/retomada, registrados por eventos. A sessão não representa uma tarefa em execução: enquanto a visita estiver em execução, o técnico poderá registrar atividades e relatos em suas tarefas. A cardinalidade exata entre visita e sessões e a necessidade de criar uma nova sessão após cada retomada ainda devem ser fechadas no desenho físico; não criar sessões artificiais por tarefa.
-
-#### `visit_execution_events` — eventos das sessões de visita
-
-Registro append-only dos eventos de início, pausa, retomada, checkout e encerramento da execução da visita.
+Registro append-only de todos os acontecimentos relevantes do ciclo operacional da visita. Esta entidade substitui as propostas anteriores de visit_execution_sessions e visit_execution_events; não haverá Máquina B nem estados independentes active, paused ou closed no MVP.
 
 Campos conceituais:
-- `identifier`, `company_identifier`, `session_identifier`, `visit_identifier`;
-- `event_type`: `started`, `paused`, `resumed`, `checked_out`, `auto_closed_at_day_end`;
-- `occurred_at`: quando o evento efetivamente ocorreu;
-- `recorded_at`: quando o backend recebeu/registrou o evento;
-- `latitude`, `longitude`, `accuracy_meters`;
-- `distance_from_visit_meters`, quando calculável e confiável;
-- `source`: manual, gps_automatic, system;
-- `actor_user_identifier`;
-- `metadata` para dados técnicos não normalizados.
+- identifier, company_identifier, visit_identifier;
+- event_type: tipo de evento de negócio, como status_changed, displacement_started, checkin, paused, resumed, checkout, authentication_revoked, prevented, interrupted, completed, canceled, gps_auto_pause e gps_auto_resume;
+- previous_status, new_status, quando o evento representar transição;
+- occurred_at: instante efetivo do acontecimento;
+- recorded_at: instante em que o backend registrou o evento;
+- latitude, longitude, accuracy_meters, quando disponíveis e aplicáveis;
+- distance_from_visit_meters, quando calculável e confiável;
+- source: manual, gps_automatic, system ou canal equivalente;
+- actor_user_identifier e actor_kind, distinguindo humano, agente e sistema;
+- reason e metadata para motivo e dados técnicos complementares;
+- identificador de correlação/idempotência, quando necessário para impedir duplicidade.
 
-Para encerramento automático de sessão pausada, o evento deve preservar o instante e coordenadas originais da pausa como dados efetivos, além do horário real de processamento. Não fabricar coordenadas no horário de processamento.
+Regras:
+- O evento de transição e a atualização do estado atual da visita devem ser atômicos no backend/banco.
+- Eventos não podem ser sobrescritos ou excluídos no fluxo operacional; correções geram novos eventos/revisões conforme ADR-0016.
+- A ordem lógica considera o instante efetivo e preserva também o instante de recebimento; atrasos de sincronização offline não devem reescrever a sequência histórica.
+- Pausas e retomadas são eventos da visita. Os intervalos de execução são projeções calculadas a partir dos eventos, não registros de sessão.
+- A visita é a única fonte de estado operacional; não manter projeção de estado de sessão que possa divergir.
+- A estrutura física, constraints, política de idempotência e estratégia de resolução de eventos fora de ordem ainda precisam ser definidas.
 
-#### `visit_events` — eventos do ciclo da visita
-
-Registro append-only dos eventos de deslocamento, check-in da visita, saída temporária, retorno, finalização, finalização automática e reabertura.
-
-Campos conceituais:
-- `identifier`, `company_identifier`, `visit_identifier`;
-- `event_type`;
-- `occurred_at`, `recorded_at`;
-- `latitude`, `longitude`, `accuracy_meters`;
-- `source`, `actor_user_identifier`;
-- `metadata`.
-
-Os campos atuais `chekin_at`, `checkout_at` e coordenadas em `visits` podem ser mantidos temporariamente como projeções/compatibilidade, mas a trilha completa deverá estar em eventos. Corrigir a grafia de `chekin_at` somente em migração planejada, com compatibilidade e atualização de consumidores.
+Os campos atuais de check-in/checkout e coordenadas em visits podem ser mantidos temporariamente como projeções/compatibilidade, mas a trilha completa deverá estar em eventos. Corrigir a grafia de chekin_at somente em migração planejada, com compatibilidade e atualização de consumidores.
 
 #### `audit_events` — trilha geral de auditoria
 
@@ -453,13 +430,31 @@ A regra “visita precisa de pelo menos um relato geral ou de tarefa” envolve 
 
 ### 5.5 Exclusividade de visita por técnico
 
-A regra de uma visita ativa por técnico precisa de garantia transacional no backend e constraint/índice no banco. A forma exata depende dos estados finais de visita. Alternativas:
+A regra de uma visita não terminal por técnico precisa de garantia transacional no backend e constraint/índice no banco. Estados considerados operacionais: in_displacement, in_progress e paused; uma visita pausada continua ocupando a disponibilidade. A forma exata depende do desenho físico. Alternativas:
 - índice único parcial sobre `responsible_id` para os estados de visita considerados ativos; ou
 - tabela de alocação/claim ativo com uma linha única por técnico e referência à visita.
 
 Não definir a lista de estados ativos até fechar a máquina de estados da visita. Reabertura deve disputar a mesma exclusividade, sem janela de concorrência.
 
 ### 5.6 Execução da visita e GPS
+
+A visita é a única máquina de estados operacional. Não haverá tabela visit_execution_sessions, tabela visit_execution_events nem Máquina B no MVP. Todos os eventos operacionais e temporais serão registrados diretamente em visit_events.
+
+- Estados da visita: pending, in_displacement, in_progress, paused, completed, interrupted, prevented, canceled.
+- Transições: pending → in_displacement, in_progress, prevented, canceled; in_displacement → pending, in_progress, prevented, canceled; in_progress → paused, completed, interrupted; paused → in_progress, interrupted.
+- completed, interrupted, prevented e canceled são terminais.
+- prevented representa impedimento antes do início; interrupted representa encerramento excepcional depois do início.
+- Revogação de autenticação: pending permanece; in_displacement retorna para pending; in_progress e paused vão para interrupted; estados terminais permanecem.
+- O fim da jornada não encerra automaticamente visita ou execução. Tentativa de início/check-in fora da jornada exige confirmação do técnico.
+- Um técnico só pode executar uma visita por vez; visita pausada mantém a exclusividade.
+- Check-in inicial automático: 5 minutos dentro de 50 metros, ambos configuráveis; funcionalidade futura fora do MVP.
+- Afastamento de 200 metros ou mais pode pausar automaticamente; retorno a 50 metros ou menos pode retomar automaticamente, ambos configuráveis. A automação deve ser idempotente.
+- Amostra GPS inicialmente aceita com incerteza reportada de até 50 metros, configurável. Em perda de sinal, usar a última posição recebida apenas como referência histórica, preservando sua idade; não disparar transição com posição obsoleta.
+- Posições de técnicos permanecem em entidade própria technician_gps_positions, separadas dos eventos de transição da visita.
+- visit_events preserva estado anterior/posterior, instante efetivo, instante de registro, ator, origem, motivo e GPS quando aplicável.
+- Duração total, intervalos ativos e pausas são calculados como projeções dos eventos; não se cria sessão para armazená-los.
+- Mudança de estado e evento correspondente devem ser confirmados atomicamente. Requisições concorrentes, eventos duplicados e sincronização offline exigem idempotência e política explícita de ordenação.
+- Detalhes de autenticação (logout voluntário, expiração e revogação administrativa), motivos padronizados, parâmetros GPS e jornada ainda exigem especificação complementar.
 
 ### 5.7 Avaliações, evidências e conclusão da visita
 
@@ -525,8 +520,8 @@ flowchart TD
     V2 --> T2[Nova tarefa da visita 2]
     T2 -.continuidade.-> T1
     T1 --> R1[Relatos da tarefa]
-    V1 --> S1[Sessões de execução da visita]
-    S1 --> X1[Eventos GPS e execução]
+    V1 --> X1[Eventos operacionais append-only da visita]
+    X1 --> GPS[Posições GPS do técnico em histórico próprio]
     V1 --> RV1[Relatos da visita]
     T2 --> R2[Relatos da tarefa]
     V1 --> RE[Requisitos da visita]
@@ -609,10 +604,10 @@ Não executar essa sequência sem aprovação do modelo físico, plano de migra�
 
 1. **Requisitos dinâmicos por tipo:** quais tipos de campos serão suportados inicialmente (texto, seleção, número, data, foto, documento, assinatura etc.) e como serão versionados?
 2. **Equipamento indefinido:** confirmar formalmente os três valores propostos: identificado, não identificado e não aplicável.
-3. **Check-in inicial:** confirmar se a regra de permanência de 5 minutos dentro de 50 metros continua válida para o primeiro início da visita.
+3. **Check-in inicial automático:** funcionalidade futura fora do MVP; manter como parâmetro inicial 5 minutos dentro de 50 metros, ambos configuráveis.
 4. **GPS:** definir frequência de amostragem, idade máxima operacional, retenção, localização simulada/antifraude e tratamento de leituras inconsistentes.
-5. **Jornada:** definir horário de corte, fuso, dias úteis e exceções para finalização da visita e sua sessão de execução.
-6. **Visita:** definir estados e transições operacionais próprios, sem confundi-los com a máquina de estados reutilizável do módulo Chat. Tarefas não têm início individual e não disparam finalização da visita.
+5. **Jornada:** definir horário, fuso, dias úteis e regra de confirmação para início/check-in fora da jornada. O fim da jornada não encerra automaticamente visita ou execução.
+6. **Visita:** estados e transições operacionais foram definidos no modelo funcional. Permanecem a especificação física, validação transacional e enforcement da exclusividade por técnico. Tarefas não têm início individual nem estados.
 7. **Relato de transição:** definir status de destino, motivos padronizados e tratamento quando o técnico não consegue registrar o relato imediatamente.
 8. **Auditoria imutável:** detalhar retenção, correções, proteção contra UPDATE/DELETE e estratégia de integridade, conforme ADR-0016 aprovada.
 9. **Documentos:** definir relação e armazenamento de fotos/documentos por tarefa e visita.
@@ -630,7 +625,7 @@ Não executar essa sequência sem aprovação do modelo físico, plano de migra�
 - A função `set_visit_address_snapshot` foi identificada na auditoria anterior como incompatível com colunas existentes em `addresses`; corrigir e testar antes de depender do snapshot.
 - Os defaults `gen_random_uuid()` em FKs de `work_order_equipment` e campos de autoria são suspeitos e devem ser investigados.
 - O schema consultado é estado observado em 2026-11-08; não foram inspecionados dados de produção, código de aplicação, workflows, políticas novamente nesta etapa ou testes de comportamento.
-- As tabelas propostas não devem ser criadas até fechar as decisões pendentes, especialmente tenancy, requisitos dinâmicos, execução/GPS, jornada e desenho físico de auditoria.
+- As tabelas propostas não devem ser criadas até fechar as decisões pendentes, especialmente tenancy, requisitos dinâmicos, estrutura física de visit_events, GPS, jornada e desenho físico de auditoria.
 - A diretriz append-only está aprovada; a estrutura física e os controles técnicos ainda não estão aprovados.
 - A proposta de repositório de catálogos globais versionados com camada local por empresa permanece pendente de aprovação.
 - O padrão append-only foi aprovado como diretriz arquitetural; implementação, retenção, proteção contra adulteração e mecanismo de revisão ainda precisam ser projetados.
@@ -646,6 +641,7 @@ Não executar essa sequência sem aprovação do modelo físico, plano de migra�
 
 ## Histórico de alterações
 
+- 2026-11-08 — v0.5.0: remoção da Máquina B e das entidades de sessão; unificação dos eventos operacionais/temporais diretamente em visit_events; inclusão da Máquina A aprovada, transições por revogação e jornada sem encerramento automático; revisão de cardinalidades, integridade e perguntas abertas.
 - 2026-11-08 — v0.4.0: inclusão das avaliações históricas por tentativa, pendências obrigatórias/opcionais, tratamento por gestor/atendente, evidências com uploads idempotentes e confirmação no backend, metadados temporais/GPS e proposta lógica de resumo/aceite digital versionado com coleta remota, presencial e offline.
 - 2026-11-08 — v0.3.0: inclusão do histórico GPS de técnicos, precisão configurável de até 50 m, posição mais recente sem inferência a partir de amostra obsoleta, gatilhos de finalização por deslocamento/fim de jornada; tarefas não possuem início individual, confirmação do check-in inicial e aprovação da diretriz append-only; detalhada proposta de repositório global de catálogos versionados.
 - 2026-11-08 — v0.2.0: revisão após decisões funcionais sobre catálogo global editável por empresa, vínculo exclusivo opcional de orçamento, execução/sessões no nível da visita, limiares GPS de pausa/retomada e transição entre visitas. Removidas sessões de tarefa; máquina de estados do módulo Chat mantida separada.
