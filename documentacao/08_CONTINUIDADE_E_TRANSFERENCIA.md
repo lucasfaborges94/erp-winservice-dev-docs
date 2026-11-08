@@ -1,7 +1,7 @@
 # Continuidade e transferência de trabalho — ERP Winservice
 
 **Documento:** Procedimento de continuidade e transferência  
-**Versão:** 1.0.0  
+**Versão:** 1.1.0  
 **Data:** 2026-11-07  
 **Estado:** procedimento estabelecido; registro inicial de referência
 
@@ -708,3 +708,52 @@ Nenhuma alteração foi feita no Supabase. Não houve DDL, DML, migration, alter
 4. Definir como o início de uma nova tarefa exige ou não a transição para fora da visita atual.
 5. Aprovar ou ajustar o repositório global de catálogos versionados e política de atualização das personalizações.
 6. Definir jornada (horário, fuso, dias e exceções) e comportamento detalhado no fim da jornada.
+
+
+### Sessão — 2026-11-08 — requisitos, evidências e aceite digital
+
+**Etapa:** consolidação funcional e atualização dos modelos funcional/lógico  
+**Estado:** requisitos funcionais confirmados; proposta lógica ainda não aprovada como modelo físico
+
+#### Definições confirmadas
+
+- Tarefas não são iniciadas individualmente nem possuem status de execução/conclusão. Permanecem vinculadas à visita; relatos e evidências registram o que ocorreu.
+- Pendências são indicadores derivados de requisitos não cumpridos: `visit_requirements` na visita e `task_type_requirements` nas tarefas.
+- Dois indicadores derivados, na visita e na tarefa: `has_pending_mandatory_requirements` e `has_pending_optional_requirements`. Não são editáveis manualmente.
+- Cada tentativa de finalização normal gera avaliação histórica completa, mesmo quando bloqueada, cobrindo requisitos da visita e de todas as tarefas.
+- Requisito obrigatório não cumprido bloqueia conclusão normal. Requisito opcional não cumprido não bloqueia, mas gera pendência para revisão.
+- A visita pode ser encerrada excepcionalmente por interrupção/abandono com requisitos obrigatórios pendentes; isso não equivale a conclusão normal. Pendências permanecem para análise e eventual reavaliação.
+- Gestor/atendente autorizado pode aceitar ausência de requisito opcional com justificativa. Técnico pode cumprir ou solicitar revisão, mas não dispensar. A dispensa não transforma resultado original em cumprido.
+- Evidências previstas: fotos, documentos e assinaturas. Foto deve ser visualizada e confirmada como legível pelo técnico antes do envio; documentos podem ser fotografados ou selecionados como arquivos.
+- Evidência só satisfaz requisito após confirmação de armazenamento/validação pelo backend. Upload pode ocorrer em segundo plano, com timeout e retries limitados, política ainda a definir, e idempotência.
+- Upload obrigatório não confirmado bloqueia conclusão normal; visita pode permanecer em andamento ou ser encerrada excepcionalmente. Upload opcional não confirmado gera pendência opcional.
+- Evidências devem guardar `created_at` (`timestamptz`), latitude/longitude do local de captura quando disponíveis e autorizadas, além de distinguir captura, recebimento e confirmação do upload.
+- Aceite digital padrão: link individual para o dispositivo pessoal do cliente. Alternativa: assinatura presencial no dispositivo do técnico; coleta offline protegida e sincronizada posteriormente.
+- Cliente deve ser identificado antes da assinatura. Não coletar impressão digital. Método inicial de identificação permanece em aberto; data de nascimento foi considerada como alternativa e CPF não deve ser exigido indiscriminadamente.
+- Resumo de aceite: data/hora, cliente, equipamento, técnico, solicitação original, relato geral e relatos das tarefas, fotografias incorporadas ao corpo e valores discriminados da visita/tarefas. Documentos somente como anexos.
+- Resumo e anexos têm versão/hash imutável. Alterações relevantes exigem novo aceite; alterações administrativas sem impacto no conteúdo aceito não exigem.
+- Cópia ao cliente após confirmação; em offline, após sincronização.
+- Nenhuma modalidade é automaticamente juridicamente superior apenas pelo dispositivo utilizado.
+
+#### Artefatos atualizados nesta sessão
+
+- `documentacao/MODELO_FUNCIONAL_OPERACIONAL_MVP.md`: v0.5.0.
+- `documentacao/MODELO_LOGICO_DADOS_OPERACAO.md`: v0.4.0.
+- `documentacao/06_STATUS_E_RELATORIOS.md`: v1.3.0.
+- `documentacao/00_LEIA-ME.md`: v0.9.0.
+- Este registro de continuidade: v1.1.0.
+
+#### Pendências para próxima sessão
+
+1. Definir parâmetros de timeout, retries, backoff, formatos/tamanho e retenção de evidências.
+2. Definir método inicial de identificação do signatário, validade/expiração/revogação de links e critérios de autenticação.
+3. Definir matriz de dispensa justificada para requisitos obrigatórios após encerramento excepcional.
+4. Detalhar quais alterações são relevantes e exigem novo aceite.
+5. Definir armazenamento local protegido e política de limpeza após sincronização.
+6. Definir jornada e procedimento para sessão ainda ativa ao fim da jornada.
+7. Fechar estados e motivos padronizados de visita e a interpretação de precisão GPS, frequência e idade máxima.
+8. Validar a proposta lógica antes de qualquer DDL. Nenhuma alteração foi realizada no Supabase.
+
+#### Segurança e limites
+
+A atualização é documental. Nenhum SQL, DDL, DML, migration, policy, função, trigger, configuração ou dado do Supabase foi alterado. As entidades descritas são propostas lógicas. Não foram feitos testes funcionais de upload, aceite digital, offline, autenticação, GPS ou conformidade jurídica.
