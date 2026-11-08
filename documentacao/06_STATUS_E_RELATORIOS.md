@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 0.9.0  
+**Versão:** 1.0.0  
 **Data-base:** 2026-11-08
 
 ## 1. Resumo executivo
@@ -20,7 +20,7 @@ A documentação passou a incluir um protocolo de fonte da verdade e um procedim
 | Supabase | Auditoria técnica somente leitura realizada em 2026-11-07; relatório versionado | Priorizar revisão de RLS, grants, função de ingestão, integridade multiempresa e trigger de visitas |
 | Permissões | Catálogo global versionado e personalizações por empresa definidos | Auditar implementação e políticas |
 | Isa | Limites de autonomia definidos | Testar autorização no backend/API |
-| Operação | Prioridade V1; baseline funcional 0.1.0 consolidado em 2026-11-08; implementação parcial no Supabase | Refinar pendências do modelo, produzir modelo lógico e matriz de conformidade antes de DDL |
+| Operação | Baseline funcional 0.1.0 e modelo lógico proposto 0.1.0; matriz de conformidade inicial concluída; implementação parcial no Supabase | Validar pendências do modelo lógico, tenancy e requisitos de sessão/GPS antes de aprovar modelo físico |
 | Atendimento | Chatwoot transitório | Mapear dependências e plano de substituição |
 | WeWeb | Direção aprovada | Definir ambiente, autenticação e contratos de API |
 | FlutterFlow | Direção aprovada | Especificar sync offline-first e GPS background |
@@ -97,7 +97,20 @@ Foi criado `documentacao/MODELO_FUNCIONAL_OPERACIONAL_MVP.md`, versão 0.1.0, co
 
 **Estado:** documentação funcional inicial criada; modelo lógico e implementação não aprovados/concluídos. Nenhuma alteração foi realizada no Supabase.
 
-## 7. Modelo para relatórios futuros
+## 7. Modelo lógico de dados e matriz de conformidade — 2026-11-08
+
+Foi criado `documentacao/MODELO_LOGICO_DADOS_OPERACAO.md`, versão 0.1.0. O documento apresenta:
+- cardinalidades entre cliente, equipamento, OS, visita, tarefa, relatos, sessões e eventos;
+- proposta de entidades existentes a aproveitar e entidades novas a criar;
+- regras de integridade multiempresa, autoria, histórico e exclusividade do técnico;
+- matriz requisito × estrutura atual × evidência × ação proposta × prioridade;
+- riscos e decisões pendentes antes de DDL.
+
+**Principais conclusões:** `customers`, `addresses`, `equipments`, `work_orders` e `visits` fornecem uma base parcial; `task_types` é catálogo, não instância de tarefa; `work_order_equipment` não substitui tarefa; não foram encontradas estruturas dedicadas a tarefas por visita, relatos, sessões de execução, eventos GPS históricos ou auditoria append-only. Orçamentos, documentos e autoria exigem complementação.
+
+**Estado:** proposta técnica para validação, não aprovada como modelo físico. Nenhuma alteração foi realizada no Supabase. A ordem de implementação é recomendação, não autorização para DDL.
+
+## 8. Modelo para relatórios futuros
 
 Cada relatório deverá conter:
 - Período e data.
@@ -113,7 +126,7 @@ Cada relatório deverá conter:
 - Documentos oficiais atualizados.
 - Commits, PRs e evidências.
 
-## 8. Status por módulo
+## 9. Status por módulo
 
 Usar apenas estes estados:
 - NOT_STARTED
@@ -129,7 +142,7 @@ Não marcar DONE sem critérios de aceite e evidências.
 
 ## Histórico de alterações
 
-- 2026-11-08 — v0.9.0: registra o modelo funcional operacional do MVP e o confronto somente leitura com o schema Supabase atual.
+- 2026-11-08 — v1.0.0: registra o modelo lógico proposto e a matriz de conformidade da Operação.\n- 2026-11-08 — v0.9.0: registra o modelo funcional operacional do MVP e o confronto somente leitura com o schema Supabase atual.
 - 2026-11-07 — v0.8.0: registra retries limitados para falhas temporárias, estados terminais para falhas permanentes/timeouts e conclusão da drenagem por estados terminais.
 - 2026-11-07 — v0.7.0: registra desativação com drenagem das execuções já aceitas e bloqueio de novas entradas até reativação nos dois níveis.
 - 2026-11-07 — v0.6.0: generaliza o controle de ativação em dois níveis para todos os módulos; registra primeiro usuário humano como superadmin e proíbe agentes de IA como superadmin.
