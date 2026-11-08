@@ -276,3 +276,23 @@ Nenhuma alteração foi realizada no Supabase nesta etapa.
 ### Aprovação complementar — idade de eventos offline (2026-11-08)
 
 O responsável aprovou a janela configurável inicial de 24 horas para reconciliação automática. A idade não é critério isolado: o servidor deve validar sequência, estado atual, identidade/origem, autorização, idempotência e consistência temporal. Eventos com mais de 24 horas seguem para revisão por gestor ou atendente/usuário expressamente autorizado. Esta definição não autoriza alterações no Supabase.
+
+
+## Atualização — 2026-11-08 — plano de migração da fundação multiempresa (Parte A)
+
+**Estado:** proposta técnica criada para aprovação; execução no Supabase não autorizada.
+
+Documento: [PLANO_MIGRACAO_FUNDACAO_MULTIEMPRESA_PARTE_A_MVP.md](relatorios/PLANO_MIGRACAO_FUNDACAO_MULTIEMPRESA_PARTE_A_MVP.md).
+
+A Parte A cobre estrutura física, backfill, constraints, FKs compostas, unicidade por empresa, correções de defaults, integridade, testes e rollback. A Parte B — contexto confiável de empresa, funções auxiliares, grants e RLS — permanece separada até definição do contrato transacional no backend.
+
+Bloqueios identificados na inspeção de 2026-11-08:
+- uma visita sem evidência para determinar o tenant;
+- 26 visitas sem ordem de serviço associada e tabela de OS vazia;
+- divergência entre `company_users.role_identifier` e as duas linhas de `company_user_roles`;
+- desenho físico pendente para catálogos globais e adoção local;
+- reconciliação do catálogo de permissões com a ADR-0011;
+- correção da função de snapshot de endereço depende da inspeção do trigger;
+- baseline de migrations e repositório de implementação ainda não identificados.
+
+Nenhum DDL, DML, migration, policy ou grant foi executado nesta etapa.
