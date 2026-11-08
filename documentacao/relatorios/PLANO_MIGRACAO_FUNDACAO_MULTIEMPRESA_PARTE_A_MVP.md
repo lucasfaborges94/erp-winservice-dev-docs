@@ -179,8 +179,8 @@ A definição física proposta para o catálogo global versionado e sua adoção
 | `company_user_roles` | Adicionar tenant; backfill pelo vínculo pai; FKs compostas para vínculo e papel | 2 linhas deriváveis |
 | `roles` | Manter tenant; impor NOT NULL; chave composta | Backfill anterior concluído |
 | `company_modules` | Manter tenant; validar chave/índice e FK | Tabela vazia |
-| `role_permissions` | Manter tenant; chaves e FKs compostas para papel e permissão | Tabela vazia |
-| `user_permissions` | Manter tenant; FK composta para vínculo e permissão; `allow NOT NULL` | Tabela vazia |
+| `role_permissions` | Manter tenant; FK composta para papel; FK para `company_permissions` somente após aprovação e implementação do desenho ADR-0011 | Tabela vazia |
+| `user_permissions` | Manter tenant; FK composta para vínculo; FK para `company_permissions` somente após aprovação e implementação do desenho ADR-0011; `allow NOT NULL` | Tabela vazia |
 | `role_modules` | Adicionar tenant derivado do papel; FK composta para papel | Tabela vazia |
 | `role_screens` | Adicionar tenant derivado do papel; FK composta para papel | Tabela vazia |
 | `user_modules` | Adicionar tenant derivado do vínculo; FK composta para vínculo | Tabela vazia |
@@ -290,9 +290,9 @@ Criar FKs compostas depois das chaves únicas compostas e da validação dos dad
 | `company_user_roles` | `(company_identifier, role_identifier)` | `roles` | `(company_identifier, identifier)` |
 | `company_users` | `(company_identifier, role_identifier)` | `roles` | `(company_identifier, identifier)` — dependente de decisão formal sobre o campo legado; não executar enquanto pendente |
 | `role_permissions` | `(company_identifier, role_identifier)` | `roles` | `(company_identifier, identifier)` |
-| `role_permissions` | `(company_identifier, permission_identifier)` | `permissions` | `(company_identifier, identifier)` — sujeito ao desenho final ADR-0011 |
+| `role_permissions` | `(company_identifier, permission_identifier)` | `company_permissions` | `(company_identifier, identifier)` — somente após aprovação do modelo físico ADR-0011 |
 | `user_permissions` | `(company_identifier, company_user_identifier)` | `company_users` | `(company_identifier, identifier)` |
-| `user_permissions` | `(company_identifier, permission_identifier)` | `permissions` | `(company_identifier, identifier)` — sujeito ao desenho final ADR-0011 |
+| `user_permissions` | `(company_identifier, permission_identifier)` | `company_permissions` | `(company_identifier, identifier)` — somente após aprovação do modelo físico ADR-0011 |
 | `role_modules` | `(company_identifier, role_identifier)` | `roles` | `(company_identifier, identifier)` |
 | `role_screens` | `(company_identifier, role_identifier)` | `roles` | `(company_identifier, identifier)` |
 | `user_modules` | `(company_identifier, company_user_identifier)` | `company_users` | `(company_identifier, identifier)` |
@@ -343,7 +343,7 @@ Impor `company_identifier NOT NULL` somente depois de backfill e validação sem
 - `customers`, `customer_contacts`, `addresses` e `roles`: dados já preenchidos; validar novamente e impor NOT NULL.
 - `equipments`, `work_orders`, `quotations`, `approval_events`, `role_modules`, `role_screens`, `user_modules` e `user_screens`: tabelas vazias; adicionar coluna e impor NOT NULL sem default artificial.
 - `company_user_roles`: backfill pelo vínculo pai, validar papéis no mesmo tenant e impor NOT NULL.
-- `visits`: NOT NULL bloqueado até resolução documentada da única visita sem evidência de tenant.
+- `visits`: impor NOT NULL depois do backfill das 26 linhas para a empresa Winservice e validação de zero nulos/conflitos.
 
 Outras correções:
 - remover default `gen_random_uuid()` de `work_orders.customer_identifier`;
@@ -409,11 +409,10 @@ Os blocos abaixo são referências para a migration final. Não foram executados
       IF EXISTS (
         SELECT 1
         FROM public.visits v
-        WHERE v.customer_identifier IS NULL
-          AND v.address_identifier IS NULL
-          AND v.company_identifier IS NULL
+        WHERE v.company_identifier IS NULL
+           OR v.company_identifier <> 'a4de8fcf-95fc-432e-88ef-96eaa45a91fc'::uuid
       ) THEN
-        RAISE EXCEPTION 'Preflight: existe visita sem evidência de tenant; resolver antes da fase NOT NULL.';
+        RAISE EXCEPTION 'Preflight: todas as visitas devem pertencer à empresa Winservice.';
       END IF;
 
       IF EXISTS (
@@ -429,7 +428,7 @@ Os blocos abaixo são referências para a migration final. Não foram executados
     END
     $preflight$;
 
-O preflight deverá ser complementado com validações de existência de colunas, constraints, índices, triggers, funções e duplicidades específicas. A visita sem cliente/endereço é um bloqueio conhecido e deverá permanecer explicitamente tratada; não remover essa condição do preflight sem decisão sobre o registro.
+O preflight deverá ser complementado com validações de existência de colunas, constraints, índices, triggers, funções e duplicidades específicas. A ausência de cliente/endereço em uma visita não é bloqueio de tenant, pois a empresa foi confirmada pelo responsável; o preflight deverá verificar que todas as 26 visitas receberam o identificador da Winservice.
 
 ### 5.2 Backfill das associações
 
@@ -488,8 +487,6 @@ O corpo final depende da confirmação da regra para endereços sem `customer_id
 
 | Bloqueio | Evidência | Tratamento necessário |
 |---|---|---|
-| Visita sem cliente/endereço | Uma das 26 visitas não possui cliente, endereço ou OS | Tenant confirmado como Winservice; manter vínculos ausentes sem fabricar dados |
-| Visitas sem OS | `work_order_identifier` nulo em todas; `work_orders` vazia | Permitido: OS é opcional; não criar OS fictícia |
 | Papéis legados divergentes | Duas associações na tabela de junção diferem de `company_users.role_identifier` | Decidir fonte operacional e reconciliar sem perda |
 | Catálogos globais e adoção local | Catálogos têm registros, mas modelo físico de adoção não está aplicado | Individualizar desenho e preservar distinção global/tenant |
 | Catálogo de permissões | `permissions` atual é tenant-scoped; ADR-0011 exige catálogo global versionado e customizações | Avaliar e aprovar a proposta física específica antes de fechar FKs de permissão |
@@ -508,9 +505,9 @@ A migration pode adicionar `company_identifier` a `company_user_roles` a partir 
 
 ### 6.2 Visitas — tratamento proposto
 
-As 25 visitas com cliente poderão receber tenant derivado do cliente após validação cliente/endereço. A visita sem evidência deve permanecer bloqueada. A coluna poderá ser adicionada nullable e o backfill parcial preparado, mas a migration não poderá declarar a fundação concluída nem impor NOT NULL até resolução.
+As 26 visitas existentes pertencem à Winservice, conforme confirmação expressa do responsável. O backfill deverá atribuir o tenant da Winservice a todas as linhas, inclusive à visita sem cliente/endereço/OS. Essa ausência de vínculos não deve ser corrigida com registros artificiais.
 
-Os estados legados permanecem inalterados. A associação obrigatória a OS deverá ser resolvida antes de ativar o fluxo operacional, mas não por criação automática de registros.
+A OS é opcional para uma visita. `work_order_identifier` permanece nullable e, quando preenchido, deverá respeitar FK composta para uma OS da mesma empresa. Os estados legados permanecem inalterados nesta migração.
 
 ---
 
@@ -581,10 +578,9 @@ A Parte A não substitui testes de autorização da Parte B. FKs compostas prote
 
 Autorizar execução somente depois de:
 - aprovação deste plano e dos pontos de decisão;
-- resolução documentada da visita sem tenant;
-- definição do tratamento das 26 visitas sem OS;
+- backfill das 26 visitas para Winservice e validação de zero nulos/conflitos;
 - decisão sobre divergência entre `company_users.role_identifier` e `company_user_roles`;
-- definição do desenho físico do catálogo de permissões e catálogos de tarefa/requisito;
+- aprovação ou ajuste da proposta física do catálogo de permissões e definição do desenho de catálogos de tarefa/requisito;
 - inspeção final do trigger de endereço;
 - definição do repositório oficial de migrations e baseline;
 - backup restaurável e ensaio em ambiente não produtivo;
@@ -607,4 +603,5 @@ Autorizar execução somente depois de:
 
 ### Histórico
 
-- 2026-11-08 — v0.1.0: proposta da Parte A preparada após concordância do responsável em separar estrutura/integridade da Parte B de autorização. Inclui evidências atuais do banco, classificação, sequência, SQL de referência, bloqueios, testes e rollback. Nenhuma alteração de banco executada.
+- 2026-11-08 — v0.1.0: proposta inicial da Parte A.
+- 2026-11-08 — v0.2.0: confirmação de que todas as 26 visitas pertencem à Winservice; OS opcional; esclarecida a ausência de decisão formal sobre a remoção de `company_users.role_identifier`; incluída proposta física separada do catálogo de permissões. Nenhuma alteração de banco executada.
