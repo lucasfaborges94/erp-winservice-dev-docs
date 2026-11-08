@@ -1,7 +1,7 @@
 # Continuidade e transferência de trabalho — ERP Winservice
 
 **Documento:** Procedimento de continuidade e transferência  
-**Versão:** 1.4.0  
+**Versão:** 1.5.0  
 **Data:** 2026-11-07  
 **Estado:** procedimento estabelecido; registro inicial de referência
 
@@ -1006,3 +1006,42 @@ A implementação depende de corrigir e validar tenancy, FKs compostas, RLS e au
 ### Complemento da sessão — aprovação da janela de reconciliação offline
 
 Em 2026-11-08, o responsável aprovou a janela configurável inicial de 24 horas para reconciliação automática de eventos offline. A idade não substitui as validações de sequência, estado atual, identidade/origem, autorização, idempotência e consistência temporal. Eventos com mais de 24 horas não são reconciliados automaticamente e devem ser encaminhados à revisão autorizada. Nenhuma alteração no banco foi autorizada ou executada.
+
+
+### Sessão — 2026-11-08 — aprovação da fundação física multiempresa do MVP
+
+**Etapa:** fundação multiempresa, integridade e autorização  
+**Estado:** especificação física aprovada; preparação de migrations é a próxima atividade; execução no Supabase não autorizada.
+
+#### Aprovação recebida
+
+O responsável aprovou explicitamente a especificação `documentacao/ESPECIFICACAO_FISICA_FUNDACAO_MULTIEMPRESA_MVP.md` v0.1.0. A aprovação valida a direção física e os contratos descritos, incluindo:
+- `company_identifier NOT NULL` em todas as tabelas tenant-scoped, inclusive tabelas filhas e associações;
+- exceções para identidade global (`users`), raiz do tenant (`companies`), identidade do provedor (`auth.users`) e catálogos/infraestrutura genuinamente globais;
+- FKs compostas para impedir relacionamentos entre empresas;
+- RLS com negação por padrão, grants mínimos e backend/API como barreiras complementares;
+- migração faseada, backfill baseado em evidência e testes negativos entre tenants.
+
+A aprovação foi registrada na especificação como versão 0.2.0.
+
+#### Limites da aprovação
+
+- Não autoriza DDL, DML, migrations, grants, policies, funções, triggers, alterações de configuração ou dados no Supabase.
+- Itens expressamente pendentes na especificação continuam pendentes e não foram implicitamente aprovados.
+- Dados legados sem tenant ou relações ambíguas não podem receber backfill presumido.
+- A decisão sobre unicidade de CPF/CNPJ por empresa versus global permanece sujeita à confirmação registrada no documento.
+
+#### Próxima atividade
+
+Preparar o pacote de migrations/DDL detalhado, por fases e em ordem executável, com plano de backfill, validações pré/pós, testes automatizados de isolamento e autorização, estratégia de rollback e identificação dos pontos que ainda exigem decisão. Apresentar o pacote para autorização explícita separada antes de qualquer execução no Supabase.
+
+#### Artefatos alterados
+
+| Arquivo | Alteração | Referência |
+|---|---|---|
+| `documentacao/ESPECIFICACAO_FISICA_FUNDACAO_MULTIEMPRESA_MVP.md` | Estado atualizado para APROVADA; limite de autorização de DDL explicitado | Commit `160cd5a5e1a8edebb71841654e8ba8241b7e4b53` |
+| `documentacao/08_CONTINUIDADE_E_TRANSFERENCIA.md` | Registro desta sessão e próxima atividade | Commit desta atualização |
+
+#### Segurança e limites
+
+Nenhuma conexão de escrita ao Supabase foi usada e nenhuma alteração de banco foi executada. A aprovação é documental e arquitetural, não autorização operacional.
