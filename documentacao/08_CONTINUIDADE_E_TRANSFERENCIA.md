@@ -162,6 +162,89 @@ Fazer uma auditoria de consistência documental do repositório: validar links r
 
 ## 8. Histórico de sessões
 
+### 2026-11-08 — Encerramento da sessão e preparação da retomada do MVP
+
+#### 1. Objetivo
+
+Encerrar a sessão de trabalho, consolidar no repositório todas as decisões e atividades realizadas nesta conversa e deixar instruções suficientes para retomar o desenvolvimento do MVP na próxima sessão, sem depender do histórico desta conversa.
+
+#### 2. Contexto consultado
+
+Foram consultados diretamente na branch `main`:
+- `00_FONTE_DA_VERDADE.md`;
+- `documentacao/PROTOCOLO_DE_ATUACAO_IA_GITHUB.md`;
+- `documentacao/00_LEIA-ME.md`;
+- `documentacao/06_STATUS_E_RELATORIOS.md`;
+- `documentacao/07_GOVERNANCA_DOCUMENTAL.md`;
+- `documentacao/08_CONTINUIDADE_E_TRANSFERENCIA.md`;
+- árvore de arquivos e metadados do repositório.
+
+#### 3. Trabalho realizado
+
+- Confirmado que o repositório já possuía fonte da verdade, governança documental, ADRs, status e histórico de continuidade.
+- Formalizado o GitHub como memória documental oficial e persistente do projeto.
+- Atualizado o protocolo para exigir recuperação do contexto no início de novas sessões e manutenção da memória nos documentos especializados.
+- Atualizado o mapa documental para explicar a distinção entre memória oficial e contexto auxiliar de ferramentas de IA.
+- Relidos os arquivos publicados após as alterações e confirmados os commits.
+- Atualizados o status do desenvolvimento e este registro de continuidade para preparar a retomada.
+
+#### 4. Decisões e instruções do responsável
+
+- O repositório GitHub `lucasfaborges94/erp-winservice-dev-docs` é a memória documental oficial do ERP Winservice.
+- Histórico de conversas, memória interna de IA, resumos e cópias anexadas são auxiliares e não substituem a documentação versionada.
+- O conhecimento deve permanecer organizado em documentos especializados; não criar um arquivo monolítico de memória.
+- O responsável encerrou a sessão por hoje e determinou que o trabalho no desenvolvimento do MVP seja retomado amanhã/próxima sessão.
+- A retomada deve partir do último estado documentado da frente Operação, conferindo pendências nos modelos funcional e lógico e verificando o estado remoto atual.
+- Não interpretar a intenção de continuar o MVP como autorização automática para executar DDL, modificar Supabase, alterar infraestrutura ou aprovar propostas ainda pendentes.
+
+#### 5. Artefatos alterados nesta sessão
+
+- `00_FONTE_DA_VERDADE.md`
+- `documentacao/PROTOCOLO_DE_ATUACAO_IA_GITHUB.md`
+- `documentacao/00_LEIA-ME.md`
+- `documentacao/06_STATUS_E_RELATORIOS.md`
+- `documentacao/08_CONTINUIDADE_E_TRANSFERENCIA.md`
+
+Os três primeiros foram atualizados na etapa de formalização da memória. Os dois últimos foram atualizados no fechamento desta sessão.
+
+#### 6. Verificações e commits
+
+- Os quatro primeiros arquivos da etapa de formalização foram relidos no GitHub após a publicação.
+- Commits da etapa de formalização:
+  - `63cb4faacf854a32a7516a30caafcb6ca0d5fc00` — `00_FONTE_DA_VERDADE.md`;
+  - `4061d55d3fe6bb61f8bec4a4f5e785e65d85758f` — `documentacao/PROTOCOLO_DE_ATUACAO_IA_GITHUB.md`;
+  - `fb5b7ebea3ab4b43b8a798a4e5580201ef5e0617` — `documentacao/00_LEIA-ME.md`;
+  - `0c7cb5e414c7e66c76b70f068b42adaf23ebe826` — primeira atualização deste registro de continuidade.
+- Os commits de fechamento do status e da continuidade serão registrados após a publicação e verificação correspondentes.
+
+#### 7. Estado ao encerrar
+
+A memória documental oficial e seu procedimento de recuperação estão formalizados no repositório. O status e o registro de continuidade passam a indicar explicitamente que a próxima sessão deverá retomar o desenvolvimento do MVP.
+
+Nenhum desenvolvimento funcional do MVP foi executado nesta sessão; o trabalho realizado foi de governança e documentação.
+
+#### 8. Pendências e bloqueios
+
+- Retomar o desenvolvimento do MVP na próxima sessão.
+- Antes de começar, conferir branch, HEAD, documentos de continuidade e status.
+- Revisar as pendências ainda abertas nos modelos funcional e lógico da Operação e identificar a próxima atividade concreta e seus critérios de aceite.
+- Não assumir aprovação do modelo lógico como modelo físico.
+- Não executar alterações no Supabase ou infraestrutura sem autorização específica.
+- Proteção da branch `main` e estado de Secret Scanning continuam sem alteração; não foram configurados nesta sessão.
+
+#### 9. Riscos e observações
+
+O repositório não é carregado automaticamente em toda conversa. A continuidade depende de executar o protocolo de recuperação pela integração do GitHub. Se o acesso não estiver disponível, a limitação deverá ser informada e o contexto não deverá ser presumido.
+
+#### 10. Próxima atividade recomendada
+
+Retomar o trabalho de desenvolvimento do MVP, começando pela frente Operação e pelo último estado registrado nos documentos funcionais, lógicos e de continuidade. Confirmar o escopo exato da próxima entrega antes de qualquer alteração técnica.
+
+#### 11. Instruções para quem assumir
+
+Começar pelo `00_FONTE_DA_VERDADE.md`, seguir o protocolo de atuação com GitHub, ler esta sessão e comparar a referência documental com o HEAD atual. Consultar `06_STATUS_E_RELATORIOS.md`, `MODELO_FUNCIONAL_OPERACIONAL_MVP.md`, `MODELO_LOGICO_DADOS_OPERACAO.md` e ADRs pertinentes. Distinguir requisitos confirmados de propostas pendentes. Não modificar Supabase, código ou infraestrutura sem a autorização correspondente.
+
+
 ### 2026-11-08 — Formalização do repositório como memória documental oficial
 
 #### 1. Objetivo
