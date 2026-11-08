@@ -1194,3 +1194,10 @@ A aprovação não resolve as decisões ainda abertas na proposta e não autoriz
 **Próxima atividade:** preparar a especificação executável e o pacote de migração, começando pelo inventário de dependências das tabelas atuais `permissions`, `role_permissions` e `user_permissions`, validação do registro legado, definição dos códigos estáveis e identificação do repositório/baseline de migrations. Apresentar o pacote para revisão e autorização operacional específica antes de qualquer execução.
 
 **Limites:** nenhuma alteração no Supabase foi realizada nesta atualização documental.
+
+
+### Complemento — auditoria somente leitura das estruturas de permissões (2026-11-08)
+
+Após a aprovação do modelo físico, foi inspecionado o schema atual do Supabase. Foram encontrados 1 registro em `permissions` (`customer/view`, ainda sem código estável), nenhum registro em `role_permissions` ou `user_permissions`, FKs individuais sem garantia composta de tenant, `user_permissions.allow` nullable, RLS habilitado sem policies retornadas para as três tabelas e nenhum trigger não interno. O único registro legado pertence à Winservice e permaneceu intacto. Detalhes e limitações estão na proposta física v0.3.0.
+
+Nenhuma alteração de dados ou schema foi executada. A próxima etapa é fechar os pontos técnicos pendentes e preparar a especificação executável/migration draft, sem executar no Supabase.
