@@ -1,6 +1,6 @@
 # Controle de escopo do MVP — itens ignorados, futuros e obsoletos
 
-**Versão:** 0.1.0  
+**Versão:** 0.2.0  
 **Data de criação:** 2026-11-08  
 **Estado:** inventário incremental  
 **Escopo de referência:** MVP operacional do ERP Winservice
@@ -26,6 +26,12 @@ A classificação documental não autoriza excluir tabelas, funções, colunas, 
 
 | Item | Tipo | Classificação | Destino / tratamento | Evidência e observações |
 |---|---|---|---|---|
+| `public.documents` | Catálogo de documentos da empresa | **PENDENTE_CLASSIFICAÇÃO** | Catálogo geral de documentos, incluindo evidências e outros documentos da empresa; os arquivos serão armazenados em outro local. A inclusão funcional no MVP ainda precisa ser confirmada conforme os fluxos de evidências/documentos. | Finalidade esclarecida pelo responsável em 2026-11-08. A tabela possui metadados de arquivo e armazenamento (`storage_disk`, `storage_path`, `filename`, `mime_type`, `size`, entre outros). Não presumir que os binários serão armazenados no PostgreSQL. |
+| `public.work_order_equipment` | Relação física OS–equipamento | **OBSOLETO_SUBSTITUÍDO** | Não utilizar no desenho atual. O equipamento será relacionado à visita, e a visita à OS. A relação direta OS–equipamento não foi finalizada e foi substituída conceitualmente pela associação no nível da visita. Não remover fisicamente a tabela sem análise e autorização próprias. | Deliberação do responsável em 2026-11-08; a tabela existe no schema, mas a relação direta não representa o modelo operacional vigente. |
+| `public.contact_channels` | Catálogo de canais de contato do cliente | **PENDENTE_CLASSIFICAÇÃO** | Finalidade definida: registrar canais como WhatsApp, Instagram, e-mail e telefone. A inclusão no MVP ainda depende da confirmação dos requisitos do cadastro/atendimento. | Esclarecimento do responsável em 2026-11-08. |
+| `public.a_blank_template` | Template técnico de criação de tabelas | **FORA_MVP** | Não é entidade funcional do ERP nem requisito de negócio do MVP. Tratar apenas como artefato auxiliar de desenvolvimento, se ainda necessário. | Esclarecimento do responsável em 2026-11-08: template utilizado para criação de novas tabelas. |
+| `public.entity_types` e `public.entity_status` | Catálogos genéricos de entidades e status | **FORA_MVP** | Não adotar como dependência do MVP. Poderão ser reutilizados pontualmente se uma necessidade concreta justificar, após avaliação. Não foram utilizados em produção. | Esclarecimento do responsável em 2026-11-08. |
+| `public.integrations`, `public.integration_sync_queue` e `public.integration_webhooks` | Infraestrutura de integrações | **FORA_MVP** | Excluir do escopo funcional e técnico do MVP atual. Não implementar nem depender dessas estruturas nesta etapa. Não remover fisicamente sem análise de dependências e autorização. | Deliberação do responsável em 2026-11-08. |
 | `public.expenses` | Tabela existente no Supabase | **FORA_MVP** | Reservada ao futuro módulo Financeiro. Ignorar no desenho e desenvolvimento do MVP operacional. Reavaliar quando o Financeiro for especificado. | A listagem do schema `public` confirmou a tabela, RLS habilitado e zero registros na consulta realizada. Possui referências a `companies` (`company_identifier`) e `users` (`created_by`, `updated_by`). Não excluir nem alterar agora. |
 | `public.can_view_expense(uuid)` | Função SQL existente | **FORA_MVP** | Ignorar no escopo atual e reavaliar junto ao módulo Financeiro. | Função associada ao domínio de despesas, registrada na auditoria anterior. A classificação não autoriza alteração ou remoção de função ou privilégios. |
 | Módulo Financeiro — despesas, contas, recebimentos, pagamentos, conciliação e indicadores | Módulo de negócio | **FUTURO** | Fora do MVP operacional atual; detalhar em etapa própria. | O mapa de módulos registra o escopo Financeiro como “a detalhar”. A tabela `public.expenses` é o elemento físico já identificado; não presumir que todas as demais entidades financeiras existam no banco. |
@@ -50,7 +56,7 @@ A classificação documental não autoriza excluir tabelas, funções, colunas, 
 ## 5. Limites e pendências do levantamento
 
 - O inventário é incremental, não uma declaração de que todos os elementos do projeto já foram examinados.
-- O schema Supabase foi consultado para confirmar `public.expenses`; não foi realizada auditoria completa de todas as tabelas de domínio neste passo.
+- O schema Supabase foi inspecionado em 2026-11-08 para identificar tabelas e policies RLS. Os resultados e limitações estão registrados em `documentacao/auditorias/AUDITORIA_DADOS_AUTORIZACAO_2026-11-08.md`; consultar esse registro antes de repetir a inspeção.
 - A presença física de `visit_execution_sessions` e `visit_execution_events` não foi verificada.
 - O inventário deverá ser enriquecido conforme avançarmos na análise dos módulos, tabelas, funções, workflows e código das aplicações.
 - A classificação de um módulo como futuro não permite inferir automaticamente que toda tabela existente com nome relacionado a esse domínio deva ser removida.
@@ -66,4 +72,5 @@ A classificação documental não autoriza excluir tabelas, funções, colunas, 
 
 ## Histórico
 
+- 2026-11-08 — v0.2.0: incorpora esclarecimentos do responsável sobre documentos, canais de contato, relação equipamento–OS substituída por equipamento–visita, catálogos genéricos, template técnico e integrações; registra classificações e tratamentos sem autorizar exclusões físicas.
 - 2026-11-08 — v0.1.0: criação do inventário incremental; inclusão da tabela `public.expenses`, função associada, domínio Financeiro, check-in inicial automático, estruturas conceituais substituídas, relação N:M não incluída no desenho inicial, Chat próprio futuro e administração SaaS futura.
