@@ -1,6 +1,6 @@
 # ERP Winservice — Base oficial de documentação
 
-**Versão do pacote:** 0.8.0  
+**Versão do pacote:** 0.9.0  
 **Data de consolidação:** 2026-11-08  
 **Estado:** baseline documental em evolução  
 **Projeto:** ERP Winservice
@@ -28,6 +28,7 @@ Esta documentação é a referência persistente para planejar, especificar, des
     ├── 08_CONTINUIDADE_E_TRANSFERENCIA.md
     ├── MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md
     ├── MODELO_FUNCIONAL_OPERACIONAL_MVP.md
+    ├── MODELO_LOGICO_DADOS_OPERACAO.md
     ├── RASCUNHO.md
     └── decisoes/
         ├── ADR-TEMPLATE.md
@@ -47,8 +48,9 @@ Esta documentação é a referência persistente para planejar, especificar, des
 9. [Governança documental](07_GOVERNANCA_DOCUMENTAL.md) — regras de aprovação, atualização e versionamento.
 10. [Continuidade e transferência](08_CONTINUIDADE_E_TRANSFERENCIA.md) — encerramento e retomada de trabalho entre pessoas e ferramentas.
 11. [Modelo de autorização e isolamento multiempresa](MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md) — proposta técnica para discussão; não aprovada.
-12. [Modelo funcional operacional do MVP](MODELO_FUNCIONAL_OPERACIONAL_MVP.md) — requisitos funcionais de Operação e confronto inicial com o schema Supabase; não substitui ADRs nem comprova implementação.
-13. [Modelo lógico de dados e matriz de conformidade — Operação](MODELO_LOGICO_DADOS_OPERACAO.md) — proposta técnica para validação; não aprovada como modelo físico.\n14. [Rascunho](RASCUNHO.md) — ideias e propostas ainda não aprovadas.
+12. [Modelo funcional operacional do MVP](MODELO_FUNCIONAL_OPERACIONAL_MVP.md) — requisitos funcionais de Operação, incluindo requisitos, evidências e aceite digital; não substitui ADRs nem comprova implementação.
+13. [Modelo lógico de dados e matriz de conformidade — Operação](MODELO_LOGICO_DADOS_OPERACAO.md) — proposta técnica para validação; não aprovada como modelo físico.
+14. [Rascunho](RASCUNHO.md) — ideias e propostas ainda não aprovadas.
 
 ## Regras essenciais
 
@@ -70,6 +72,7 @@ Esses arquivos são fotografias técnicas daquela data, não garantia de que o a
 
 ## Histórico deste arquivo
 
+- 2026-11-08 — v0.9.0: atualização do mapa documental para incluir o escopo consolidado de requisitos, evidências e aceite digital nos modelos funcional e lógico.
 - 2026-11-08 — v0.8.0: consolidação das definições de GPS, histórico de posições, finalização de visita, histórico append-only aprovado e proposta de catálogo global versionado.
 - 2026-11-08 — v0.8.0: consolidação das definições de GPS, histórico de posições, finalização de visita, histórico append-only aprovado e proposta de catálogo global versionado.
 - 2026-11-08 — v0.7.0: atualização do modelo lógico com decisões funcionais sobre execução da visita, GPS, catálogo global editável por empresa e vínculo de orçamento.
