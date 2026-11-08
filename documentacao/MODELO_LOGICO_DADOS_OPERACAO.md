@@ -363,6 +363,12 @@ Não definir a lista de estados ativos até fechar a máquina de estados da visi
 - Os limiares de saída e retorno são assimétricos de propósito e evitam alternância frequente perto de um único limite (histerese).
 - GPS automático deve ser idempotente: repetição de callback/localização não pode criar início, pausa ou retomada duplicados.
 - Visita finalizada não deve ser silenciosamente reativada por mera chegada GPS.
+- Check-in inicial automático exige permanência de 5 minutos dentro de 50 metros, ambos configuráveis.
+- A amostra GPS é aceita inicialmente quando a incerteza reportada é de até 50 metros, limite configurável.
+- Manter histórico de posições dos técnicos em `technician_gps_positions`, separando `captured_at` de `received_at`.
+- Em perda de sinal, a última posição recebida permanece como última referência conhecida; registrar idade e não tratá-la como posição atual. Não gerar transição automática baseada somente em amostra obsoleta.
+- A execução/visita deve ser finalizada quando uma nova tarefa provocar a transição para fora da visita atual, quando iniciar novo deslocamento ou quando terminar a jornada do técnico responsável. O comportamento exato da transição quando uma tarefa começa dentro da mesma visita precisa ser confirmado.
+- A finalização por tarefa/deslocamento/jornada deve preservar relato textual com as palavras do técnico, status de destino e motivo de abandono/interrupção. Os valores padronizados de status/motivo e o tratamento de ausência de conectividade ainda serão definidos.
 - Precisão mínima, frequência de amostragem, tolerância, perda de sinal, localização simulada/antifraude e tratamento de ausência de coordenadas continuam pendentes.
 - Check-in inicial confirmado: permanência de 5 minutos dentro do raio configurável de 50 metros.
 - Limite inicial de aceitação da precisão GPS: até 50 metros de incerteza reportada, configurável; valores menores indicam maior precisão.
@@ -444,7 +450,7 @@ Legenda:
 2. **Núcleo operacional:** ajustar `customers`, `addresses`, `equipments`, `work_orders` e `visits`.
 3. **Tarefas e catálogo:** `visit_tasks`, escopo/versionamento de `task_types` e requisitos por tipo.
 4. **Relatos e evidências:** `visit_reports`, `task_reports`, vínculo de documentos e regra de encerramento com relato.
-5. **Execução e GPS:** sessões e eventos da visita, idempotência, exclusividade do técnico, pausa/retomada e limite de jornada.
+5. **Execução e GPS:** sessões e eventos da visita, histórico de posições dos técnicos, idempotência, exclusividade, pausa/retomada e finalização por transição/jornada.
 6. **Histórico e auditoria:** snapshots, eventos imutáveis e revisões, autoria de humano/agente/sistema.
 7. **Comercial:** vínculo exclusivo opcional de orçamento a OS, visita ou tarefa, versões e aprovação.
 8. **Migração e testes:** plano de migração de dados, constraints, RLS, concorrência, GPS simulado, falhas offline e regressão.
@@ -456,14 +462,14 @@ Não executar essa sequência sem aprovação do modelo físico, plano de migra�
 1. **Requisitos dinâmicos por tipo:** quais tipos de campos serão suportados inicialmente (texto, seleção, número, data, foto, documento, assinatura etc.) e como serão versionados?
 2. **Equipamento indefinido:** confirmar formalmente os três valores propostos: identificado, não identificado e não aplicável.
 3. **Check-in inicial:** confirmar se a regra de permanência de 5 minutos dentro de 50 metros continua válida para o primeiro início da visita.
-4. **GPS:** definir precisão mínima, frequência de amostragem, tolerância, perda de sinal, localização simulada/antifraude e condição exata para retomada quando houver incerteza.
-5. **Jornada:** definir horário de corte, fuso, dias úteis e exceções para finalização automática de execução pausada.
+4. **GPS:** definir frequência de amostragem, idade máxima operacional, retenção, localização simulada/antifraude e tratamento de leituras inconsistentes.
+5. **Jornada:** definir horário de corte, fuso, dias úteis e exceções para finalização da visita e sua sessão de execução.
 6. **Visita:** definir estados e transições operacionais próprios, sem confundi-los com a máquina de estados reutilizável do módulo Chat.
 7. **Relato de transição:** definir conteúdo mínimo e obrigatoriedade do relato ao finalizar a visita anterior para iniciar outra; esclarecer também o fluxo quando o técnico não consegue registrar o relato imediatamente.
-8. **Auditoria imutável:** validar a recomendação de eventos append-only + revisões/snapshots, incluindo retenção, correções, proteção contra UPDATE/DELETE e estratégia de integridade.
+8. **Auditoria imutável:** detalhar retenção, correções, proteção contra UPDATE/DELETE e estratégia de integridade, conforme ADR-0016 aprovada.
 9. **Documentos:** definir relação e armazenamento de fotos/documentos por tarefa e visita.
 10. **Identidade:** normalizar referências de autoria para usuário humano, agente autônomo e sistema.
-11. **Catálogo por empresa:** detalhar como personalizações de tipos globais serão preservadas ao publicar novas versões globais.
+11. **Catálogos globais:** aprovar ou ajustar o repositório versionado e a política de atualização/merge das personalizações.
 
 ## 10. Riscos e pré-condições antes de DDL
 
@@ -488,5 +494,5 @@ Não executar essa sequência sem aprovação do modelo físico, plano de migra�
 ## Histórico de alterações
 
 - 2026-11-08 — v0.3.0: inclusão do histórico GPS de técnicos, precisão configurável de até 50 m, posição mais recente sem inferência a partir de amostra obsoleta, gatilhos de finalização por nova tarefa/deslocamento/fim de jornada, confirmação do check-in inicial e aprovação da diretriz append-only; detalhada proposta de repositório global de catálogos versionados.
-- 2026-11-08 — v0.2.0: revisão após decisões funcionais sobre catálogo global editável por empresa, vínculo exclusivo opcional de orçamento, execução/sessões no nível da visita, limiares GPS de pausa/retomada e transição entre visitas. Removidas sessões de tarefa; máquina de estados do módulo Chat mantida separada. Histórico append-only registrado como recomendação pendente de validação.
+- 2026-11-08 — v0.2.0: revisão após decisões funcionais sobre catálogo global editável por empresa, vínculo exclusivo opcional de orçamento, execução/sessões no nível da visita, limiares GPS de pausa/retomada e transição entre visitas. Removidas sessões de tarefa; máquina de estados do módulo Chat mantida separada.
 - 2026-11-08 — v0.1.0: criação do modelo lógico proposto e matriz de conformidade inicial com o schema Supabase.
