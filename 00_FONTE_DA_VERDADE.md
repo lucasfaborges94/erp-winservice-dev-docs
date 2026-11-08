@@ -1,7 +1,7 @@
 # ERP Winservice — Fonte da verdade e protocolo de trabalho
 
 **Documento:** Fonte da verdade do projeto  
-**Versão:** 1.0.0  
+**Versão:** 1.1.0  
 **Data:** 2026-11-07  
 **Idioma oficial:** Português (Brasil)  
 **Repositório oficial:** https://github.com/lucasfaborges94/erp-winservice-dev-docs  
@@ -12,6 +12,16 @@
 Este documento estabelece como qualquer pessoa, equipe ou sistema de inteligência artificial deve compreender, consultar, desenvolver, revisar e documentar o ERP Winservice.
 
 O projeto deve ser independente de uma conta específica, conversa, fornecedor de IA, IDE ou profissional. O conhecimento necessário para dar continuidade ao trabalho deve permanecer em artefatos versionados e acessíveis no repositório.
+
+### 1.1 Memória documental oficial
+
+O repositório GitHub indicado neste documento é a **memória documental oficial e persistente do ERP Winservice**. Ele deve concentrar o conhecimento necessário para compreender, decidir, desenvolver, auditar e retomar o projeto, independentemente da conta, conversa, ferramenta de IA ou profissional utilizado.
+
+A memória documental é formada pelo conjunto de documentos oficiais, ADRs, registros de continuidade, especificações, relatórios, inventários datados e, quando aplicável, código, migrações e evidências versionadas. Cada informação deve permanecer no artefato especializado correspondente; não se deve criar um arquivo monolítico que replique todo o projeto.
+
+A memória interna de ferramentas de IA, o histórico de conversas, anexos e resumos são recursos auxiliares de contexto. **Não substituem o repositório e não prevalecem sobre suas fontes primárias.** Quando houver divergência, o agente deve consultar a autoridade definida na seção 2, registrar a inconsistência e não escolher silenciosamente uma versão.
+
+Toda sessão que produza decisão, requisito, alteração, descoberta técnica relevante ou mudança de estado deve deixar registro documental suficiente para retomada, conforme a seção 9 e o procedimento de continuidade.
 
 Este protocolo aplica-se, entre outros, a ChatGPT, Claude, Gemini, outras ferramentas de IA, desenvolvedores, arquitetos, analistas, consultores e responsáveis pela manutenção.
 
@@ -153,4 +163,5 @@ Mudanças neste documento devem ser revisadas pelo responsável pelo projeto. Al
 
 ## Histórico de alterações
 
+- 2026-11-08 — v1.1.0: explicita o repositório como memória documental oficial e diferencia memória persistente de contexto auxiliar de ferramentas de IA.
 - 2026-11-07 — v1.0.0: criação do protocolo independente de fornecedor, conta, ferramenta ou profissional, com regras de autoridade por tipo de informação, consulta, execução, aprovação, segurança e transferência.
