@@ -1,6 +1,6 @@
 # ERP Winservice — Base oficial de documentação
 
-**Versão do pacote:** 0.9.0  
+**Versão do pacote:** 1.0.0  
 **Data de consolidação:** 2026-11-08  
 **Estado:** baseline documental em evolução  
 **Projeto:** ERP Winservice
@@ -8,6 +8,8 @@
 ## Objetivo
 
 Esta documentação é a referência persistente para planejar, especificar, desenvolver, auditar e evoluir o ERP Winservice. Ela deve permitir continuidade por diferentes contas, ferramentas de IA, profissionais e equipes, sem dependência de históricos privados de conversa.
+
+**Memória oficial do projeto:** o repositório Git é a memória documental persistente. Históricos de conversa, memórias internas de IA e cópias anexadas são auxiliares e não substituem os documentos versionados. Toda sessão relevante deve consultar a fonte da verdade e registrar decisões, mudanças e continuidade nos documentos especializados.
 
 **Ponto de entrada obrigatório:** [00_FONTE_DA_VERDADE.md](../00_FONTE_DA_VERDADE.md), na raiz do repositório. Ele define a autoridade das fontes, o protocolo de trabalho, aprovação, segurança e transferência.
 
@@ -72,6 +74,7 @@ Esses arquivos são fotografias técnicas daquela data, não garantia de que o a
 
 ## Histórico deste arquivo
 
+- 2026-11-08 — v1.0.0: explicita o repositório como memória documental oficial do projeto e os históricos de conversa como contexto auxiliar.
 - 2026-11-08 — v0.9.0: atualização do mapa documental para incluir o escopo consolidado de requisitos, evidências e aceite digital nos modelos funcional e lógico.
 - 2026-11-08 — v0.8.0: consolidação das definições de GPS, histórico de posições, finalização de visita, histórico append-only aprovado e proposta de catálogo global versionado.
 - 2026-11-08 — v0.8.0: consolidação das definições de GPS, histórico de posições, finalização de visita, histórico append-only aprovado e proposta de catálogo global versionado.
