@@ -20,7 +20,7 @@ A documentação passou a definir explicitamente o repositório GitHub como mem�
 | Supabase | Auditoria técnica somente leitura realizada em 2026-11-07; relatório versionado | Priorizar revisão de RLS, grants, função de ingestão, integridade multiempresa e trigger de visitas |
 | Permissões | Catálogo global versionado e personalizações por empresa definidos | Auditar implementação e políticas |
 | Isa | Limites de autonomia definidos | Testar autorização no backend/API |
-| Operação | Modelos funcional v0.5.0 e lógico v0.4.0; requisitos de pendências, avaliações históricas, evidências e aceite digital consolidados; implementação parcial no Supabase ainda não reavaliada | Fechar parâmetros de upload/identificação/aceite, validar modelo lógico, tenancy e requisitos de jornada antes de aprovar modelo físico |
+| Operação | Modelo funcional v0.6.0 e modelo lógico v0.5.0; Máquina A única aprovada; Máquina B eliminada; histórico unificado em visit_events; tarefas sem estados; Base de Conhecimento conceitualmente aprovada; implementação parcial no Supabase ainda não reavaliada | Especificar modelo físico de visit_events, idempotência/concorrência, jornada, GPS e validar tenancy antes de qualquer DDL |
 | Atendimento | Chatwoot transitório | Mapear dependências e plano de substituição |
 | WeWeb | Direção aprovada | Definir ambiente, autenticação e contratos de API |
 | FlutterFlow | Direção aprovada | Especificar sync offline-first e GPS background |
