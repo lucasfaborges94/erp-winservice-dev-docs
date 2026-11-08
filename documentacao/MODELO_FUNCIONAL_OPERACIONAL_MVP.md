@@ -1,6 +1,6 @@
 # Modelo funcional operacional do MVP — ERP Winservice
 
-**Versão:** 0.3.0  
+**Versão:** 0.4.0  
 **Data da consolidação:** 2026-11-08  
 **Estado:** baseline funcional em consolidação  
 **Escopo:** clientes, equipamentos, ordens de serviço, visitas, tarefas, relatos, execução técnica por GPS, orçamentos e aprovações.
@@ -117,11 +117,13 @@ Parâmetros anteriormente definidos:
 - Permanência mínima dentro do raio: **5 minutos**, configurável.
 - Pré-condição: a visita deve estar em deslocamento (in_displacement).
 
-A permanência de 5 minutos para o primeiro check-in precisa ser confirmada em conjunto com os novos limiares de pausa e retomada; não deve ser confundida com a regra de retomada.
+Confirmado: o primeiro check-in automático exige permanência de 5 minutos dentro do raio configurável de 50 metros. Essa regra é distinta da retomada automática da execução pausada.
 
 Quando as condições de check-in forem satisfeitas, registrar a chegada/início da execução da visita. Não iniciar uma tarefa individual: as tarefas são atividades registradas dentro da visita.
 
 O evento automático deve preservar horário, coordenadas, precisão GPS, parâmetros aplicados e identificação do processo que o produziu. Eventos repetidos de localização não podem gerar check-ins duplicados.
+
+A leitura GPS será aceita inicialmente quando o raio de incerteza reportado pelo dispositivo for de até 50 metros; esse limite é configurável. Valores menores representam leituras mais precisas. Em perda de sinal, o sistema conserva como referência a posição mais recente recebida, registrando sua data/hora e idade. Uma posição antiga não será tratada como nova leitura nem, isoladamente, provocará pausa ou retomada automática.
 
 ### 4.4 Pausa automática por afastamento
 
@@ -141,7 +143,18 @@ O evento automático deve preservar horário, coordenadas, precisão GPS, parâm
 
 Os limiares assimétricos de 200 m para pausa e 50 m para retomada estabelecem uma faixa de histerese para reduzir oscilações repetidas próximas a um único limite.
 
-### 4.6 Checkout manual e limite da jornada
+### 4.6 Finalização por nova atividade, deslocamento ou jornada
+
+A execução da visita atual será finalizada quando ocorrer qualquer um destes eventos:
+- início de outra tarefa que provoque a transição para fora da visita atual;
+- início de um novo deslocamento;
+- término da jornada de trabalho do técnico responsável.
+
+Quando a finalização ocorrer por transição para outra tarefa ou deslocamento, o técnico deverá registrar texto com suas próprias palavras, a mudança de status da visita e o motivo do abandono/interrupção. O código/valor exato do novo status e a taxonomia de motivos ainda serão especificados. O relato deve ser preservado como evento histórico, sem substituição posterior.
+
+No encerramento por fim de jornada, somente uma execução pausada pode ser fechada automaticamente; uma execução ativa não será encerrada automaticamente sem o fluxo operacional correspondente.
+
+### 4.7 Checkout manual e limite da jornada
 
 - O técnico poderá finalizar manualmente a execução da visita, registrando horário e coordenadas GPS do checkout.
 - O sistema não deve finalizar automaticamente uma execução que ainda esteja ativa.
@@ -181,7 +194,7 @@ Campos conceituais usuais:
 
 A aplicação dessa convenção deverá ser avaliada entidade por entidade. Usuários humanos e usuários autônomos/agentes de IA devem ser identificados por suas próprias identidades no ERP; o usuário que configurou um agente não deve ser confundido com o agente que executou a operação.
 
-Recomendação técnica em avaliação: além dos metadados de criação/última alteração, manter histórico append-only de alterações relevantes, contendo:
+Decisão arquitetural aprovada: além dos metadados de criação/última alteração, manter histórico append-only de alterações relevantes, contendo:
 - entidade e identificador do registro;
 - tipo de evento/operação;
 - autor;
@@ -192,7 +205,7 @@ Recomendação técnica em avaliação: além dos metadados de criação/última
 
 O histórico da visita deverá preservar versões anteriores dos dados da visita e de seus registros relacionados, especialmente tarefas, relatos e associações de equipamentos. A proposta é que correções gerem novos eventos/revisões, sem destruir a evidência do conteúdo anteriormente registrado.
 
-A adoção formal do padrão append-only, assim como a estrutura técnica de auditoria, retenção, proteção contra adulteração e granularidade dos snapshots, ainda depende de validação do responsável pelo projeto.
+O padrão append-only está aprovado. Permanecem para desenho técnico a estrutura de auditoria, retenção, proteção contra adulteração, granularidade dos snapshots e mecanismo de correção/revisão. A aprovação da diretriz não significa que a implementação esteja concluída.
 
 ## 7. Vínculo funcional dos orçamentos
 
@@ -212,7 +225,26 @@ A máquina de estados reutilizável definida para o projeto pertence ao módulo 
 
 Como recomendação técnica ainda sujeita à validação do responsável, o histórico imutável pode ser implementado com eventos append-only e snapshots/revisões versionadas. Correções devem gerar novos registros de correção/revisão, sem sobrescrever o conteúdo histórico original. A política definitiva de retenção, integridade e proteção contra alteração ainda não foi aprovada.
 
-## 9. Confronto com o schema Supabase consultado em 2026-11-08
+## 9. Histórico de posições GPS
+
+O sistema manterá um histórico de posições recebidas dos dispositivos dos técnicos, em tabela própria conceitualmente denominada `technician_gps_positions`. Cada amostra deverá preservar, no mínimo, técnico, empresa, latitude, longitude, precisão reportada, instante da captura no dispositivo, instante de recebimento pelo backend, origem/dispositivo e metadados técnicos necessários à validação.
+
+A posição mais recente recebida será a última amostra válida, acompanhada de sua idade e precisão. Em perda de sinal, a última posição fica disponível como referência histórica; não é prova de localização atual. Sem nova amostra, não executar transição automática de pausa/retomada baseada em posição desatualizada. O histórico GPS é dado operacional sensível e exige controle de acesso por empresa, retenção definida, minimização e auditoria de consultas.
+
+## 10. Catálogos globais e personalizações por empresa
+
+Diretriz funcional confirmada: tipos de tarefa partem de um catálogo global e podem ser editados independentemente por cada empresa. A arquitetura física recomendada é um repositório de catálogos globais versionados, com versões imutáveis publicadas pela plataforma, e uma camada de catálogo efetivo por empresa.
+
+Estrutura conceitual sugerida:
+- `global_catalogs`: identifica cada catálogo e seu domínio;
+- `global_catalog_versions`: versões globais publicadas e imutáveis;
+- `global_catalog_items`: itens pertencentes a cada versão;
+- `company_catalogs` e `company_catalog_items`: versão adotada e personalizações locais, com referência ao item e à versão de origem;
+- snapshots/histórico das personalizações para comparação, restauração e atualização controlada.
+
+A empresa não altera registros globais. Aderir a uma nova versão global deve ser ação explícita e controlada, apresentar diferenças e preservar customizações locais. A estrutura exata e a política de merge permanecem como proposta técnica, ainda não aprovada como ADR.
+
+## 11. Confronto com o schema Supabase consultado em 2026-11-08
 
 **Projeto:** Winservice — `voaovwphncwbrwtcqnsc`  
 **Schema:** `public`  
@@ -264,7 +296,7 @@ O Supabase possui uma fundação cadastral e relacionamentos iniciais para clien
 
 A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de conformidade detalhada antes de qualquer DDL ou migração. Não adicionar tabelas/colunas por inferência nem adaptar `work_order_equipment` para representar tarefas.
 
-## 10. Pendências de especificação
+## 12. Pendências de especificação
 
 1. Definir campos, relatos e evidências obrigatórios para cada tipo de tarefa.
 2. Definir o esquema de tarefa e a distinção persistente entre equipamento não identificado e tarefa sem equipamento.
@@ -281,7 +313,7 @@ A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de con
 13. Definir como a seleção da OS existente ou criação de nova OS será apresentada no fluxo do técnico.
 14. Definir tratamento de falha/indisponibilidade do GPS e ações manuais excepcionais, sem permitir fraude ou perda de rastreabilidade.
 
-## 11. Segurança e limites desta análise
+## 13. Segurança e limites desta análise
 
 - A inspeção do Supabase foi somente leitura.
 - Nenhuma tabela, coluna, policy, função, trigger, dado ou configuração foi alterada.
@@ -293,6 +325,7 @@ A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de con
 
 ## Histórico de alterações
 
+- 2026-11-08 — v0.4.0: confirmação do check-in inicial de 5 minutos/50 m, precisão GPS configurável até 50 m, histórico de posições, gatilhos de finalização por nova tarefa/deslocamento/fim de jornada, relato de transição e aprovação do histórico append-only; incluída proposta de repositório de catálogos globais versionados.
 - 2026-11-08 — v0.3.0: inclusão do vínculo opcional e exclusivo de orçamento e separação entre máquina de estados do módulo Chat e ciclo operacional da visita; histórico append-only registrado como recomendação pendente de validação.
 - 2026-11-08 — v0.2.0: atualização para execução/sessões no nível da visita, finalização da visita anterior mediante relato, limiares GPS de 200 m/50 m e catálogo global de tipos editável independentemente por empresa.
 - 2026-11-08 — v0.1.0: criação do baseline funcional de Operação e confronto inicial com o schema Supabase consultado em tempo real, somente leitura.
