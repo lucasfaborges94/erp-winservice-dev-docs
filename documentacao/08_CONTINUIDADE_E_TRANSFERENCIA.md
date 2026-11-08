@@ -1,7 +1,7 @@
 # Continuidade e transferência de trabalho — ERP Winservice
 
 **Documento:** Procedimento de continuidade e transferência  
-**Versão:** 1.1.0  
+**Versão:** 1.2.0  
 **Data:** 2026-11-07  
 **Estado:** procedimento estabelecido; registro inicial de referência
 
@@ -903,3 +903,78 @@ Nenhuma alteração foi feita no Supabase. Não houve DDL, DML, migration, alter
 #### Segurança e limites
 
 A atualização é documental. Nenhum SQL, DDL, DML, migration, policy, função, trigger, configuração ou dado do Supabase foi alterado. As entidades descritas são propostas lógicas. Não foram feitos testes funcionais de upload, aceite digital, offline, autenticação, GPS ou conformidade jurídica.
+
+### Sessão — 2026-11-08 — aprovação da máquina única da visita e arquitetura da Base de Conhecimento
+
+**Etapa:** consolidação funcional e atualização dos modelos  
+**Estado:** decisões aprovadas pelo responsável; documentação atualizada nesta publicação
+
+#### Aprovações recebidas
+
+O responsável aprovou expressamente:
+- eliminar a Máquina B;
+- não manter estados ou entidades independentes de sessão no MVP;
+- registrar o histórico operacional/temporal em um único fluxo append-only de eventos da visita (visit_events);
+- manter tarefas sem estados de execução/conclusão;
+- adotar conceitualmente a arquitetura de Base de Conhecimento em quatro camadas.
+
+#### Consolidação da visita
+
+A visita é a única entidade com ciclo de vida operacional:
+- pending → in_displacement, in_progress, prevented, canceled;
+- in_displacement → pending, in_progress, prevented, canceled;
+- in_progress → paused, completed, interrupted;
+- paused → in_progress, interrupted.
+
+Estados terminais: completed, interrupted, prevented, canceled.
+
+Revogação de autenticação:
+- pending: permanece;
+- in_displacement: retorna para pending;
+- in_progress e paused: transicionam para interrupted;
+- terminais: permanecem inalterados.
+
+Jornada:
+- o fim da jornada não encerra automaticamente visita nem execução;
+- início/check-in fora da jornada exige confirmação do técnico no aplicativo.
+
+Eventos:
+- a proposta de visit_execution_sessions e visit_execution_events foi removida do modelo lógico;
+- visit_events passa a registrar diretamente transições, início, pausas, retomadas, checkout, revogação e demais acontecimentos;
+- duração e intervalos são projeções calculadas a partir dos eventos;
+- a estrutura física e os controles de concorrência/idempotência ainda precisam de especificação.
+
+Check-in automático inicial permanece futuro, fora do MVP, com parâmetros iniciais de 50 metros e 5 minutos configuráveis. As regras funcionais de pausa/retomada GPS permanecem registradas; automação depende de validação de GPS recente e confiável.
+
+#### Arquitetura aprovada conceitualmente para a Base de Conhecimento
+
+1. Domínio: glossário, entidades, atributos semânticos e relacionamentos.
+2. Operação: processos, regras de negócio, estados, exceções e procedimentos.
+3. Contratos: APIs, operações, parâmetros, permissões, erros e formatos.
+4. Guias por público: materiais para técnicos, atendentes, gestores, administradores e agentes, derivados das três camadas normativas.
+
+A autorização não decorre do conhecimento. Backend/API/RLS continuam sendo responsáveis por impor permissões de humanos e agentes. Os guias não devem duplicar ou substituir fontes normativas. Conteúdo deverá manter versão, origem, vigência e nível de autoridade.
+
+#### Artefatos atualizados
+
+- MODELO_FUNCIONAL_OPERACIONAL_MVP.md: v0.6.0.
+- MODELO_LOGICO_DADOS_OPERACAO.md: v0.5.0.
+- BASE_CONHECIMENTO_ERP.md: criado como arquitetura/governança inicial.
+- 00_LEIA-ME.md: mapa documental atualizado.
+- 06_STATUS_E_RELATORIOS.md: v1.5.0.
+- Este documento: v1.2.0.
+
+#### Pendências
+
+1. Definir esquema físico de visit_events, transações atômicas e integridade de estado/evento.
+2. Definir política de idempotência, ordenação e sincronização offline dos eventos.
+3. Especificar jornada por empresa e confirmação de início fora da jornada.
+4. Definir equivalência ou distinção entre logout voluntário, expiração de token e revogação administrativa.
+5. Definir taxonomia de motivos de impedimento, interrupção e cancelamento.
+6. Definir frequência, idade máxima, retenção e acesso ao histórico GPS.
+7. Desenvolver o conteúdo normativo das camadas da Base de Conhecimento e os contratos técnicos.
+8. Validar o modelo lógico contra o Supabase atual antes de qualquer DDL.
+
+#### Segurança e limites
+
+Atualização exclusivamente documental. Nenhum código, SQL, DDL, DML, migration, policy, função, trigger, dado, configuração ou infraestrutura Supabase foi alterado. O modelo lógico permanece proposta técnica, não aprovada como modelo físico. Não foram executados testes funcionais, de GPS, concorrência, autenticação, RLS ou sincronização offline.
