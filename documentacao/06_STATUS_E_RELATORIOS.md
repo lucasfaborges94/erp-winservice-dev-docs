@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 0.5.0  
+**Versão:** 0.6.0  
 **Data-base:** 2026-11-07
 
 ## 1. Resumo executivo
@@ -25,7 +25,7 @@ A documentação passou a incluir um protocolo de fonte da verdade e um procedim
 | WeWeb | Direção aprovada | Definir ambiente, autenticação e contratos de API |
 | FlutterFlow | Direção aprovada | Especificar sync offline-first e GPS background |
 | Jurídico | Módulo amplo aprovado; primeira funcionalidade documental | Elaborar arquitetura funcional e requisitos |
-| Módulo de IA | Governança dos dois níveis e condição de execução definidas; proposta documental v0.1.3 | Especificar provisionamento do superadmin e interrupção segura das execuções |
+| Módulos do ERP | Regra geral de ativação em dois níveis definida na proposta documental v0.1.4; primeiro usuário humano como superadmin; agentes de IA proibidos de ocupar superadmin | Especificar enforcement transversal, interrupção segura de operações em andamento e recuperação do superadmin |
 | ADRs | Índice e fichas individuais em consolidação documental | Verificar integridade de todas as fichas e referências |
 | Continuidade | Protocolo universal e modelo de transferência registrados | Aplicar ao final de cada sessão relevante |
 
@@ -103,6 +103,7 @@ Não marcar DONE sem critérios de aceite e evidências.
 
 ## Histórico de alterações
 
+- 2026-11-07 — v0.6.0: generaliza o controle de ativação em dois níveis para todos os módulos; registra primeiro usuário humano como superadmin e proíbe agentes de IA como superadmin.
 - 2026-11-07 — v0.5.0: registra responsáveis pelos controles do Módulo de IA, mínimo de um superadmin por empresa e bloqueio de execuções quando o módulo não estiver ativo.
 - 2026-11-07 — v0.4.0: registra a definição conceitual do Módulo de IA com disponibilidade global pela plataforma e ativação individual por empresa.
 - 2026-11-07 — v0.3.0: inclusão do relatório de auditoria técnica somente leitura do Supabase e atualização do estado conhecido.\n- 2026-11-07 — v0.2.0: registro do protocolo de fonte da verdade e da continuidade entre ferramentas e profissionais.
