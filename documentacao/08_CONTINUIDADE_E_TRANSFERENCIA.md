@@ -1,7 +1,7 @@
 # Continuidade e transferência de trabalho — ERP Winservice
 
 **Documento:** Procedimento de continuidade e transferência  
-**Versão:** 1.3.0  
+**Versão:** 1.4.0  
 **Data:** 2026-11-07  
 **Estado:** procedimento estabelecido; registro inicial de referência
 
@@ -996,8 +996,13 @@ Atualização exclusivamente documental. Nenhum código, SQL, DDL, DML, migratio
 
 #### Recomendação ainda pendente
 
-Foi recomendada janela configurável inicial de 24 horas para reconciliação automática de eventos offline, desde que os demais critérios de consistência sejam satisfeitos. Eventos mais antigos seriam encaminhados à revisão autorizada. O prazo não foi aprovado e não pode ser tratado como requisito vigente.
+Foi recomendada janela configurável inicial de 24 horas para reconciliação automática de eventos offline, desde que os demais critérios de consistência sejam satisfeitos. Eventos mais antigos seriam encaminhados à revisão autorizada. O responsável aprovou o prazo configurável inicial de 24 horas para reconciliação automática. Eventos mais antigos seguem para revisão por gestor ou atendente/usuário expressamente autorizado.
 
 #### Pré-condições e limites
 
 A implementação depende de corrigir e validar tenancy, FKs compostas, RLS e autorização multiempresa, além das inconsistências de schema/função de visita já identificadas. Nenhuma alteração de DDL, migration, policy, função, trigger ou dado foi executada nesta sessão.
+
+
+### Complemento da sessão — aprovação da janela de reconciliação offline
+
+Em 2026-11-08, o responsável aprovou a janela configurável inicial de 24 horas para reconciliação automática de eventos offline. A idade não substitui as validações de sequência, estado atual, identidade/origem, autorização, idempotência e consistência temporal. Eventos com mais de 24 horas não são reconciliados automaticamente e devem ser encaminhados à revisão autorizada. Nenhuma alteração no banco foi autorizada ou executada.
