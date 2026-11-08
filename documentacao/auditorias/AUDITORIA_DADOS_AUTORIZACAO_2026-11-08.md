@@ -97,7 +97,7 @@ Essas verificações cobrem somente as relações consultadas. Não comprovam co
 
 1. A migração deve preservar a atribuição legada `superuser` e as duas atribuições atuais `financial` e `technician` até que o responsável aprove o mapeamento de destino.
 2. `company_admin = true` é o único indicador atual de administração/titularidade no vínculo encontrado; não converter para `account_owner` antes de aprovar regra e destino.
-3. O papel `superuser` não deve ser renomeado para `superadmin` sem aprovação de equivalência semântica.
+3. A nomenclatura conceitual vigente é `superuser`; o registro legado já contém esse identificador, mas sua equivalência e migração devem ser avaliadas no mapeamento de papéis, sem conversão automática de dados.
 4. Os quatro usuários inativos sem vínculo exigem análise individual antes de qualquer migração; não devem ser apagados nem receber vínculo automaticamente.
 5. A ausência de linhas em `role_permissions` e `user_permissions` significa que não há dados de concessão/negação nessas estruturas a migrar nesta fotografia, mas a permissão isolada existente deve ser preservada e avaliada.
 6. Como `company_users` não tem status próprio, a futura especificação deve distinguir estado da identidade global e estado do vínculo com cada empresa.
@@ -131,7 +131,7 @@ Foi localizada a função `public.can_view_expense(p_expense_identifier uuid)`, 
 - não consulta `company_user_roles`;
 - pode ser executada por `anon`, `authenticated` e `service_role`, conforme `has_function_privilege`.
 
-Consequência: `company_users.role_identifier` possui dependência funcional concreta no banco e não pode ser removido ou descontinuado sem substituir e validar essa função. A exposição de execução a `anon` deve ser revisada como achado de segurança; esta auditoria não alterou grants nem a função.
+A dependência foi registrada apenas para contexto histórico do futuro módulo Financeiro. Como a função está obsoleta e fora do escopo atual, esse achado não deve bloquear a especificação geral de autorização. A função, seus grants e o campo legado não foram alterados; eventual revisão ocorrerá quando o módulo Financeiro for especificado.
 
 ### 12.2 Policies RLS nas tabelas de autorização
 
