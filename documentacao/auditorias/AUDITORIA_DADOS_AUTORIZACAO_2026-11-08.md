@@ -182,3 +182,68 @@ A ausência de migrations registradas no Supabase dificulta reconstruir a evolu�
 ## 15. Deliberação posterior — nomenclatura e escopo da função de despesas
 
 Em 2026-11-08, foi adotado `superuser` como nomenclatura conceitual no lugar de `superadmin`. A função SQL `public.can_view_expense(uuid)` foi classificada como obsoleta e fora do escopo atual, devendo ser reavaliada no futuro módulo Financeiro. A classificação não alterou o banco e não autoriza remover a função, seus grants ou o campo legado consultado por ela.
+
+
+## 16. Auditoria RLS ampliada — fotografia de 2026-11-08
+
+Esta seção registra os achados da inspeção ampliada do schema `public`, para que sessões futuras consultem este documento em vez de repetir a descoberta e voltar a apresentar os mesmos problemas como novos.
+
+### 16.1 Escopo e método
+
+Inspeção somente leitura das policies registradas em `pg_policies`, das tabelas do schema `public` e de colunas selecionadas de tabelas de domínio. Nenhuma policy, grant, função, tabela ou dado foi alterado. Esta fotografia complementa as observações anteriores dos Security Advisors; não substitui testes de acesso efetivo via PostgREST/API e diferentes papéis de banco.
+
+### 16.2 Cobertura de policies
+
+Na fotografia consultada:
+- 38 tabelas no schema `public`, todas com RLS habilitado segundo a listagem de tabelas;
+- 12 tabelas com ao menos uma policy;
+- 26 tabelas sem policy registrada.
+
+Ter RLS habilitado não comprova isolamento correto. Para tabelas sem policy, o comportamento efetivo depende também do papel de execução, grants, funções privilegiadas e caminhos de acesso.
+
+### 16.3 Policies permissivas sem isolamento por empresa
+
+Foram observadas policies com predicado `true` ou `WITH CHECK (true)` nas seguintes tabelas:
+
+| Tabela | Operação | Predicado observado |
+|---|---|---|
+| `addresses` | SELECT | `true` |
+| `addresses` | INSERT | `WITH CHECK (true)` |
+| `addresses` | UPDATE | `USING (true)` |
+| `companies` | ALL | `USING (true)` |
+| `customer_contacts` | SELECT | `true` |
+| `customer_contacts` | INSERT | `WITH CHECK (true)` |
+| `customers` | SELECT | `true` |
+| `customers` | INSERT | `WITH CHECK (true)` |
+| `entity_status` | SELECT | `true` |
+| `entity_status` | INSERT | `WITH CHECK (true)` |
+| `entity_status` | UPDATE | `USING (true)` |
+| `entity_types` | SELECT | `true` |
+| `entity_types` | INSERT | `WITH CHECK (true)` |
+| `entity_types` | UPDATE | `USING (true)` |
+| `visits` | SELECT | `true` |
+| `visits` | INSERT | `WITH CHECK (true)` |
+| `visits` | UPDATE | `USING (true)` |
+
+A policy de `company_users` limita SELECT ao próprio usuário; a policy de SELECT em `users` limita a identidade ao próprio registro. A policy de `expenses` chama a função legada `can_view_expense`, já classificada fora do MVP e reservada à retomada do Financeiro.
+
+**Impacto:** as policies permissivas acima não expressam o isolamento por `company_identifier` exigido pela ADR-0017. Em especial, operações de leitura/escrita em dados de clientes, endereços, contatos e visitas não devem ser consideradas protegidas por tenancy apenas porque RLS está habilitado. O risco precisa ser tratado como pendência de segurança já conhecida e bloqueadora para confiar no isolamento multiempresa dessas rotas.
+
+### 16.4 Estado e tratamento
+
+- Status: **PENDÊNCIA DE SEGURANÇA CONHECIDA — NÃO CORRIGIDA**.
+- Referência normativa: ADR-0017 e modelo de autorização multiempresa.
+- Não criar policies corretivas isoladamente sem revisar grants, funções `SECURITY DEFINER`, backend/API, contexto de empresa ativa e testes positivos/negativos.
+- A correção de tenancy, integridade multiempresa e RLS permanece pré-condição para implementar `visit_events`, conforme o registro de continuidade e a especificação operacional.
+- Nenhuma alteração foi autorizada ou executada nesta auditoria.
+
+### 16.5 Regra para sessões futuras — evitar redescoberta
+
+Antes de relatar problemas de RLS, tenancy ou autorização:
+1. Ler esta seção e a seção 13 deste documento.
+2. Tratar os achados acima como **já conhecidos**, não como novas descobertas.
+3. Revalidar somente se a tarefa exigir confirmar o estado atual, houver evidência de alteração posterior ou for necessário testar comportamento efetivo.
+4. Se revalidar, comparar o resultado com esta fotografia e registrar apenas diferenças, correções, regressões ou novas evidências.
+5. Atualizar este documento com data, escopo, resultados e referências de commit antes de considerar o achado encerrado.
+
+A lista de policies é uma fotografia do momento da consulta. Não afirmar que o estado continua igual sem revalidação.
