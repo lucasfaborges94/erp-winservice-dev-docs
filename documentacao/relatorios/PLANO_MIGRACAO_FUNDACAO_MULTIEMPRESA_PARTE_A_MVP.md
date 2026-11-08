@@ -2,7 +2,7 @@
 
 **Projeto:** ERP Winservice  
 **Data da inspeção:** 2026-11-08  
-**Versão:** 0.2.0  
+**Versão:** 0.3.0  
 **Estado:** PROPOSTA TÉCNICA PARA APROVAÇÃO — NÃO EXECUTADA  
 **Ambiente:** Supabase PostgreSQL 17.6, projeto `voaovwphncwbrwtcqnsc`, região `sa-east-1`  
 **Branch documental:** `main`  
@@ -35,7 +35,7 @@ Este plano não aprova nem executa DDL, DML, migrations, policies, grants, funç
 5. FKs compostas entre entidades do mesmo tenant.
 6. Unicidade por empresa de CPF/CNPJ e identificadores externos aplicáveis.
 7. Remoção de defaults que criam referências artificiais.
-8. Reconciliação estrutural das associações usuário–empresa–papel, sem escolher papéis pelo responsável.
+8. Estruturar `company_user_roles` como fonte única de papéis; ignorar o campo legado `company_users.role_identifier` e seus dados, conforme ADR-0018.
 9. Correção da função de snapshot de endereço, após validação do comportamento do trigger.
 10. Testes de integridade, validação pós-migração e plano de rollback.
 
@@ -129,11 +129,11 @@ Estado verificado:
 - `company_users`: 1 vínculo.
 - `roles`: 3 registros, todos associados à empresa.
 - `company_user_roles`: 2 associações sem `company_identifier`.
-- `company_users.role_identifier` legado está preenchido.
-- As duas linhas de `company_user_roles` não coincidem com o `role_identifier` legado.
-- Não foi encontrado relacionamento de papel entre empresas diferentes.
+- O responsável aprovou a ADR-0018: `company_user_roles` é a fonte única de atribuição de papéis.
+- O valor de `company_users.role_identifier` será ignorado, sem reconciliação ou migração.
+- A inspeção somente leitura identificou uma FK (`company_users_role_identifier_fkey`) e uma referência no corpo de `public.can_view_expense(uuid)`. A função está classificada como obsoleta e fora do escopo atual; sua dependência deverá ser tratada antes da remoção física da coluna.
 
-A ADR-0017 estabelece que o contexto de autorização é próprio de cada vínculo usuário–empresa e inclui papéis. A tabela `company_user_roles` representa a associação N:N de papéis ao vínculo e é compatível com esse requisito. Entretanto, **não foi localizada decisão aprovada que declare formalmente `company_user_roles` como fonte única e determine a remoção de `company_users.role_identifier`**. O plano, portanto, não removerá essa coluna nem escolherá automaticamente entre os dados divergentes. A definição exige deliberação documental específica, além de reconciliação das duas associações existentes e auditoria de dependências (inclusive funções legadas).
+A ADR-0017 estabelece o contexto de autorização por vínculo; a ADR-0018 complementa essa decisão e resolve a fonte única. As duas associações existentes em `company_user_roles` deverão ser preservadas e validadas quanto ao vínculo/papel/tenant, sem comparação com o campo legado.
 
 ### 2.5 Clientes e CPF/CNPJ
 
@@ -175,7 +175,7 @@ A definição física proposta para o catálogo global versionado e sua adoção
 | `visits` | Adicionar coluna; backfill de 26 para Winservice; impor NOT NULL; FKs compostas; OS opcional | Empresa confirmada pelo responsável |
 | `quotations` | Adicionar tenant; FKs compostas para cliente, OS e visita | Tabela vazia |
 | `approval_events` | Manter coluna; impor NOT NULL; FKs compostas para orçamento, OS e cliente | Tabela vazia |
-| `company_users` | Manter tenant; chave composta para referência por vínculo | Já possui tenant |
+| `company_users` | Manter tenant; remover `role_identifier` do modelo e do schema após tratamento de dependências; manter vínculo e tenant | Já possui tenant |
 | `company_user_roles` | Adicionar tenant; backfill pelo vínculo pai; FKs compostas para vínculo e papel | 2 linhas deriváveis |
 | `roles` | Manter tenant; impor NOT NULL; chave composta | Backfill anterior concluído |
 | `company_modules` | Manter tenant; validar chave/índice e FK | Tabela vazia |
@@ -288,7 +288,6 @@ Criar FKs compostas depois das chaves únicas compostas e da validação dos dad
 | `approval_events` | `(company_identifier, quotation_uuid)` | `quotations` | `(company_identifier, identifier)` |
 | `company_user_roles` | `(company_identifier, company_user_identifier)` | `company_users` | `(company_identifier, identifier)` |
 | `company_user_roles` | `(company_identifier, role_identifier)` | `roles` | `(company_identifier, identifier)` |
-| `company_users` | `(company_identifier, role_identifier)` | `roles` | `(company_identifier, identifier)` — dependente de decisão formal sobre o campo legado; não executar enquanto pendente |
 | `role_permissions` | `(company_identifier, role_identifier)` | `roles` | `(company_identifier, identifier)` |
 | `role_permissions` | `(company_identifier, permission_identifier)` | `company_permissions` | `(company_identifier, identifier)` — somente após aprovação do modelo físico ADR-0011 |
 | `user_permissions` | `(company_identifier, company_user_identifier)` | `company_users` | `(company_identifier, identifier)` |
@@ -350,7 +349,7 @@ Outras correções:
 - tornar `work_orders.customer_identifier NOT NULL` (tabela vazia e cliente obrigatório no modelo de OS);
 - tornar `user_permissions.allow NOT NULL` (tabela vazia);
 - tornar `company_user_roles.identifier NOT NULL` somente após confirmar ausência de NULL e criar unicidade apropriada;
-- manter `company_users.role_identifier` sem alteração até deliberação formal sobre a fonte única de papéis, reconciliação dos dados e auditoria das dependências.
+- não migrar nem reconciliar `company_users.role_identifier`; remover a FK `company_users_role_identifier_fkey`, tratar `public.can_view_expense(uuid)` e demais dependências encontradas, e então remover a coluna em migration revisada, conforme ADR-0018.
 
 ---
 
@@ -487,21 +486,24 @@ O corpo final depende da confirmação da regra para endereços sem `customer_id
 
 | Bloqueio | Evidência | Tratamento necessário |
 |---|---|---|
-| Papéis legados divergentes | Duas associações na tabela de junção diferem de `company_users.role_identifier` | Decidir fonte operacional e reconciliar sem perda |
+| Campo legado de papéis | `company_users.role_identifier` diverge das associações; ADR-0018 aprovada determina ignorá-lo | Não migrar nem reconciliar; tratar FK e função dependente antes de remover coluna |
 | Catálogos globais e adoção local | Catálogos têm registros, mas modelo físico de adoção não está aplicado | Individualizar desenho e preservar distinção global/tenant |
 | Catálogo de permissões | `permissions` atual é tenant-scoped; ADR-0011 exige catálogo global versionado e customizações | Avaliar e aprovar a proposta física específica antes de fechar FKs de permissão |
 | Identidade Auth/ERP | `users` global; `auth_user_identifier` pode exigir unicidade 1:1; `approval_events.created_by` referencia `auth.users` | Validar mapeamento e unicidade sem presumir equivalência entre IDs |
 | Trigger de endereço | Função consulta colunas inexistentes | Inspecionar trigger e fechar regra para endereço genérico |
 | Baseline de migrations | Nenhuma migration registrada; repositório de implementação não identificado | Definir local versionado oficial antes da execução |
 
-### 6.1 Papéis — tratamento proposto
+### 6.1 Papéis — fonte única e tratamento da coluna legada
 
-A migration pode adicionar `company_identifier` a `company_user_roles` a partir do vínculo pai e criar chaves compostas, porque a empresa do vínculo e do papel é verificável. A ADR-0017 exige papéis no contexto do vínculo, mas a documentação ainda não declarou a tabela de associação como fonte única nem aprovou a remoção do campo legado. Portanto, até deliberação formal, isso não autoriza:
-- remover `company_users.role_identifier`;
-- apagar associações;
-- escolher uma das duas fontes;
-- transformar `company_admin` em papel;
-- promover qualquer usuário a `superuser`.
+A ADR-0018 aprova `company_user_roles` como fonte única de atribuição de papéis. A migration deverá:
+- preservar e validar as linhas existentes em `company_user_roles`;
+- preencher `company_identifier` a partir do vínculo pai e garantir que o papel pertença ao mesmo tenant;
+- não importar, comparar ou reconciliar `company_users.role_identifier`;
+- remover a constraint `company_users_role_identifier_fkey` e a coluna legada somente depois de tratar dependências;
+- não transformar `company_admin` em papel;
+- não promover qualquer usuário a `superuser`.
+
+A inspeção somente leitura identificou referência de `public.can_view_expense(uuid)` ao campo legado. A função está classificada como obsoleta e fora do escopo atual do MVP. Antes de remover a coluna, a função deverá ser explicitamente retirada ou reescrita sem a referência, conforme o escopo do módulo Financeiro. Também deverá ser feita busca final por referências em funções, triggers, views, policies, código e integrações. A dependência não será ignorada apenas porque o campo foi retirado do modelo lógico.
 
 ### 6.2 Visitas — tratamento proposto
 
@@ -579,7 +581,7 @@ A Parte A não substitui testes de autorização da Parte B. FKs compostas prote
 Autorizar execução somente depois de:
 - aprovação deste plano e dos pontos de decisão;
 - backfill das 26 visitas para Winservice e validação de zero nulos/conflitos;
-- decisão sobre divergência entre `company_users.role_identifier` e `company_user_roles`;
+- implementar ADR-0018: preservar `company_user_roles`, ignorar o valor legado e tratar dependências antes de remover `company_users.role_identifier`;
 - aprovação ou ajuste da proposta física do catálogo de permissões e definição do desenho de catálogos de tarefa/requisito;
 - inspeção final do trigger de endereço;
 - definição do repositório oficial de migrations e baseline;
@@ -604,4 +606,5 @@ Autorizar execução somente depois de:
 ### Histórico
 
 - 2026-11-08 — v0.1.0: proposta inicial da Parte A.
-- 2026-11-08 — v0.2.0: confirmação de que todas as 26 visitas pertencem à Winservice; OS opcional; esclarecida a ausência de decisão formal sobre a remoção de `company_users.role_identifier`; incluída proposta física separada do catálogo de permissões. Nenhuma alteração de banco executada.
+- 2026-11-08 — v0.2.0: confirmação de que todas as 26 visitas pertencem à Winservice; OS opcional; proposta física separada do catálogo de permissões.
+- 2026-11-08 — v0.3.0: ADR-0018 aprovada; `company_user_roles` definida como fonte única; campo e dados de `company_users.role_identifier` descartados do modelo, com remoção física condicionada ao tratamento da FK e da função `can_view_expense`. Nenhuma alteração de banco executada.
