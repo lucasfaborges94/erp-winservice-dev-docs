@@ -119,7 +119,11 @@ As consultas executadas foram SELECTs sobre `information_schema.columns` e agreg
 
 ## 12. Dependências técnicas e segurança — complemento da auditoria
 
-### 12.1 Função dependente do campo legado
+### 12.1 Função legada obsoleta — fora do escopo atual
+
+A função `public.can_view_expense(p_expense_identifier uuid)` foi identificada durante a auditoria, mas o responsável pelo projeto determinou que ela seja tratada como obsoleta e ignorada nesta etapa, pois será reavaliada no futuro módulo Financeiro. Portanto, ela não deve orientar decisões do modelo geral de autorização nem bloquear o avanço da especificação atual. Sua dependência do campo legado `company_users.role_identifier` e seus privilégios de execução permanecem registrados apenas como contexto histórico para a futura retomada do módulo Financeiro. Nenhuma alteração na função, em seus grants ou no campo foi executada ou autorizada por esta classificação.
+
+### 12.1.1 Evidência técnica registrada na auditoria
 
 Foi localizada a função `public.can_view_expense(p_expense_identifier uuid)`, definida como `SECURITY DEFINER`, que:
 - consulta `company_users.role_identifier`;
@@ -155,7 +159,7 @@ Essas concessões não significam, isoladamente, que todas as operações esteja
 
 ### 13.2 Views e rotinas
 
-A busca em views públicas não encontrou definições que mencionem diretamente `company_users`, `company_user_roles`, `company_admin` ou `role_identifier`. A busca de rotinas confirmou `public.can_view_expense(uuid)` como a função diretamente dependente de `company_users.role_identifier` entre as funções examinadas.
+A busca em views públicas não encontrou definições que mencionem diretamente `company_users`, `company_user_roles`, `company_admin` ou `role_identifier`. A busca de rotinas confirmou `public.can_view_expense(uuid)` como função que consulta `company_users.role_identifier`; esse achado fica registrado para retomada no futuro módulo Financeiro, não como bloqueio da especificação atual.
 
 ### 13.3 Supabase Security Advisors
 
@@ -166,7 +170,7 @@ A consulta aos Security Advisors em 2026-11-08 retornou:
 - 2 funções `SECURITY DEFINER` executáveis por `authenticated`;
 - proteção contra senhas vazadas desabilitada.
 
-Entre as funções destacadas estão `public.can_view_expense` e `public.authorize_integration_sync_event`. A lista completa de tabelas sem policies e as referências de remediação estão no resultado dos advisors da execução desta auditoria. Estes achados são para avaliação e não foram corrigidos nesta etapa.
+Entre as funções destacadas estão `public.can_view_expense` (obsoleta e fora do escopo atual; futura retomada no módulo Financeiro) e `public.authorize_integration_sync_event`. A lista completa de tabelas sem policies e as referências de remediação estão no resultado dos advisors da execução desta auditoria. Estes achados são para avaliação e não foram corrigidos nesta etapa.
 
 ## 14. Migrations e Edge Functions
 
@@ -174,3 +178,7 @@ Entre as funções destacadas estão `public.can_view_expense` e `public.authori
 - A listagem de Edge Functions retornou vazia.
 
 A ausência de migrations registradas no Supabase dificulta reconstruir a evolução do schema exclusivamente pelo histórico nativo de migrations. Antes de alterações futuras, será necessário estabelecer uma linha de base documental do schema real e reconciliá-la com os arquivos versionados de migrations, se existirem em outro repositório/ambiente. A ausência de Edge Functions no projeto consultado significa que não foi identificada essa camada de backend neste levantamento; não exclui APIs ou serviços hospedados externamente.
+
+## 15. Deliberação posterior — nomenclatura e escopo da função de despesas
+
+Em 2026-11-08, foi adotado `superuser` como nomenclatura conceitual no lugar de `superadmin`. A função SQL `public.can_view_expense(uuid)` foi classificada como obsoleta e fora do escopo atual, devendo ser reavaliada no futuro módulo Financeiro. A classificação não alterou o banco e não autoriza remover a função, seus grants ou o campo legado consultado por ela.
