@@ -20,7 +20,7 @@ A documentação passou a incluir um protocolo de fonte da verdade e um procedim
 | Supabase | Auditoria técnica somente leitura realizada em 2026-11-07; relatório versionado | Priorizar revisão de RLS, grants, função de ingestão, integridade multiempresa e trigger de visitas |
 | Permissões | Catálogo global versionado e personalizações por empresa definidos | Auditar implementação e políticas |
 | Isa | Limites de autonomia definidos | Testar autorização no backend/API |
-| Operação | Prioridade V1 | Fechar processos, estados, requisitos e aceite |
+| Operação | Prioridade V1; baseline funcional 0.1.0 consolidado em 2026-11-08; implementação parcial no Supabase | Refinar pendências do modelo, produzir modelo lógico e matriz de conformidade antes de DDL |
 | Atendimento | Chatwoot transitório | Mapear dependências e plano de substituição |
 | WeWeb | Direção aprovada | Definir ambiente, autenticação e contratos de API |
 | FlutterFlow | Direção aprovada | Especificar sync offline-first e GPS background |
@@ -71,7 +71,33 @@ Esses artefatos devem acompanhar a base do Projeto como evidência técnica. Ant
 - A documentação atual contém decisões e propostas; itens não confirmados estão marcados como pendentes.
 - Não iniciar mudanças estruturais com base apenas em nomes de tabelas ou snippets: consultar inventário e definições completas.
 
-## 6. Modelo para relatórios futuros
+## 6. Modelo funcional operacional do MVP — 2026-11-08
+
+Foi criado `documentacao/MODELO_FUNCIONAL_OPERACIONAL_MVP.md`, versão 0.1.0, consolidando os requisitos funcionais discutidos para clientes, equipamentos, OS, visitas, tarefas, relatos, sessões de execução, GPS, autoria, auditoria e continuidade do atendimento.
+
+**Pontos funcionais consolidados:**
+- A OS preserva o histórico completo e pode conter várias visitas.
+- Cada visita possui suas próprias tarefas; uma nova data gera nova visita, normalmente na mesma OS.
+- Tarefa não possui status de execução/conclusão; períodos de trabalho são registrados em sessões independentes.
+- Relatos podem pertencer à visita ou à tarefa; visita exige pelo menos um relato para encerramento.
+- Equipamento em tarefa é opcional e distingue equipamento identificado, não identificado e ausência de equipamento.
+- Check-in automático inicial: 50 m e 5 minutos, com parâmetros configuráveis; inicia a primeira tarefa sem sessão iniciada.
+- Afastamento pausa a sessão; retorno permite retomada automática.
+- Somente sessões pausadas podem ser finalizadas pelo limite da jornada; sessão ainda em execução não deve ser finalizada automaticamente.
+- Reabertura de visita finalizada é exclusiva do técnico dentro de 200 m; gestor não pode reabrir.
+- Edição de visita finalizada por técnico/atendente é configurável pelo gestor; gestor pode editar.
+- Autoria e histórico de alterações devem preservar versões anteriores.
+
+**Confronto com schema consultado em tempo real (somente leitura):**
+- Estruturas existentes: `customers`, `customer_contacts`, `phonenumbers`, `addresses`, `equipments`, `work_orders`, `visits`, `work_order_equipment`, `task_types`, `visit_types`, `visit_requirements`, `visit_type_requirement`, `quotations`, `approval_events` e `documents`.
+- Não foram encontradas tabelas dedicadas a tarefas por visita, relatos, sessões de execução, eventos GPS históricos ou auditoria append-only.
+- `task_types` existe como catálogo básico, mas não apresenta configuração de campos/obrigatoriedades por tipo.
+- `work_order_equipment` relaciona OS e equipamento; não substitui uma tarefa vinculada a uma visita.
+- A autoria está incompleta/inconsistente em algumas entidades, e a auditoria anterior apontou riscos de RLS e integridade multiempresa.
+
+**Estado:** documentação funcional inicial criada; modelo lógico e implementação não aprovados/concluídos. Nenhuma alteração foi realizada no Supabase.
+
+## 7. Modelo para relatórios futuros
 
 Cada relatório deverá conter:
 - Período e data.
@@ -87,7 +113,7 @@ Cada relatório deverá conter:
 - Documentos oficiais atualizados.
 - Commits, PRs e evidências.
 
-## 7. Status por módulo
+## 8. Status por módulo
 
 Usar apenas estes estados:
 - NOT_STARTED
