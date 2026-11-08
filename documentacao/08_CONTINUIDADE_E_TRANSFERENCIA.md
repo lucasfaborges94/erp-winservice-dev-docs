@@ -1181,3 +1181,16 @@ A função `can_view_expense` está classificada no modelo de autorização como
 Atualizar o pacote de migrations da Parte A para implementar a ADR-0018: preservar as associações da tabela de relacionamento, adicionar tenant e FKs compostas, remover a constraint e dependências do campo legado e, por fim, remover `company_users.role_identifier`. A execução continuará condicionada à revisão do SQL final e autorização operacional específica. A proposta física do catálogo de permissões permanece aguardando aprovação.
 
 **Limites:** nenhum DDL, DML, migration, policy, grant, função, trigger ou dado foi alterado no Supabase.
+
+
+### Sessão — 2026-11-08 — aprovação do modelo físico do catálogo de permissões
+
+**Estado:** modelo físico aprovado; implementação física não autorizada.
+
+O responsável aprovou a proposta `documentacao/relatorios/PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md`, atualizada para v0.2.0. A aprovação valida a separação entre catálogo global versionado e catálogo efetivo materializado por empresa, adoção voluntária, preservação de customizações, histórico/restauração e referências de permissões efetivas em `role_permissions` e `user_permissions`.
+
+A aprovação não resolve as decisões ainda abertas na proposta e não autoriza DDL, DML, migrations, policies, grants ou alterações no Supabase.
+
+**Próxima atividade:** preparar a especificação executável e o pacote de migração, começando pelo inventário de dependências das tabelas atuais `permissions`, `role_permissions` e `user_permissions`, validação do registro legado, definição dos códigos estáveis e identificação do repositório/baseline de migrations. Apresentar o pacote para revisão e autorização operacional específica antes de qualquer execução.
+
+**Limites:** nenhuma alteração no Supabase foi realizada nesta atualização documental.
