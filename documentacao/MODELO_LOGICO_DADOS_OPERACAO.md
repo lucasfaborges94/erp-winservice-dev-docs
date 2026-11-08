@@ -1,6 +1,6 @@
 # Modelo lógico de dados e matriz de conformidade — Operação MVP
 
-**Versão:** 0.1.0  
+**Versão:** 0.2.0  
 **Data:** 2026-11-08  
 **Estado:** proposta técnica para validação; não aprovada como modelo físico  
 **Projeto Supabase avaliado:** Winservice — `voaovwphncwbrwtcqnsc`  
@@ -16,9 +16,9 @@ O modelo deve:
 - registrar tarefas específicas dentro de cada visita, sem status de execução ou conclusão na tarefa;
 - relacionar opcionalmente cada tarefa a um equipamento identificado, ainda não identificado ou não aplicável;
 - registrar relatos gerais da visita e relatos próprios de cada tarefa;
-- registrar períodos de trabalho em sessões independentes, com eventos GPS;
+- registrar períodos de execução em sessões vinculadas à visita, com eventos GPS;
 - preservar autoria, versões anteriores e histórico de alterações;
-- permitir navegação cliente → equipamento/OS → visita → tarefa → relatos/sessões;
+- permitir navegação cliente → equipamento/OS → visita → tarefa → relatos e execução da visita;
 - garantir coerência entre empresa, cliente, OS, visita, equipamento e usuários.
 
 Fora do escopo desta proposta: DDL, migrações, políticas RLS, implementação de GPS no aplicativo, contratos de API, workflow n8n e definição completa de todos os estados de visita.
@@ -33,15 +33,20 @@ Fora do escopo desta proposta: DDL, migrações, políticas RLS, implementação
 6. Cada tipo de tarefa pode exigir campos, relatos e evidências próprios.
 7. A visita precisa ter pelo menos um relato geral ou um relato de alguma tarefa antes de ser encerrada.
 8. O equipamento da tarefa é opcional. Deve ser possível registrar equipamento ainda não identificado sem criar um equipamento fictício.
-9. O trabalho temporal é representado por sessões de execução associadas à tarefa.
+9. A execução temporal é representada por sessões vinculadas à visita, nunca às tarefas. As tarefas não possuem sessão nem estado próprio de execução.
 10. O técnico pode ter somente uma visita em execução por vez.
-11. Check-in automático inicial: visita em `in_displacement`, técnico dentro de 50 metros por 5 minutos (ambos configuráveis); inicia a primeira tarefa ainda sem sessão iniciada.
-12. O afastamento pausa a sessão; o retorno pode retomá-la automaticamente. Os parâmetros de afastamento e retomada ainda precisam ser definidos.
-13. Somente sessões pausadas podem ser finalizadas automaticamente pelo limite da jornada. A hora efetiva de encerramento é a hora da pausa; coordenadas são as capturadas na pausa. O horário em que o sistema processou a finalização deve ser armazenado separadamente.
-14. A visita finalizada automaticamente pode exigir relato posterior do técnico antes de ele prosseguir no aplicativo ou iniciar novo deslocamento/visita.
-15. Reabertura de visita finalizada é exclusiva do técnico dentro de 200 metros do endereço. Gestor e atendente não podem reabrir.
-16. Gestor pode editar visita finalizada. Edição por técnico e atendente é configurável pelo gestor.
-17. Alterações devem preservar dados anteriores e registrar autoria e temporalidade.
+11. O início de uma nova visita finaliza a visita anterior, desde que o técnico registre o relato exigido para a finalização.
+12. Ao se afastar 200 metros ou mais do endereço da visita (limiar configurável), a execução da visita é pausada automaticamente.
+13. Ao retornar para 50 metros ou menos do endereço da visita (limiar configurável), a execução pausada pode ser retomada automaticamente, desde que a visita ainda esteja apta a continuar.
+14. A regra anteriormente registrada de check-in inicial dentro de 50 metros por 5 minutos permanece como requisito a confirmar em conjunto com os novos limiares; não deve ser confundida com a regra de retomada.
+15. Somente sessões pausadas podem ser finalizadas automaticamente pelo limite da jornada. A hora efetiva de encerramento é a hora da pausa; coordenadas são as capturadas na pausa. O horário em que o sistema processou o fechamento deve ser armazenado separadamente.
+16. A visita finalizada automaticamente pode exigir relato posterior do técnico antes de ele prosseguir no aplicativo ou iniciar novo deslocamento/visita.
+17. Reabertura de visita finalizada é exclusiva do técnico dentro de 200 metros do endereço. Gestor e atendente não podem reabrir.
+18. Gestor pode editar visita finalizada. Edição por técnico e atendente é configurável pelo gestor.
+19. Tipos de tarefa partem de um catálogo global, mas cada empresa poderá editar sua própria versão sem alterar o catálogo global nem as versões das demais empresas.
+20. Um orçamento pode estar vinculado a, no máximo, uma entidade operacional: uma OS, uma visita, uma tarefa ou nenhuma delas.
+21. A máquina de estados reutilizável mencionada pelo responsável pertence ao módulo Chat. Ela não define nem substitui o ciclo operacional das visitas.
+22. Alterações devem preservar dados anteriores e registrar autoria e temporalidade. A arquitetura de histórico imutável descrita adiante é recomendação técnica ainda sujeita a validação.
 
 ## 3. Modelo conceitual e cardinalidades
 
@@ -60,12 +65,12 @@ erDiagram
     VISIT_TASKS o|--o{ VISIT_TASKS : previous_task
     VISITS ||--o{ VISIT_REPORTS : records
     VISIT_TASKS ||--o{ TASK_REPORTS : records
-    VISIT_TASKS ||--o{ TASK_EXECUTION_SESSIONS : executed_in
-    TASK_EXECUTION_SESSIONS ||--o{ TASK_EXECUTION_EVENTS : emits
+    VISITS ||--o{ VISIT_EXECUTION_SESSIONS : executed_in
+    VISIT_EXECUTION_SESSIONS ||--o{ VISIT_EXECUTION_EVENTS : emits
     VISITS ||--o{ VISIT_EVENTS : emits
-    WORK_ORDERS ||--o{ QUOTATIONS : groups
-    VISIT_TASKS o|--o{ QUOTATION_TASKS : quoted
-    QUOTATIONS ||--o{ QUOTATION_TASKS : includes
+    WORK_ORDERS o|--o{ QUOTATIONS : context
+    VISITS o|--o{ QUOTATIONS : context
+    VISIT_TASKS o|--o{ QUOTATIONS : context
 ```
 
 O diagrama é conceitual. As relações opcionais e as restrições multiempresa devem ser formalizadas por chaves compostas e regras adicionais, não apenas pelo desenho.
@@ -84,10 +89,9 @@ O diagrama é conceitual. As relações opcionais e as restrições multiempresa
 | Tarefa → tarefa anterior | 0..1:N | Uma tarefa pode apontar para uma tarefa anterior; uma tarefa pode originar várias continuidades |
 | Visita → relatos | 1:N | Relato geral é opcional individualmente; conjunto deve satisfazer regra mínima de encerramento |
 | Tarefa → relatos | 1:N | Uma tarefa pode ter vários relatos |
-| Tarefa → sessões | 1:N | Uma tarefa pode ter vários períodos/sessões |
-| Sessão → eventos | 1:N | Eventos formam a trilha temporal/GPS da sessão |
-| OS → orçamentos | 1:N | A OS agrupa orçamentos |
-| Orçamento ↔ tarefas | N:M (proposta) | Um orçamento pode contemplar uma ou mais tarefas; validar no MVP |
+| Visita → sessões de execução | 1:N | A sessão pertence à visita; tarefas não possuem sessões |
+| Sessão da visita → eventos | 1:N | Eventos formam a trilha temporal/GPS da execução da visita |
+| OS/visita/tarefa → orçamento | 0..1:N | Cada orçamento pode apontar para no máximo uma dessas entidades, ou nenhuma |
 
 ## 4. Entidades lógicas propostas
 
@@ -163,7 +167,7 @@ Define campos, relatos e evidências obrigatórios para cada tipo de tarefa. Cam
 
 A configuração JSONB deve descrever validação e apresentação, mas não substituir colunas relacionais para dados críticos de negócio. Deve existir versionamento ou snapshot dos requisitos aplicados à tarefa, para que uma alteração futura no tipo não modifique retroativamente o que era obrigatório no momento do atendimento.
 
-Ainda precisa ser decidido se tipos de tarefa são globais, personalizados por empresa ou uma combinação de catálogo global com extensões locais.
+O requisito funcional está definido: haverá um catálogo global inicial e cada empresa poderá editar sua própria versão, sem afetar o catálogo global nem outras empresas. A estratégia física ainda deve escolher entre cópia sob demanda (copy-on-write), registros de personalização vinculados ao tipo global ou outra estrutura equivalente. Deve preservar a origem global, a versão herdada e o histórico de alterações. Uma edição local não pode alterar o tipo global nem propagar-se silenciosamente às empresas que já personalizaram o tipo.
 
 #### `visit_reports` — relatos gerais da visita
 
@@ -179,32 +183,33 @@ Relatos devem ser append-only: correções geram novo registro ou revisão vincu
 
 Mesma lógica de `visit_reports`, com `task_identifier` obrigatório. Deve suportar relatos de orçamento, coleta, cobrança, retorno/garantia, vistoria e outros tipos. Os requisitos aplicáveis dependem do tipo da tarefa.
 
-#### `task_execution_sessions` — sessões de execução
+#### `visit_execution_sessions` — sessões de execução da visita
 
-Representa um período lógico de trabalho sobre uma tarefa. Uma tarefa pode ter várias sessões. A sessão, e não a tarefa, possui estado operacional.
+Representa um período contínuo de execução de uma visita. A sessão pertence à visita, nunca a uma tarefa. Uma visita pode acumular sessões ao longo de ciclos de início, pausa e retomada, conforme a política operacional que vier a ser especificada.
 
 Campos conceituais:
 - `identifier`, `company_identifier`;
-- `task_identifier`;
+- `visit_identifier`;
 - `state`: `active`, `paused`, `closed`;
 - `started_at`, `paused_at`, `closed_at` como projeções do estado atual;
 - `effective_closed_at`: horário efetivo do encerramento;
 - `recorded_closed_at`: horário em que o sistema registrou o encerramento;
-- `closure_reason`: manual, limite_jornada, substituição_de_sessão etc.;
+- `closure_reason`: manual, limite_jornada, finalizacao_visita etc.;
 - `created_at`, `created_by`, `updated_at`, `updated_by`.
 
-A sessão poderá ter vários ciclos de pausa/retomada. O estado atual é uma projeção operacional para consulta e concorrência; a fonte histórica são os eventos append-only. Uma sessão pausada finalizada automaticamente no limite da jornada deve usar como `effective_closed_at` o instante da pausa e preservar `recorded_closed_at` como instante do processamento automático.
+A sessão poderá ter vários ciclos de pausa/retomada, registrados por eventos. A sessão não representa uma tarefa em execução: enquanto a visita estiver em execução, o técnico poderá registrar atividades e relatos em suas tarefas. A cardinalidade exata entre visita e sessões e a necessidade de criar uma nova sessão após cada retomada ainda devem ser fechadas no desenho físico; não criar sessões artificiais por tarefa.
 
-#### `task_execution_events` — eventos das sessões
+#### `visit_execution_events` — eventos das sessões de visita
 
-Registro append-only de cada início, pausa, retomada, checkout e encerramento automático.
+Registro append-only dos eventos de início, pausa, retomada, checkout e encerramento da execução da visita.
 
 Campos conceituais:
-- `identifier`, `company_identifier`, `session_identifier`;
+- `identifier`, `company_identifier`, `session_identifier`, `visit_identifier`;
 - `event_type`: `started`, `paused`, `resumed`, `checked_out`, `auto_closed_at_day_end`;
 - `occurred_at`: quando o evento efetivamente ocorreu;
 - `recorded_at`: quando o backend recebeu/registrou o evento;
 - `latitude`, `longitude`, `accuracy_meters`;
+- `distance_from_visit_meters`, quando calculável e confiável;
 - `source`: manual, gps_automatic, system;
 - `actor_user_identifier`;
 - `metadata` para dados técnicos não normalizados.
@@ -240,11 +245,21 @@ Campos conceituais:
 
 A referência polimórfica (`entity_type` + `entity_identifier`) não possui FK convencional para todas as tabelas. A integridade e a imutabilidade precisam ser garantidas por mecanismo confiável no backend/banco. Alternativa: tabelas de revisão específicas por entidade, se a exigência de FK for prioritária. Não conceder UPDATE/DELETE direto para papéis operacionais sobre eventos históricos.
 
-#### `quotation_tasks` — associação orçamento ↔ tarefa (condicional)
+#### `quotations` — vínculo contextual exclusivo do orçamento
 
-Proposta N:M se um orçamento puder incluir várias tarefas e uma tarefa puder receber mais de uma versão/orçamento. Campos: `quotation_identifier`, `task_identifier`, `company_identifier`, `created_at`, `created_by`.
+Regra funcional definida: cada orçamento pode estar associado a uma única entidade de contexto — OS, visita ou tarefa — ou não possuir vínculo operacional.
 
-Se o MVP definir rigorosamente um orçamento para uma única tarefa, pode-se preferir `task_identifier` diretamente em `quotations`. A decisão deve ser tomada antes do modelo físico.
+A proposta lógica é manter três FKs opcionais em `quotations` (`work_order_identifier`, `visit_identifier`, `task_identifier`) com uma constraint que permita zero ou apenas uma delas preenchida. Isso evita referência polimórfica sem FK e garante exclusividade do vínculo. A alternativa de uma tabela de vínculo polimórfica não é preferida por perder integridade referencial convencional.
+
+Implicações:
+- orçamento vinculado à OS não precisa também preencher visita ou tarefa;
+- orçamento vinculado à visita não precisa preencher OS ou tarefa, embora a visita pertença a uma OS;
+- orçamento vinculado à tarefa não precisa preencher visita ou OS, embora a tarefa pertença a uma visita e OS;
+- orçamento sem vínculo mantém os três campos nulos;
+- a coerência de empresa/cliente deve ser garantida por FKs compostas/validações transacionais;
+- o schema atual possui vínculos com OS e visita; a migração deverá resolver registros existentes que hoje preencham ambos, sem presumir qual vínculo deve prevalecer.
+
+Não haverá relação N:M `quotation_tasks` neste desenho inicial. Caso surja requisito de um orçamento abranger várias tarefas, isso será uma mudança explícita de modelo.
 
 ### 4.3 Entidades existentes que exigem decisão
 
@@ -280,7 +295,9 @@ A cadeia canônica recomendada é:
 - `work_orders`: `(identifier, company_identifier, customer_identifier)`;
 - `visits`: `(identifier, company_identifier, work_order_identifier)`;
 - `visit_tasks`: `(identifier, company_identifier, visit_identifier, equipment_identifier)`;
-- `equipments`: `(identifier, company_identifier, customer_identifier)`.
+- `visit_execution_sessions`: `(identifier, company_identifier, visit_identifier)`;
+- `equipments`: `(identifier, company_identifier, customer_identifier)`;
+- `quotations`: vínculo opcional exclusivo a OS, visita ou tarefa, sempre na mesma empresa e contexto de cliente.
 
 Constraints compostas devem impedir:
 - visita ligada a OS de outra empresa;
@@ -313,15 +330,18 @@ A regra de uma visita ativa por técnico precisa de garantia transacional no bac
 
 Não definir a lista de estados ativos até fechar a máquina de estados da visita. Reabertura deve disputar a mesma exclusividade, sem janela de concorrência.
 
-### 5.6 Sessões de execução
+### 5.6 Execução da visita e GPS
 
-- Uma tarefa pode ter várias sessões históricas.
-- No máximo uma sessão ativa por tarefa.
-- A regra de uma visita por técnico e a regra de uma sessão ativa por técnico devem ser coordenadas transacionalmente.
-- Eventos de sessão são append-only e ordenados por `occurred_at` e `recorded_at`.
+- Sessões de execução pertencem à visita; não existe sessão de execução de tarefa.
+- A exclusividade é de uma visita em execução por técnico.
+- Eventos de sessão e GPS são append-only e ordenados por `occurred_at` e `recorded_at`.
+- Afastamento a partir de 200 metros (inclusive) do endereço da visita pausa a execução; o limiar é configurável.
+- Retorno a até 50 metros (inclusive) retoma a execução pausada, desde que a visita permaneça operacional; o limiar é configurável.
+- Os limiares de saída e retorno são assimétricos de propósito e evitam alternância frequente perto de um único limite (histerese).
 - GPS automático deve ser idempotente: repetição de callback/localização não pode criar início, pausa ou retomada duplicados.
-- A retomada automática exige visita ainda operacional e técnico elegível; visita finalizada automaticamente não deve ser silenciosamente reativada por mera chegada GPS.
-- Sessão fechada não pode voltar a ativa; uma nova sessão pode ser aberta conforme as regras operacionais.
+- Visita finalizada não deve ser silenciosamente reativada por mera chegada GPS.
+- Precisão mínima, frequência de amostragem, tolerância, perda de sinal, localização simulada/antifraude e tratamento de ausência de coordenadas continuam pendentes.
+- O check-in inicial dentro de 50 metros por 5 minutos permanece a confirmar em separado; não foi substituído automaticamente pela regra de retomada.
 
 ## 6. Diagrama de fluxo do histórico
 
@@ -335,11 +355,10 @@ flowchart TD
     V2 --> T2[Nova tarefa da visita 2]
     T2 -.continuidade.-> T1
     T1 --> R1[Relatos da tarefa]
-    T1 --> S1[Sessões de execução]
+    V1 --> S1[Sessões de execução da visita]
     S1 --> X1[Eventos GPS e execução]
     V1 --> RV1[Relatos da visita]
     T2 --> R2[Relatos da tarefa]
-    T2 --> S2[Sessões de execução]
     T1 -.equipamento opcional.-> E
     T2 -.mesmo equipamento, quando identificado.-> E
 ```
@@ -369,12 +388,12 @@ Legenda:
 | Continuidade entre tarefas de visitas distintas | Nenhuma relação encontrada | Sem entidade tarefa | Criar FK opcional `previous_task_identifier` em `visit_tasks` | P1 |
 | Relatos gerais da visita | Nenhuma tabela dedicada encontrada | `visits` não tem relato estruturado observado | Criar `visit_reports` | P0 |
 | Relatos por tarefa | Nenhuma tabela dedicada encontrada | Não há instância de tarefa nem relatório | Criar `task_reports` | P0 |
-| Sessões de execução | Nenhuma tabela dedicada encontrada | `visits` possui um único conjunto de check-in/checkout | Criar `task_execution_sessions` | P0 |
-| Eventos GPS de sessão | Nenhuma tabela dedicada encontrada | Sem histórico de múltiplas pausas/retomadas | Criar `task_execution_events` | P0 |
+| Sessões de execução da visita | Nenhuma tabela dedicada encontrada | `visits` possui um único conjunto de check-in/checkout | Criar `visit_execution_sessions` | P0 |
+| Eventos GPS/execução da visita | Nenhuma tabela dedicada encontrada | Sem histórico de múltiplas pausas/retomadas | Criar `visit_execution_events` | P0 |
 | Eventos do ciclo da visita | Nenhuma tabela dedicada encontrada | Colunas atuais armazenam poucos marcos | Criar `visit_events`; manter colunas atuais como projeção temporária | P0 |
 | Auditoria de alterações | Nenhuma trilha append-only dedicada encontrada | Campos created/updated em algumas tabelas | Criar `audit_events` ou revisões por entidade; imutabilidade | P0 |
 | Associação OS-equipamento | `work_order_equipment` | Associação simples; defaults UUID suspeitos em FKs e autoria | Revisar; não usar como tarefa; corrigir defaults ou descontinuar após análise | P1 |
-| Orçamentos | `quotations` | Relaciona OS, cliente e visita; não tarefa | Ajustar para vincular a tarefa ou criar `quotation_tasks`; definir cardinalidade | P1 |
+| Orçamentos | `quotations` | Relaciona OS, cliente e visita | Ajustar para vínculo opcional exclusivo: OS OU visita OU tarefa OU nenhum; sanear vínculos simultâneos existentes | P1 |
 | Eventos de aprovação | `approval_events` | Evento, versão, hash, decisão e referências a orçamento/OS/cliente | Aproveitar; garantir consistência empresa e vincular versão/escopo da tarefa quando aplicável | P1 |
 | Documentos/evidências | `documents` | Metadados e uploader, sem vínculo operacional direto observado | Criar relação explícita de documentos com visita/tarefa; não usar referência polimórfica sem integridade | P1 |
 | Autoria uniforme | Diversas tabelas | Autoria ausente em equipamentos, OS, telefones e orçamento; padrões divergentes | Ajustar convenção e garantir identidade de humano/agente/sistema | P0 |
@@ -386,7 +405,7 @@ Legenda:
 - `task_types` é catálogo, não registro de tarefa executada.
 - `visit_types` e `visit_type_requirement` descrevem tipo/requisitos de visita; não substituem requisitos de tarefa.
 - `documents` pode continuar como repositório de metadados de arquivos, mas precisa de uma relação explícita e segura com a entidade operacional correspondente.
-- `quotations` já tem FK para OS e visita. A ligação a tarefa deve ser definida sem perder histórico de orçamento e aprovação.
+- `quotations` já tem FKs para OS e visita. O modelo funcional agora exige vínculo exclusivo e opcional com OS, visita ou tarefa; a migração precisa tratar os registros atuais com mais de um vínculo preenchido.
 - `approval_events` contém `created_by` apontando a `auth.users.id`, enquanto outras entidades apontam a `public.users.identifier`. Essa diferença de identidade deve ser normalizada/documentada antes de expandir auditoria.
 
 ## 8. Ordem recomendada de implementação (ainda não autorizada)
@@ -395,27 +414,26 @@ Legenda:
 2. **Núcleo operacional:** ajustar `customers`, `addresses`, `equipments`, `work_orders` e `visits`.
 3. **Tarefas e catálogo:** `visit_tasks`, escopo/versionamento de `task_types` e requisitos por tipo.
 4. **Relatos e evidências:** `visit_reports`, `task_reports`, vínculo de documentos e regra de encerramento com relato.
-5. **Execução e GPS:** sessões, eventos, idempotência, exclusividade do técnico, pausa/retomada e limite de jornada.
-6. **Histórico e auditoria:** snapshots, eventos imutáveis, autoria de humano/agente/sistema.
-7. **Comercial:** vínculo de orçamento a tarefas, versões e aprovação.
+5. **Execução e GPS:** sessões e eventos da visita, idempotência, exclusividade do técnico, pausa/retomada e limite de jornada.
+6. **Histórico e auditoria:** snapshots, eventos imutáveis e revisões, autoria de humano/agente/sistema.
+7. **Comercial:** vínculo exclusivo opcional de orçamento a OS, visita ou tarefa, versões e aprovação.
 8. **Migração e testes:** plano de migração de dados, constraints, RLS, concorrência, GPS simulado, falhas offline e regressão.
 
 Não executar essa sequência sem aprovação do modelo físico, plano de migração e testes.
 
 ## 9. Decisões e perguntas ainda abertas
 
-1. **Catálogo de tipos:** os tipos de tarefa serão globais, por empresa ou catálogo global com extensões locais?
-2. **Requisitos dinâmicos:** quais tipos de campos serão suportados inicialmente (texto, seleção, número, data, foto, documento, assinatura etc.)?
-3. **Equipamento indefinido:** confirmar os três valores propostos: identificado, não identificado e não aplicável.
-4. **Orçamento:** uma cotação pode conter várias tarefas ou cada orçamento pertence a uma única tarefa?
-5. **Sessões:** ao iniciar outra tarefa, uma sessão ativa anterior será automaticamente pausada, bloqueada ou poderá continuar? A exclusividade atual é uma visita por técnico; simultaneidade de tarefas ainda não foi definida.
-6. **GPS:** definir raio/tempo para afastamento e retomada, precisão mínima, tolerância, tratamento de perda de sinal e antifraude.
-7. **Jornada:** definir horário de corte, fuso, dias úteis e exceções.
-8. **Visita:** fechar estados e transições, inclusive quando e como uma visita é finalizada automaticamente.
-9. **Relato pendente:** definir quais eventos exigem relato posterior e o que constitui relato adequado.
-10. **Auditoria:** escolher trilha genérica com referência polimórfica protegida ou tabelas de revisão por entidade com FKs convencionais.
-11. **Documentos:** definir relação e armazenamento de fotos/documentos por tarefa e visita.
-12. **Identidade:** normalizar referências de autoria para usuário humano, agente autônomo e sistema.
+1. **Requisitos dinâmicos por tipo:** quais tipos de campos serão suportados inicialmente (texto, seleção, número, data, foto, documento, assinatura etc.) e como serão versionados?
+2. **Equipamento indefinido:** confirmar formalmente os três valores propostos: identificado, não identificado e não aplicável.
+3. **Check-in inicial:** confirmar se a regra de permanência de 5 minutos dentro de 50 metros continua válida para o primeiro início da visita.
+4. **GPS:** definir precisão mínima, frequência de amostragem, tolerância, perda de sinal, localização simulada/antifraude e condição exata para retomada quando houver incerteza.
+5. **Jornada:** definir horário de corte, fuso, dias úteis e exceções para finalização automática de execução pausada.
+6. **Visita:** definir estados e transições operacionais próprios, sem confundi-los com a máquina de estados reutilizável do módulo Chat.
+7. **Relato de transição:** definir conteúdo mínimo e obrigatoriedade do relato ao finalizar a visita anterior para iniciar outra; esclarecer também o fluxo quando o técnico não consegue registrar o relato imediatamente.
+8. **Auditoria imutável:** validar a recomendação de eventos append-only + revisões/snapshots, incluindo retenção, correções, proteção contra UPDATE/DELETE e estratégia de integridade.
+9. **Documentos:** definir relação e armazenamento de fotos/documentos por tarefa e visita.
+10. **Identidade:** normalizar referências de autoria para usuário humano, agente autônomo e sistema.
+11. **Catálogo por empresa:** detalhar como personalizações de tipos globais serão preservadas ao publicar novas versões globais.
 
 ## 10. Riscos e pré-condições antes de DDL
 
@@ -423,7 +441,9 @@ Não executar essa sequência sem aprovação do modelo físico, plano de migra�
 - A função `set_visit_address_snapshot` foi identificada na auditoria anterior como incompatível com colunas existentes em `addresses`; corrigir e testar antes de depender do snapshot.
 - Os defaults `gen_random_uuid()` em FKs de `work_order_equipment` e campos de autoria são suspeitos e devem ser investigados.
 - O schema consultado é estado observado em 2026-11-08; não foram inspecionados dados de produção, código de aplicação, workflows, políticas novamente nesta etapa ou testes de comportamento.
-- As tabelas propostas não devem ser criadas até fechar as decisões pendentes, especialmente tenancy, catálogo de tipos, sessões e auditoria.
+- As tabelas propostas não devem ser criadas até fechar as decisões pendentes, especialmente tenancy, requisitos dinâmicos, execução/GPS, jornada e auditoria.
+- A proposta de histórico append-only é recomendação técnica; ainda depende de validação explícita do responsável.
+- A definição de tipos globais editáveis por empresa e o vínculo exclusivo opcional de orçamento já foram recebidos como requisitos funcionais, mas a estratégia física ainda não está aprovada.
 
 ## 11. Evidência e limites da inspeção
 
@@ -435,4 +455,5 @@ Não executar essa sequência sem aprovação do modelo físico, plano de migra�
 
 ## Histórico de alterações
 
+- 2026-11-08 — v0.2.0: revisão após decisões funcionais sobre catálogo global editável por empresa, vínculo exclusivo opcional de orçamento, execução/sessões no nível da visita, limiares GPS de pausa/retomada e transição entre visitas. Removidas sessões de tarefa; máquina de estados do módulo Chat mantida separada. Histórico append-only registrado como recomendação pendente de validação.
 - 2026-11-08 — v0.1.0: criação do modelo lógico proposto e matriz de conformidade inicial com o schema Supabase.
