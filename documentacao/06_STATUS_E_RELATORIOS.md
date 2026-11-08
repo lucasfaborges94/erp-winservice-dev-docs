@@ -81,7 +81,7 @@ Foi criado `documentacao/MODELO_FUNCIONAL_OPERACIONAL_MVP.md`, versão 0.1.0, co
 - Tarefa não possui status de execução/conclusão; períodos de trabalho são registrados em sessões independentes.
 - Relatos podem pertencer à visita ou à tarefa; visita exige pelo menos um relato para encerramento.
 - Equipamento em tarefa é opcional e distingue equipamento identificado, não identificado e ausência de equipamento.
-- Check-in automático inicial: 50 m e 5 minutos, com parâmetros configuráveis; inicia a primeira tarefa sem sessão iniciada.
+- Check-in automático inicial: 50 m e 5 minutos, com parâmetros configuráveis; inicia a execução da visita; tarefas são registradas dentro da visita e não possuem início individual.
 - Afastamento pausa a sessão; retorno permite retomada automática.
 - Somente sessões pausadas podem ser finalizadas pelo limite da jornada; sessão ainda em execução não deve ser finalizada automaticamente.
 - Reabertura de visita finalizada é exclusiva do técnico dentro de 200 m; gestor não pode reabrir.
