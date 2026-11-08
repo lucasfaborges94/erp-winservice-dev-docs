@@ -1,6 +1,6 @@
 # ERP Winservice — Base oficial de documentação
 
-**Versão do pacote:** 0.5.0  
+**Versão do pacote:** 0.6.0  
 **Data de consolidação:** 2026-11-08  
 **Estado:** baseline documental em evolução  
 **Projeto:** ERP Winservice
@@ -48,7 +48,7 @@ Esta documentação é a referência persistente para planejar, especificar, des
 10. [Continuidade e transferência](08_CONTINUIDADE_E_TRANSFERENCIA.md) — encerramento e retomada de trabalho entre pessoas e ferramentas.
 11. [Modelo de autorização e isolamento multiempresa](MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md) — proposta técnica para discussão; não aprovada.
 12. [Modelo funcional operacional do MVP](MODELO_FUNCIONAL_OPERACIONAL_MVP.md) — requisitos funcionais de Operação e confronto inicial com o schema Supabase; não substitui ADRs nem comprova implementação.
-13. [Rascunho](RASCUNHO.md) — ideias e propostas ainda não aprovadas.
+13. [Modelo lógico de dados e matriz de conformidade — Operação](MODELO_LOGICO_DADOS_OPERACAO.md) — proposta técnica para validação; não aprovada como modelo físico.\n14. [Rascunho](RASCUNHO.md) — ideias e propostas ainda não aprovadas.
 
 ## Regras essenciais
 
@@ -70,7 +70,7 @@ Esses arquivos são fotografias técnicas daquela data, não garantia de que o a
 
 ## Histórico deste arquivo
 
-- 2026-11-08 — v0.5.0: inclusão do modelo funcional operacional do MVP no mapa documental.
+- 2026-11-08 — v0.6.0: inclusão do modelo lógico de dados e matriz de conformidade da Operação.\n- 2026-11-08 — v0.5.0: inclusão do modelo funcional operacional do MVP no mapa documental.
 - 2026-11-07 — v0.4.0: inclusão da proposta de modelo de autorização e isolamento multiempresa no mapa documental.
 
 - 2026-11-07 — v0.3.0: inclusão do protocolo universal de fonte da verdade e do procedimento de continuidade e transferência entre contas, ferramentas e profissionais.
