@@ -31,6 +31,7 @@ Esta documentação é a referência persistente para planejar, especificar, des
     ├── MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md
     ├── MODELO_FUNCIONAL_OPERACIONAL_MVP.md
     ├── MODELO_LOGICO_DADOS_OPERACAO.md
+    ├── BASE_CONHECIMENTO_ERP.md
     ├── RASCUNHO.md
     └── decisoes/
         ├── ADR-TEMPLATE.md
@@ -52,7 +53,8 @@ Esta documentação é a referência persistente para planejar, especificar, des
 11. [Modelo de autorização e isolamento multiempresa](MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md) — proposta técnica para discussão; não aprovada.
 12. [Modelo funcional operacional do MVP](MODELO_FUNCIONAL_OPERACIONAL_MVP.md) — requisitos funcionais de Operação, incluindo requisitos, evidências e aceite digital; não substitui ADRs nem comprova implementação.
 13. [Modelo lógico de dados e matriz de conformidade — Operação](MODELO_LOGICO_DADOS_OPERACAO.md) — proposta técnica para validação; não aprovada como modelo físico.
-14. [Rascunho](RASCUNHO.md) — ideias e propostas ainda não aprovadas.
+14. [Base de Conhecimento do ERP](BASE_CONHECIMENTO_ERP.md) — arquitetura aprovada conceitualmente para organizar conhecimento compartilhado por humanos e agentes de IA; contratos e conteúdos detalhados serão construídos progressivamente.
+15. [Rascunho](RASCUNHO.md) — ideias e propostas ainda não aprovadas.
 
 ## Regras essenciais
 
@@ -74,6 +76,7 @@ Esses arquivos são fotografias técnicas daquela data, não garantia de que o a
 
 ## Histórico deste arquivo
 
+- 2026-11-08 — atualização do mapa documental para incluir a arquitetura da Base de Conhecimento do ERP e a consolidação do ciclo operacional único da visita.
 - 2026-11-08 — v1.0.0: explicita o repositório como memória documental oficial do projeto e os históricos de conversa como contexto auxiliar.
 - 2026-11-08 — v0.9.0: atualização do mapa documental para incluir o escopo consolidado de requisitos, evidências e aceite digital nos modelos funcional e lógico.
 - 2026-11-08 — v0.8.0: consolidação das definições de GPS, histórico de posições, finalização de visita, histórico append-only aprovado e proposta de catálogo global versionado.
