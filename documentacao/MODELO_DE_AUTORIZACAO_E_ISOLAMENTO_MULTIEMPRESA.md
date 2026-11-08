@@ -419,8 +419,16 @@ Foi concluída auditoria somente leitura no Supabase do projeto documentado, sch
 
 Resumo: 1 empresa; 5 usuários (1 ativo, 4 inativos); 1 vínculo empresarial; 3 papéis globais (`financial`, `superuser`, `technician`); 2 atribuições via `company_user_roles`; 1 permissão; nenhuma linha em `role_permissions` ou `user_permissions`. O vínculo existente tem `company_admin=true), `company_users.role_identifier` apontando para `superuser`, enquanto `company_user_roles` atribui `financial` e `technician`. Os achados não autorizam conversão automática; o mapeamento precisa de aprovação. Nenhum DDL ou dado foi alterado.
 
+
+## 17. Complemento da auditoria técnica — 2026-11-08
+
+A auditoria identificou que `public.can_view_expense(uuid)` é `SECURITY DEFINER`, consulta `company_users.role_identifier` e é executável por `anon`, `authenticated` e `service_role`. Portanto, o campo legado tem dependência funcional real e não pode ser removido sem substituição e validação da função. A função e a permissão de execução de `anon` são achados para revisão de segurança, não corrigidos nesta etapa.
+
+Nas sete tabelas de autorização examinadas, RLS está habilitado; policies foram encontradas somente em `users` e `company_users`. Não foram encontradas policies em `company_user_roles`, `roles`, `permissions`, `role_permissions` e `user_permissions`. Os cinco usuários têm `identifier = auth_user_identifier`; não foram encontrados triggers nas tabelas examinadas. Detalhes e limitações constam no relatório de auditoria. Nenhuma alteração foi feita no banco.
+
 ## Histórico de alterações
 
+- 2026-11-08 — v0.3.2: registra achados técnicos complementares da auditoria RLS e dependência da função can_view_expense no campo legado.
 - 2026-11-08 — v0.3.1: registra referência à auditoria somente leitura dos papéis, vínculos, administradores e permissões atuais. Nenhuma migração autorizada.
 - 2026-11-08 — v0.3.0: registra diretrizes em avaliação sobre sessões por aplicação, arquitetura extensível de catálogos, account_owner, papéis iniciais e levantamento de dados/dependências antes da migração. Não altera ADRs nem autoriza implementação.
 - 2026-11-08 — v0.2.0: consolida a união das permissões de múltiplos papéis para usuários comuns; define concessões e negações individuais, com negação prevalecendo para usuários comuns; define a imunidade do `superadmin` a negações individuais dentro do escopo empresarial; distingue `company_admin` de `superadmin`; formaliza os tipos conceituais `human` e `agent`; registra que o primeiro usuário humano provisionado recebe a designação `company_admin` e o papel `superadmin`; corrige a referência à tenancy para refletir a ADR-0017 aprovada; explicita questões técnicas ainda pendentes. Nenhuma alteração no Supabase.
