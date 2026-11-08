@@ -399,3 +399,36 @@ Ler primeiro `documentacao/relatorios/2026-11-07-auditoria-tecnica-supabase.md` 
 **Verificação:** os cinco arquivos foram relidos com sucesso no GitHub após as gravações.
 
 **Próxima ação:** executar auditoria de consistência documental descrita na seção 7.
+
+
+### Sessão — 2026-11-07 — Governança geral dos módulos e superadmin
+
+**Responsável/agente:** ChatGPT, sob orientação do responsável pelo projeto  
+**Ferramenta/ambiente:** GitHub — repositório documental, branch main  
+**Etapa do roadmap:** definição arquitetural / autorização multiempresa  
+**Módulo/processo:** governança transversal de módulos, provisionamento de usuários e agentes autônomos  
+**Estado:** CONCLUÍDA para atualização documental; implementação não iniciada
+
+#### 1. Objetivo
+Registrar as regras definidas pelo responsável para o papel de superadmin e a ativação dos módulos do ERP.
+
+#### 2. Decisões registradas nesta sessão
+- Agentes de IA nunca poderão ser superadmin.
+- O primeiro usuário de cada empresa será obrigatoriamente um usuário humano com papel de superadmin.
+- Cada empresa deverá manter ao menos um superadmin humano ativo; o sistema deverá impedir remoção, suspensão ou rebaixamento do último superadmin humano ativo.
+- A ativação em dois níveis — disponibilidade global pela plataforma e ativação individual por empresa — aplica-se a todos os módulos do ERP, não somente ao Módulo de IA.
+- Um módulo somente poderá operar quando estiver ativo nos dois níveis. O backend/API/orquestrador deverá impor essa condição; desativação deverá impedir novas ações de operações em andamento.
+
+#### 3. Artefatos alterados
+- `documentacao/MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md`: versão 0.1.4.
+- `documentacao/06_STATUS_E_RELATORIOS.md`: versão 0.6.0.
+- Este registro de continuidade.
+
+#### 4. Estado e limites
+As regras foram registradas na proposta documental e no status. Não foram criadas ou alteradas ADRs nesta sessão; a proposta permanece sujeita à formalização arquitetural. Nenhuma alteração foi realizada no Supabase, código, policies, funções, triggers ou configurações.
+
+#### 5. Pendências
+- Especificar o enforcement técnico transversal dos estados dos módulos.
+- Definir interrupção/cancelamento seguro de operações em andamento para qualquer módulo.
+- Especificar recuperação de acesso administrativo.
+- Formalizar as decisões em ADRs, após revisão e aprovação explícita do pacote correspondente.
