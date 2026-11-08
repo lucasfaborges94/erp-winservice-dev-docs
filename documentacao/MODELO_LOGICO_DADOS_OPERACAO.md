@@ -487,14 +487,14 @@ Não definir a lista de estados ativos até fechar a máquina de estados da visi
 - A amostra GPS é aceita inicialmente quando a incerteza reportada é de até 50 metros, limite configurável.
 - Manter histórico de posições dos técnicos em `technician_gps_positions`, separando `captured_at` de `received_at`.
 - Em perda de sinal, a última posição recebida permanece como última referência conhecida; registrar idade e não tratá-la como posição atual. Não gerar transição automática baseada somente em amostra obsoleta.
-- A execução/visita deve ser finalizada quando uma nova tarefa provocar a transição para fora da visita atual, quando iniciar novo deslocamento ou quando terminar a jornada do técnico responsável. O comportamento exato da transição quando uma tarefa começa dentro da mesma visita precisa ser confirmado.
-- A finalização por tarefa/deslocamento/jornada deve preservar relato textual com as palavras do técnico, status de destino e motivo de abandono/interrupção. Os valores padronizados de status/motivo e o tratamento de ausência de conectividade ainda serão definidos.
+- A execução/visita deve ser finalizada quando iniciar novo deslocamento ou quando terminar a jornada do técnico responsável. Tarefas não são iniciadas individualmente; todas permanecem vinculadas à visita e são avaliadas em conjunto no encerramento.
+- A finalização por deslocamento/interrupção deve preservar relato textual com as palavras do técnico, status de destino e motivo de abandono/interrupção. Os valores padronizados de status/motivo e o tratamento de ausência de conectividade ainda serão definidos.
 - Precisão mínima, frequência de amostragem, tolerância, perda de sinal, localização simulada/antifraude e tratamento de ausência de coordenadas continuam pendentes.
 - Check-in inicial confirmado: permanência de 5 minutos dentro do raio configurável de 50 metros.
 - Limite inicial de aceitação da precisão GPS: até 50 metros de incerteza reportada, configurável; valores menores indicam maior precisão.
 - Manter histórico de posições GPS dos técnicos em entidade própria, registrando captura, recebimento, precisão, origem e idade da posição.
 - Em perda de sinal, usar a última posição recebida como última referência conhecida, sem tratá-la como leitura atual. Não disparar pausa/retomada automática com base apenas em posição desatualizada.
-- Finalizar a visita quando outra tarefa que exija transição para fora da visita atual iniciar, quando novo deslocamento iniciar ou quando terminar a jornada do técnico responsável. Transições por tarefa/deslocamento exigem relato textual, atualização de status e motivo de abandono/interrupção.
+- Finalizar a visita quando iniciar novo deslocamento ou quando terminar a jornada do técnico responsável. Tarefas não são iniciadas individualmente e não constituem gatilho de finalização. Encerramento por deslocamento/interrupção exige relato textual, atualização de status e motivo de abandono/interrupção.
 - No fim da jornada, somente execução pausada pode ser fechada automaticamente; execução ativa não deve ser encerrada automaticamente.
 
 ## 6. Diagrama de fluxo do histórico
@@ -647,6 +647,6 @@ Não executar essa sequência sem aprovação do modelo físico, plano de migra�
 ## Histórico de alterações
 
 - 2026-11-08 — v0.4.0: inclusão das avaliações históricas por tentativa, pendências obrigatórias/opcionais, tratamento por gestor/atendente, evidências com uploads idempotentes e confirmação no backend, metadados temporais/GPS e proposta lógica de resumo/aceite digital versionado com coleta remota, presencial e offline.
-- 2026-11-08 — v0.3.0: inclusão do histórico GPS de técnicos, precisão configurável de até 50 m, posição mais recente sem inferência a partir de amostra obsoleta, gatilhos de finalização por nova tarefa/deslocamento/fim de jornada, confirmação do check-in inicial e aprovação da diretriz append-only; detalhada proposta de repositório global de catálogos versionados.
+- 2026-11-08 — v0.3.0: inclusão do histórico GPS de técnicos, precisão configurável de até 50 m, posição mais recente sem inferência a partir de amostra obsoleta, gatilhos de finalização por deslocamento/fim de jornada; tarefas não possuem início individual, confirmação do check-in inicial e aprovação da diretriz append-only; detalhada proposta de repositório global de catálogos versionados.
 - 2026-11-08 — v0.2.0: revisão após decisões funcionais sobre catálogo global editável por empresa, vínculo exclusivo opcional de orçamento, execução/sessões no nível da visita, limiares GPS de pausa/retomada e transição entre visitas. Removidas sessões de tarefa; máquina de estados do módulo Chat mantida separada.
 - 2026-11-08 — v0.1.0: criação do modelo lógico proposto e matriz de conformidade inicial com o schema Supabase.
