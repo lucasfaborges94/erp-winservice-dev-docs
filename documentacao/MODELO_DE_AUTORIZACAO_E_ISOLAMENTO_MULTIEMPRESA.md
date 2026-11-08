@@ -1,7 +1,7 @@
 # Modelo de autorização e isolamento multiempresa — ERP Winservice
 
 **Documento:** Modelo de autorização e isolamento multiempresa  
-**Versão:** 0.1.3  
+**Versão:** 0.1.4  
 **Data:** 2026-11-07  
 **Estado:** PROPOSTA PARA DISCUSSÃO — não aprovada como decisão arquitetural  
 **Projeto Supabase consultado:** Winservice (`voaovwphncwbrwtcqnsc`)  
@@ -194,7 +194,7 @@ A Isa é a primeira instância desse conceito na Winservice, configurada para at
 
 ### 10.2 Identidade, vínculo e autorização
 
-Cada usuário autônomo deve possuir identidade própria no contexto da empresa, vínculo explícito com a empresa proprietária e permissões limitadas à sua função. Não deve operar com a identidade pessoal do usuário que o cadastrou, nem herdar automaticamente os privilégios desse usuário.
+Cada usuário autônomo deve possuir identidade própria no contexto da empresa, vínculo explícito com a empresa proprietária e permissões limitadas à sua função. Agentes de IA nunca poderão receber, ocupar ou exercer o papel de superadmin, independentemente de sua função ou configuração. Não deve operar com a identidade pessoal do usuário que o cadastrou, nem herdar automaticamente os privilégios desse usuário.
 
 A autorização de um agente deve considerar:
 
@@ -242,26 +242,30 @@ Workflows e integrações de infraestrutura, como n8n e conectores externos, nã
 
 Não reutilizar indiscriminadamente a identidade de um administrador ou a chave `service_role`. O uso de `service_role` ou de funções `SECURITY DEFINER` deve ser excepcional, restrito e justificado; essas vias não podem contornar silenciosamente as regras de negócio e de isolamento.
 
-### 10.6 Módulo de Inteligência Artificial
+### 10.6 Governança de ativação dos módulos do ERP
 
-O ERP deverá possuir um **Módulo de Inteligência Artificial (IA)** próprio, cuja disponibilidade e ativação serão controladas em dois níveis independentes:
+A regra de ativação em dois níveis aplica-se **a todos os módulos do ERP**, e não somente ao Módulo de Inteligência Artificial. Cada módulo deverá possuir controles independentes de disponibilidade global pela plataforma e de ativação individual por empresa.
 
-1. **Disponibilidade global pela plataforma:** somente os desenvolvedores responsáveis pelo ERP — inicialmente o próprio responsável pelo projeto e, futuramente, membros de sua equipe — poderão ativar ou desativar globalmente a disponibilidade do módulo.
-2. **Ativação individual por empresa:** o superadmin da própria empresa poderá ativar ou desativar o módulo para aquela empresa. Cada empresa deverá manter no mínimo um superadmin.
+1. **Disponibilidade global pela plataforma:** somente os desenvolvedores responsáveis pelo ERP — inicialmente o responsável pelo projeto e, futuramente, membros autorizados de sua equipe — poderão ativar ou desativar globalmente a disponibilidade de cada módulo.
+2. **Ativação individual por empresa:** o superadmin da própria empresa poderá ativar ou desativar cada módulo para aquela empresa.
 
-A condição efetiva de utilização será a conjunção dos dois controles: o módulo somente estará disponível para uma empresa quando estiver disponibilizado globalmente pela plataforma **e** habilitado para aquela empresa. A ativação individual não poderá sobrepor uma indisponibilidade global.
+Um módulo somente estará efetivamente disponível para uma empresa quando estiver disponibilizado globalmente pela plataforma **e** habilitado para aquela empresa. A ativação individual não poderá sobrepor uma indisponibilidade global.
 
-A ativação do módulo não ativa automaticamente os agentes. Cada usuário autônomo/agente deverá possuir estado próprio e somente poderá executar operações quando, cumulativamente, o módulo estiver disponibilizado globalmente, estiver habilitado para a empresa, o agente estiver ativo e as permissões e demais condições de autorização forem satisfeitas.
+A verificação da condição efetiva deverá ocorrer no backend/API ou no orquestrador responsável pela operação, e não apenas na interface. Nenhuma operação ou execução pertencente a um módulo poderá começar ou continuar produzindo novas ações quando qualquer um dos dois níveis estiver desativado. O mecanismo técnico de interrupção, cancelamento ou encerramento seguro de operações em andamento deverá ser especificado.
 
-**Toda execução de IA deverá ocorrer somente enquanto o módulo estiver efetivamente ativo para a empresa.** A verificação desse estado deverá ser aplicada no backend/orquestrador, não apenas na interface. O controle deverá impedir o início de novas execuções quando qualquer um dos dois níveis estiver desativado. Se o módulo for desativado durante uma execução, o sistema deverá impedir que a execução continue realizando novas ações; o mecanismo seguro de interrupção, cancelamento ou encerramento de etapa deverá ser especificado tecnicamente.
+A desativação de um módulo deverá bloquear novas operações daquele módulo no escopo afetado, sem apagar automaticamente dados, configurações, históricos ou registros anteriormente produzidos. A retomada dependerá de o módulo voltar a estar disponível globalmente e habilitado para a empresa, além das demais condições de autorização.
 
-A desativação do módulo por uma empresa deverá bloquear as execuções de seus agentes, sem apagar identidades, configurações, históricos ou registros anteriormente produzidos. A indisponibilidade global também deverá impedir execuções em todas as empresas afetadas, preservando os dados e permitindo retomada conforme as regras da plataforma.
+Esta regra é transversal e deverá ser aplicada de forma consistente a todos os módulos, APIs, workflows, aplicações e canais de acesso. Um módulo não poderá contornar o controle por meio de chamadas diretas, funções privilegiadas ou automações técnicas.
 
-O módulo de IA deverá ser tratado como módulo funcional/comercial do ERP. Provedores de modelos, workflows de execução, n8n e demais componentes de infraestrutura são serviços de suporte e não se confundem com o módulo nem com a identidade dos agentes.
+### 10.7 Regras específicas do Módulo de Inteligência Artificial
 
-A exigência de no mínimo um superadmin por empresa implica que o sistema deverá impedir operações administrativas que deixem uma empresa sem superadmin ativo, inclusive a remoção, suspensão ou rebaixamento do último superadmin. O procedimento de criação inicial da empresa e de recuperação de acesso administrativo ainda deverá ser especificado.
+O ERP deverá possuir um **Módulo de Inteligência Artificial (IA)** próprio. Sua utilização estará subordinada à regra geral de ativação dos módulos descrita na seção 10.6.
 
-**Escopo desta definição:** estão definidos os responsáveis por cada nível de controle, a exigência de pelo menos um superadmin por empresa e a condição de que nenhuma execução de IA ocorra com o módulo inativo. Permanecem para especificação o tratamento técnico de execuções em andamento, o procedimento de provisionamento/recuperação do superadmin, a política de contratação/limites e os requisitos operacionais de retomada.
+A ativação do Módulo de IA não ativa automaticamente os agentes. Cada usuário autônomo/agente deverá possuir estado próprio e somente poderá executar operações quando, cumulativamente, o módulo estiver efetivamente ativo para a empresa, o agente estiver ativo e as permissões e demais condições de autorização forem satisfeitas.
+
+Toda execução de IA deverá ser bloqueada quando o módulo estiver indisponível globalmente ou desabilitado para a empresa. Se o módulo for desativado durante uma execução, a execução não poderá continuar realizando novas ações. O mecanismo seguro de interrupção, cancelamento ou encerramento de etapa deverá ser especificado tecnicamente.
+
+Provedores de modelos, workflows de execução, n8n e demais componentes de infraestrutura são serviços de suporte e não se confundem com o Módulo de IA nem com a identidade dos agentes.
 
 ## 11. Estratégia de tenancy — alternativas em avaliação
 
@@ -337,6 +341,7 @@ Os itens abaixo precisam de resposta do responsável antes de transformar esta p
 
 ## Histórico de alterações
 
+- 2026-11-07 — v0.1.4: generaliza a ativação em dois níveis para todos os módulos; define que o primeiro usuário da empresa será humano e superadmin; proíbe agentes de IA como superadmin; exige a manutenção de ao menos um superadmin humano ativo.
 - 2026-11-07 — v0.1.3: define que desenvolvedores do ERP controlam a disponibilidade global, superadmin controla a ativação por empresa, cada empresa mantém ao menos um superadmin e toda execução de IA depende do módulo efetivamente ativo.
 - 2026-11-07 — v0.1.2: registra o Módulo de Inteligência Artificial com disponibilidade global pela plataforma e ativação individual por empresa; define a conjunção dos controles e a independência do estado de cada agente.
 - 2026-11-07 — v0.1.1: esclarece usuários autônomos como usuários ERP operados por IA, configuráveis por empresa; diferencia agentes de negócio de workflows técnicos; delimita a ADR-0012 à configuração da Isa e registra questões de implementação pendentes.
