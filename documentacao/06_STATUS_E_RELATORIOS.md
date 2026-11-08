@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 1.7.0  
+**Versão:** 1.8.0  
 **Data-base:** 2026-11-08
 
 ## 1. Resumo executivo
@@ -286,13 +286,30 @@ Documento: [PLANO_MIGRACAO_FUNDACAO_MULTIEMPRESA_PARTE_A_MVP.md](relatorios/PLAN
 
 A Parte A cobre estrutura física, backfill, constraints, FKs compostas, unicidade por empresa, correções de defaults, integridade, testes e rollback. A Parte B — contexto confiável de empresa, funções auxiliares, grants e RLS — permanece separada até definição do contrato transacional no backend.
 
-Bloqueios identificados na inspeção de 2026-11-08:
-- uma visita sem evidência para determinar o tenant;
-- 26 visitas sem ordem de serviço associada e tabela de OS vazia;
-- divergência entre `company_users.role_identifier` e as duas linhas de `company_user_roles`;
-- desenho físico pendente para catálogos globais e adoção local;
-- reconciliação do catálogo de permissões com a ADR-0011;
-- correção da função de snapshot de endereço depende da inspeção do trigger;
-- baseline de migrations e repositório de implementação ainda não identificados.
+**Atualização documental subsequente:** o responsável confirmou que todas as 26 visitas pertencem à Winservice e que a OS é opcional para uma visita. Esses dois pontos deixam de ser bloqueios. A visita sem cliente/endereço continuará sem vínculos artificiais.
+
+Pendências vigentes:
+- divergência entre `company_users.role_identifier` e as duas linhas de `company_user_roles`; a documentação ainda não aprova formalmente a fonte única nem a remoção do campo legado;
+- aprovação/ajuste da proposta física do catálogo de permissões global versionado e adoção por empresa;
+- desenho físico de catálogos de tarefa/requisito;
+- correção da função de snapshot de endereço, dependente da inspeção do trigger;
+- baseline de migrations e repositório de implementação ainda não identificados;
+- Parte B: contrato confiável de contexto transacional no backend antes de funções, grants e RLS.
 
 Nenhum DDL, DML, migration, policy ou grant foi executado nesta etapa.
+
+
+## 15. Complemento — revisão do plano multiempresa e catálogo de permissões (2026-11-08)
+
+O plano da Parte A foi revisado para incorporar as deliberações do responsável:
+- todas as 26 visitas existentes pertencem à Winservice; o backfill deverá preencher o tenant em todas;
+- visita pode existir sem OS; `work_order_identifier` permanece nullable e a FK composta será aplicada quando houver referência;
+- a ADR-0017 não foi considerada suficiente para declarar formalmente `company_user_roles` como fonte única e remover `company_users.role_identifier`; o campo permanece sem alteração até deliberação e reconciliação dos dados divergentes.
+
+Foi criada a proposta [PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md](relatorios/PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md), v0.1.0, com catálogo global versionado, cópia efetiva tenant-scoped, preservação de customizações, adoção voluntária, histórico e restauração. A proposta aguarda aprovação e não autoriza DDL.
+
+Artefatos atualizados:
+- [PLANO_MIGRACAO_FUNDACAO_MULTIEMPRESA_PARTE_A_MVP.md](relatorios/PLANO_MIGRACAO_FUNDACAO_MULTIEMPRESA_PARTE_A_MVP.md), v0.2.0.
+- [PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md](relatorios/PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md), v0.1.0.
+
+A inspeção somente leitura do schema confirmou, neste momento, 1 registro em `permissions`, 0 em `role_permissions`, 0 em `user_permissions`, 3 em `roles`, 1 em `company_users` e 2 em `company_user_roles`. Nenhuma alteração no Supabase foi executada.
