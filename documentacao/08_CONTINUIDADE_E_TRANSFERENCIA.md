@@ -162,6 +162,27 @@ Fazer uma auditoria de consistência documental do repositório: validar links r
 
 ## 8. Histórico de sessões
 
+### 2026-11-07 — Esclarecimento do conceito de usuários autônomos de IA
+
+**Estado:** CONCLUÍDA para atualização da proposta documental; decisões de implementação ainda pendentes.  
+**Contexto:** o responsável esclareceu que a Isa foi concebida como um usuário comum do ERP, operado autonomamente por IA. Cada empresa poderá cadastrar usuários autônomos para funções específicas e personalizar nome e perfil de cada agente. A Isa é a primeira atendente de IA da Winservice, não uma função fixa da plataforma.
+
+**Atualização realizada:**
+- A seção de agentes foi reformulada para definir usuários autônomos como usuários ERP operados por IA.
+- Diferenciados usuários autônomos de workflows e integrações técnicas.
+- Registrado que agentes têm identidade e permissões próprias, sem herdar automaticamente privilégios de quem os cadastrou.
+- Delimitados os limites da ADR-0012 à configuração atual da Isa, sem generalizá-los automaticamente a todos os futuros agentes.
+- Incluída rastreabilidade entre empresa, configurador, agente executor e atendimento/processo.
+- Registrado como pendente decidir se a implementação reutilizará `users` com tipo/modo de execução ou terá entidade complementar.
+
+**Arquivo alterado:**
+- `documentacao/MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md` — versão 0.1.1, commit `078712afdff5fa7d74ea18276de912a6d5151dad`.
+
+**Banco Supabase:** nenhuma alteração realizada.
+
+**Próxima ação:** validar o conceito e, depois, definir a representação de dados, ciclo de vida, vínculo com empresa, configuração e matriz de permissões dos usuários autônomos.
+
+
 ### 2026-11-07 — Proposta do modelo de autorização e isolamento multiempresa
 
 **Responsável/agente:** ChatGPT, com autorização do responsável para elaborar a proposta  
