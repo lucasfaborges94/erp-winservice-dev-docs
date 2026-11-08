@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 1.4.0  
+**Versão:** 1.5.0  
 **Data-base:** 2026-11-08
 
 ## 1. Resumo executivo
@@ -217,3 +217,40 @@ O status e a continuidade foram atualizados nesta publicação para refletir o f
 - 2026-11-07 — v0.4.0: registra a definição conceitual do Módulo de IA com disponibilidade global pela plataforma e ativação individual por empresa.
 - 2026-11-07 — v0.3.0: inclusão do relatório de auditoria técnica somente leitura do Supabase e atualização do estado conhecido.\n- 2026-11-07 — v0.2.0: registro do protocolo de fonte da verdade e da continuidade entre ferramentas e profissionais.
 - 2026-11-07 — v0.1.0: baseline inicial do status do projeto.
+
+## 14. Consolidação do ciclo operacional da visita e Base de Conhecimento — 2026-11-08
+
+### Decisões funcionais aprovadas pelo responsável
+
+- A visita é a única entidade com máquina de estados do ciclo operacional. A proposta de Máquina B foi eliminada.
+- Não haverá estados independentes de sessão (active, paused, closed) nem entidade de sessão de execução no MVP.
+- O histórico temporal e operacional será registrado em eventos append-only diretamente vinculados à visita (visit_events); duração e intervalos serão projeções calculadas a partir dos eventos.
+- Tarefas permanecem sem estados e sem sessões de execução.
+- Máquina A aprovada: pending, in_displacement, in_progress, paused, completed, interrupted, prevented, canceled, com transições documentadas no modelo funcional.
+- Revogação de autenticação: pending permanece; in_displacement retorna a pending; in_progress e paused passam a interrupted; estados terminais permanecem.
+- Fim da jornada não encerra automaticamente visita nem execução. Início/check-in fora da jornada exige confirmação do técnico.
+- A arquitetura conceitual da Base de Conhecimento foi aprovada em quatro camadas: domínio, operação, contratos e guias por público. Guias devem derivar das fontes normativas, sem duplicar regras.
+- A autorização de humanos e agentes permanece imposta pelo backend/API/RLS; conhecimento de uma operação não concede autorização.
+
+### Artefatos documentais atualizados
+
+- MODELO_FUNCIONAL_OPERACIONAL_MVP.md: v0.6.0.
+- MODELO_LOGICO_DADOS_OPERACAO.md: v0.5.0 (proposta lógica; não aprovada como modelo físico).
+- BASE_CONHECIMENTO_ERP.md: criado como arquitetura e governança da base compartilhada.
+- 00_LEIA-ME.md: mapa documental atualizado.
+- 08_CONTINUIDADE_E_TRANSFERENCIA.md: registro desta sessão.
+
+### Estado e limites
+
+Esta atualização é documental. Não foram alterados código da aplicação, banco Supabase, DDL, DML, migrations, policies, funções, triggers, dados ou infraestrutura. A estrutura física de visit_events, transações, idempotência, índices, projeções e retenção permanece pendente de especificação. Nenhuma Máquina B foi implementada ou aprovada anteriormente como ADR; sua eliminação consolida o modelo funcional/lógico aprovado pelo responsável.
+
+### Pendências prioritárias
+
+1. Especificar estrutura física e transações atômicas de visit_events.
+2. Definir idempotência e ordenação de eventos, inclusive sincronização offline.
+3. Definir jornada por empresa e confirmação para início fora do horário.
+4. Definir se logout voluntário, expiração de token e revogação administrativa compartilham a regra de revogação aprovada.
+5. Fechar motivos padronizados de prevented, interrupted e cancelamento.
+6. Definir frequência, idade máxima, retenção e controles do histórico GPS.
+7. Continuar especificação da Base de Conhecimento: glossário, entidades, processos, contratos e guias derivados.
+8. Validar o modelo lógico e confrontá-lo novamente com o estado real do Supabase antes de qualquer DDL.
