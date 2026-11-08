@@ -1,13 +1,13 @@
 # Especificação física proposta — Fundação multiempresa e isolamento do MVP
 
-**Versão:** 0.1.0  
+**Versão:** 0.2.0  
 **Data:** 2026-11-08  
-**Estado:** PROPOSTA TÉCNICA COMPLETA PARA APROVAÇÃO — NÃO APROVADA  
+**Estado:** APROVADA PELO RESPONSÁVEL — DIRETRIZ FÍSICA; DDL AINDA NÃO AUTORIZADO  
 **Escopo:** modelo físico lógico-relacional, tenancy, integridade, autorização, RLS, backend e migração  
 **Ambiente auditado:** Supabase Winservice, projeto `voaovwphncwbrwtcqnsc`, schema `public`  
 **Natureza:** especificação para deliberação; não é migration nem autorização para executar DDL.
 
-> **Regra de segurança:** nenhum DDL, grant, policy, função, trigger, migration ou dado foi alterado por este documento. A aprovação desta proposta deverá ser explícita e não autoriza automaticamente a execução no Supabase. A execução será apresentada em plano/migrations revisáveis, com backup, validações e janela de implantação.
+> **Regra de segurança:** nenhum DDL, grant, policy, função, trigger, migration ou dado foi alterado por este documento. A proposta foi aprovada explicitamente pelo responsável em 2026-11-08. Essa aprovação valida a direção e os contratos descritos, mas não autoriza automaticamente a execução no Supabase. A execução será apresentada em plano/migrations revisáveis, com backup, validações e janela de implantação.
 
 ## 1. Objetivo e resultado esperado
 
@@ -489,9 +489,11 @@ A proposta abaixo contém escolhas técnicas que precisam de aprovação ou ajus
 13. política de retenção e anonimização de eventos/GPS/evidências ainda precisa de especificação.
 14. modelo físico de autenticação de agentes e contexto de sessões por aplicação permanece dependente de especificação própria.
 
-## 15. Critério de aprovação desta proposta
+## 15. Aprovação e próximo gate
 
-Aprovar este documento significa aprovar a direção técnica e os contratos físicos aqui descritos, sujeitos às ressalvas explicitamente indicadas. Itens marcados como pendentes não se tornam automaticamente aprovados. A aprovação não autoriza execução no Supabase.
+**Aprovação registrada:** o responsável aprovou explicitamente esta especificação em 2026-11-08. A aprovação valida a direção técnica e os contratos físicos descritos, sujeitos às ressalvas explicitamente indicadas. Itens marcados como pendentes não se tornam automaticamente aprovados.
+
+**Limite da aprovação:** não autoriza execução no Supabase, alteração de schema, grants, policies, funções, triggers, dados ou migrations. A próxima entrega será o pacote de migrations/DDL detalhado, acompanhado de plano de backfill, testes automatizados e rollback, para autorização explícita e separada.
 
 Após aprovação:
 - preparar plano de migração detalhado, tabela por tabela, com SQL completo e ordem de execução;
@@ -514,4 +516,5 @@ Após aprovação:
 
 ## Histórico
 
+- 2026-11-08 — v0.2.0: aprovação explícita do responsável para a direção física e os contratos desta especificação. DDL, migrations e alterações no Supabase permanecem não autorizados.
 - 2026-11-08 — v0.1.0: primeira consolidação da proposta física multiempresa, com classificação tenant por tabela, regras de integridade, identidade, autorização, RLS, backend, migração e critérios de aceite. Criada para revisão; não aprovada e não implementada.
