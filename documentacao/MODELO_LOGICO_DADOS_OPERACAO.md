@@ -41,7 +41,7 @@ Fora do escopo desta proposta: DDL, migrações, políticas RLS, implementação
 14. A regra anteriormente registrada de check-in inicial dentro de 50 metros por 5 minutos permanece como requisito a confirmar em conjunto com os novos limiares; não deve ser confundida com a regra de retomada.
 15. O fim da jornada não encerra automaticamente a visita nem a execução. Ao tentar iniciar/check-in fora da jornada, o aplicativo solicita confirmação explícita ao técnico.
 16. A visita finalizada automaticamente pode exigir relato posterior do técnico antes de ele prosseguir no aplicativo ou iniciar novo deslocamento/visita.
-17. Reabertura de visita finalizada é exclusiva do técnico dentro de 200 metros do endereço. Gestor e atendente não podem reabrir.
+17. Estados terminais da visita não podem ser reabertos; a continuidade exige nova visita, que poderá permanecer vinculada à mesma OS.
 18. Gestor pode editar visita finalizada. Edição por técnico e atendente é configurável pelo gestor.
 19. Tipos de tarefa partem de um catálogo global, mas cada empresa poderá editar sua própria versão sem alterar o catálogo global nem as versões das demais empresas.
 20. Um orçamento pode estar vinculado a, no máximo, uma entidade operacional: uma OS, uma visita, uma tarefa ou nenhuma delas.
@@ -434,7 +434,7 @@ A regra de uma visita não terminal por técnico precisa de garantia transaciona
 - índice único parcial sobre `responsible_id` para os estados de visita considerados ativos; ou
 - tabela de alocação/claim ativo com uma linha única por técnico e referência à visita.
 
-Os estados que ocupam a exclusividade são in_displacement, in_progress e paused. Reabertura deve disputar a mesma exclusividade, sem janela de concorrência.
+Os estados que ocupam a exclusividade são in_displacement, in_progress e paused. O início de nova visita deve disputar a mesma exclusividade, sem janela de concorrência.
 
 ### 5.6 Execução da visita e GPS
 
