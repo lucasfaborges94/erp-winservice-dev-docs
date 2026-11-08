@@ -401,7 +401,7 @@ A cadeia canônica recomendada é:
 - `work_orders`: `(identifier, company_identifier, customer_identifier)`;
 - `visits`: `(identifier, company_identifier, work_order_identifier)`;
 - `visit_tasks`: `(identifier, company_identifier, visit_identifier, equipment_identifier)`;
-- `visit_execution_sessions`: `(identifier, company_identifier, visit_identifier)`;
+- `visit_events`: `(identifier, company_identifier, visit_identifier)`;
 - `equipments`: `(identifier, company_identifier, customer_identifier)`;
 - `quotations`: vínculo opcional exclusivo a OS, visita ou tarefa, sempre na mesma empresa e contexto de cliente.
 
@@ -409,7 +409,7 @@ Constraints compostas devem impedir:
 - visita ligada a OS de outra empresa;
 - equipamento de outro cliente/empresa associado à tarefa;
 - tarefa anterior de outro cliente/empresa;
-- relato, sessão ou evento associado a registro de outro tenant.
+- relato ou evento associado a registro de outro tenant.
 
 O cliente da visita deve ser herdado da OS como fonte canônica. Se a coluna `visits.customer_identifier` for mantida por compatibilidade, precisa ser validada contra `work_orders.customer_identifier`.
 
@@ -434,7 +434,7 @@ A regra de uma visita não terminal por técnico precisa de garantia transaciona
 - índice único parcial sobre `responsible_id` para os estados de visita considerados ativos; ou
 - tabela de alocação/claim ativo com uma linha única por técnico e referência à visita.
 
-Não definir a lista de estados ativos até fechar a máquina de estados da visita. Reabertura deve disputar a mesma exclusividade, sem janela de concorrência.
+Os estados que ocupam a exclusividade são in_displacement, in_progress e paused. Reabertura deve disputar a mesma exclusividade, sem janela de concorrência.
 
 ### 5.6 Execução da visita e GPS
 
@@ -469,28 +469,6 @@ A visita é a única máquina de estados operacional. Não haverá tabela visit_
 - Uploads devem ser idempotentes; tentativas e retries precisam ser registráveis sem duplicar evidência.
 - Assinatura digital deve apontar para uma versão imutável do resumo e anexos, identificada por hash. Alteração relevante exige nova versão e novo aceite.
 - A coleta offline permanece provisória até sincronização e confirmação pelo backend.
-
-- Sessões de execução pertencem à visita; não existe sessão de execução de tarefa.
-- A exclusividade é de uma visita em execução por técnico.
-- Eventos de sessão e GPS são append-only e ordenados por `occurred_at` e `recorded_at`.
-- Afastamento a partir de 200 metros (inclusive) do endereço da visita pausa a execução; o limiar é configurável.
-- Retorno a até 50 metros (inclusive) retoma a execução pausada, desde que a visita permaneça operacional; o limiar é configurável.
-- Os limiares de saída e retorno são assimétricos de propósito e evitam alternância frequente perto de um único limite (histerese).
-- GPS automático deve ser idempotente: repetição de callback/localização não pode criar início, pausa ou retomada duplicados.
-- Visita finalizada não deve ser silenciosamente reativada por mera chegada GPS.
-- Check-in inicial automático exige permanência de 5 minutos dentro de 50 metros, ambos configuráveis.
-- A amostra GPS é aceita inicialmente quando a incerteza reportada é de até 50 metros, limite configurável.
-- Manter histórico de posições dos técnicos em `technician_gps_positions`, separando `captured_at` de `received_at`.
-- Em perda de sinal, a última posição recebida permanece como última referência conhecida; registrar idade e não tratá-la como posição atual. Não gerar transição automática baseada somente em amostra obsoleta.
-- A execução/visita deve ser finalizada quando iniciar novo deslocamento ou quando terminar a jornada do técnico responsável. Tarefas não são iniciadas individualmente; todas permanecem vinculadas à visita e são avaliadas em conjunto no encerramento.
-- A finalização por deslocamento/interrupção deve preservar relato textual com as palavras do técnico, status de destino e motivo de abandono/interrupção. Os valores padronizados de status/motivo e o tratamento de ausência de conectividade ainda serão definidos.
-- Precisão mínima, frequência de amostragem, tolerância, perda de sinal, localização simulada/antifraude e tratamento de ausência de coordenadas continuam pendentes.
-- Check-in inicial confirmado: permanência de 5 minutos dentro do raio configurável de 50 metros.
-- Limite inicial de aceitação da precisão GPS: até 50 metros de incerteza reportada, configurável; valores menores indicam maior precisão.
-- Manter histórico de posições GPS dos técnicos em entidade própria, registrando captura, recebimento, precisão, origem e idade da posição.
-- Em perda de sinal, usar a última posição recebida como última referência conhecida, sem tratá-la como leitura atual. Não disparar pausa/retomada automática com base apenas em posição desatualizada.
-- Finalizar a visita quando iniciar novo deslocamento ou quando terminar a jornada do técnico responsável. Tarefas não são iniciadas individualmente e não constituem gatilho de finalização. Encerramento por deslocamento/interrupção exige relato textual, atualização de status e motivo de abandono/interrupção.
-- No fim da jornada, somente execução pausada pode ser fechada automaticamente; execução ativa não deve ser encerrada automaticamente.
 
 ## 6. Diagrama de fluxo do histórico
 
@@ -565,8 +543,7 @@ Legenda:
 | Pendências e revisão | Nenhuma estrutura dedicada encontrada | Não há tratamento auditável de requisito não cumprido | Criar `requirement_pending_reviews` ou eventos equivalentes | P0 |
 | Evidências e uploads | `documents` genérico; sem fluxo dedicado comprovado | Não há vínculo estruturado a requisito, tentativa, upload, retry e confirmação | Criar/ajustar `evidence_records`, `evidence_uploads` e tentativas | P0 |
 | Aceite digital | `approval_events` e `documents` existem, mas não comprovam o fluxo especificado | Não há versão imutável do resumo nem assinatura vinculada à versão comprovada | Criar `acceptance_document_versions`, `digital_acceptances` e eventos de entrega | P1 |
-| Sessões de execução da visita | Nenhuma tabela dedicada encontrada | `visits` possui um único conjunto de check-in/checkout | Criar `visit_execution_sessions` | P0 |
-| Eventos GPS/execução da visita | Nenhuma tabela dedicada encontrada | Sem histórico de múltiplas pausas/retomadas | Criar `visit_execution_events` | P0 |
+| Eventos operacionais da visita | Nenhuma tabela dedicada encontrada | `visits` possui um único conjunto de check-in/checkout, insuficiente para a trilha append-only | Criar `visit_events` com eventos de estado, execução e GPS | P0 |
 | Histórico de posições GPS | Nenhuma tabela dedicada encontrada | `visits` mantém apenas coordenadas pontuais | Criar `technician_gps_positions` append-only, com captura/recebimento/precisão | P0 |
 | Eventos do ciclo da visita | Nenhuma tabela dedicada encontrada | Colunas atuais armazenam poucos marcos | Criar `visit_events`; manter colunas atuais como projeção temporária | P0 |
 | Auditoria de alterações | Nenhuma trilha append-only dedicada encontrada | Campos created/updated em algumas tabelas | Criar `audit_events` e/ou revisões por entidade; append-only obrigatório | P0 |
@@ -579,7 +556,7 @@ Legenda:
 
 ### 7.1 Notas específicas sobre objetos atuais
 
-- `work_order_equipment` não pode ser reaproveitada como entidade de tarefa. A tarefa precisa pertencer a uma visita e ter tipo, relatos, sessões e vínculo opcional a equipamento.
+- `work_order_equipment` não pode ser reaproveitada como entidade de tarefa. A tarefa precisa pertencer a uma visita e ter tipo, relatos, eventos relacionados e vínculo opcional a equipamento.
 - `task_types` é catálogo, não registro de tarefa executada.
 - O catálogo global deve ser versionado e separado das personalizações locais das empresas; uma atualização global não pode sobrescrever personalizações.
 - `visit_types` e `visit_type_requirement` descrevem tipo/requisitos de visita; não substituem requisitos de tarefa.
