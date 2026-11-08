@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 1.8.0  
+**Versão:** 1.9.0  
 **Data-base:** 2026-11-08
 
 ## 1. Resumo executivo
@@ -289,7 +289,7 @@ A Parte A cobre estrutura física, backfill, constraints, FKs compostas, unicida
 **Atualização documental subsequente:** o responsável confirmou que todas as 26 visitas pertencem à Winservice e que a OS é opcional para uma visita. Esses dois pontos deixam de ser bloqueios. A visita sem cliente/endereço continuará sem vínculos artificiais.
 
 Pendências vigentes:
-- divergência entre `company_users.role_identifier` e as duas linhas de `company_user_roles`; a documentação ainda não aprova formalmente a fonte única nem a remoção do campo legado;
+- executar ADR-0018: manter `company_user_roles` como fonte única, ignorar o campo legado e tratar dependências antes da remoção física de `company_users.role_identifier`;
 - aprovação/ajuste da proposta física do catálogo de permissões global versionado e adoção por empresa;
 - desenho físico de catálogos de tarefa/requisito;
 - correção da função de snapshot de endereço, dependente da inspeção do trigger;
@@ -313,3 +313,21 @@ Artefatos atualizados:
 - [PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md](relatorios/PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md), v0.1.0.
 
 A inspeção somente leitura do schema confirmou, neste momento, 1 registro em `permissions`, 0 em `role_permissions`, 0 em `user_permissions`, 3 em `roles`, 1 em `company_users` e 2 em `company_user_roles`. Nenhuma alteração no Supabase foi executada.
+
+
+## 16. Decisão aprovada — fonte única de papéis por vínculo (ADR-0018)
+
+Em 2026-11-08, o responsável aprovou formalmente a ADR-0018:
+- `company_user_roles` é a única fonte de atribuição de papéis aos vínculos usuário–empresa;
+- `company_users.role_identifier` e seu valor legado ficam fora do ERP; não haverá reconciliação nem migração desse valor;
+- a coluna deverá ser removida do schema físico após tratamento das dependências.
+
+Inspeção somente leitura do Supabase identificou a constraint `company_users_role_identifier_fkey` e referência a `company_users.role_identifier` no corpo da função `public.can_view_expense(uuid)`. Esta função está classificada como obsoleta e fora do escopo atual do MVP. Seu destino deverá ser resolvido antes da remoção da coluna. Nenhuma função, constraint, coluna ou dado foi alterado.
+
+Documentos atualizados:
+- [ADR-0018](decisoes/ADR-0018-company-user-roles-fonte-unica-de-papeis.md) — aprovada.
+- [Índice de decisões arquiteturais](02_DECISOES_ARQUITETURA.md) — v0.7.0.
+- [Modelo de autorização e isolamento multiempresa](MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md) — v0.3.2.
+- [Plano de migração Parte A](relatorios/PLANO_MIGRACAO_FUNDACAO_MULTIEMPRESA_PARTE_A_MVP.md) — v0.3.0.
+
+A decisão documental não autoriza execução de DDL/DML ou migration no Supabase.
