@@ -666,3 +666,45 @@ A atualização é documental. Não houve geração ou execução de SQL, migrat
 6. Definir requisitos dinâmicos e versionamento dos tipos de tarefa.
 7. Especificar estados e transições operacionais da visita, sem confundir com a máquina de estados do módulo Chat.
 8. Detalhar como personalizações de tipos globais serão preservadas ao publicar novas versões globais.
+
+
+### Sessão — 2026-11-08 — GPS, finalização de visitas e histórico imutável
+
+**Etapa:** consolidação funcional e atualização dos modelos documental/lógico  
+**Estado:** diretrizes funcionais atualizadas; ADR-0016 aprovada; catálogo global versionado ainda como proposta
+
+#### Definições confirmadas
+
+- Check-in inicial: permanência de 5 minutos dentro de 50 metros, configuráveis.
+- Precisão GPS inicial: aceitar amostras com incerteza reportada de até 50 metros, configurável. Valores menores indicam maior precisão.
+- Manter histórico de posições GPS dos técnicos em entidade própria.
+- Em perda de sinal, usar a posição mais recente recebida como última referência conhecida, mantendo sua idade; não simular atualização nem executar transição automática baseada em posição obsoleta.
+- Finalizar a visita quando outra tarefa que exija transição para fora da visita atual iniciar, quando iniciar novo deslocamento ou quando terminar a jornada do técnico responsável.
+- Na transição por tarefa/deslocamento, exigir relato textual com as palavras do técnico, atualização do status e motivo de abandono/interrupção. Valores exatos de status e motivos permanecem pendentes.
+- Aprovação do histórico append-only, formalizada na ADR-0016. Correções devem gerar novos eventos/revisões sem sobrescrever ou excluir o registro original.
+
+#### Proposta ainda pendente
+
+Repositório global de catálogos versionados, com versões globais imutáveis e camada de adoção/personalização por empresa. Sugestão de entidades: `global_catalogs`, `global_catalog_versions`, `global_catalog_items`, `company_catalogs`, `company_catalog_items`, com origem/versão e snapshots locais. A política de comparação, merge e resolução de conflitos ainda precisa de aprovação.
+
+#### Artefatos atualizados
+
+- `MODELO_FUNCIONAL_OPERACIONAL_MVP.md`: v0.4.0.
+- `MODELO_LOGICO_DADOS_OPERACAO.md`: v0.3.0.
+- `02_DECISOES_ARQUITETURA.md`: v0.5.0.
+- `00_LEIA-ME.md`: v0.8.0.
+- `06_STATUS_E_RELATORIOS.md`: v1.2.0.
+- Nova ficha `ADR-0016-historico-append-only.md`.
+
+#### Segurança e limites
+
+Nenhuma alteração foi feita no Supabase. Não houve DDL, DML, migration, alteração de RLS, função, trigger, configuração ou dado. As tabelas e estruturas descritas são conceituais. O histórico GPS é dado operacional sensível; retenção, frequência e controles de acesso precisam ser definidos antes da implementação.
+
+#### Pendências
+
+1. Confirmar a interpretação do limite de precisão GPS de até 50 m de incerteza reportada.
+2. Definir frequência de amostragem, idade máxima operacional e retenção das posições GPS.
+3. Definir status de destino e motivos padronizados para abandono/interrupção da visita.
+4. Definir como o início de uma nova tarefa exige ou não a transição para fora da visita atual.
+5. Aprovar ou ajustar o repositório global de catálogos versionados e política de atualização das personalizações.
+6. Definir jornada (horário, fuso, dias e exceções) e comportamento detalhado no fim da jornada.
