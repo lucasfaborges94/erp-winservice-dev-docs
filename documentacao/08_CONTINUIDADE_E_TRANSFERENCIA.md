@@ -468,3 +468,44 @@ A regra foi registrada na proposta documental. Nenhuma ADR foi criada ou alterad
 - Definir política de retry para execuções já aceitas sem permitir admissão indevida de novas execuções.
 - Definir comportamento de falhas permanentes, timeouts e execuções que não conseguem terminar normalmente, sem contrariar a regra de drenagem.
 - Criar testes concorrentes para desativação enquanto há execuções ativas e aguardando na fila.
+
+
+### Sessão — 2026-11-07 — Tratamento de falhas durante a drenagem de módulos
+
+**Responsável/agente:** ChatGPT, sob orientação e aprovação explícita do responsável pelo projeto  
+**Ferramenta/ambiente:** GitHub — repositório documental, branch main  
+**Etapa do roadmap:** definição arquitetural / governança transversal de módulos  
+**Módulo/processo:** ciclo de vida de execuções, filas, retries e falhas  
+**Estado:** CONCLUÍDA para registro da decisão; implementação não iniciada
+
+#### 1. Definição aprovada
+
+O responsável aprovou a aplicação geral, a todos os módulos do ERP, destas regras:
+- Falhas temporárias permitem novas tentativas da mesma execução, com limite de tentativas e política de backoff.
+- Falhas permanentes encerram a execução em `FAILED`, com registro do motivo.
+- Timeouts encerram a execução em `TIMEOUT`, com registro do ocorrido.
+- Retries preservam identidade e contexto da execução originalmente aceita e não constituem nova execução.
+- Para fins de drenagem, a execução é encerrada ao atingir estado terminal, incluindo `COMPLETED`, `FAILED` ou `TIMEOUT`.
+- Não será permitido retry ilimitado que impeça a conclusão da drenagem.
+
+Os valores de limite, backoff e timeout, assim como os critérios de classificação de falhas, permanecem pendentes de especificação técnica.
+
+#### 2. Artefatos alterados
+- `documentacao/decisoes/ADR-0015-drenagem-e-falhas-de-execucoes.md`: nova ADR-0015, estado APROVADA.
+- `documentacao/02_DECISOES_ARQUITETURA.md`: índice atualizado para versão 0.4.0.
+- `documentacao/MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md`: versão 0.1.6.
+- `documentacao/06_STATUS_E_RELATORIOS.md`: versão 0.8.0.
+- Este registro de continuidade.
+
+#### 3. Estado e limites
+
+A regra de tratamento de falhas durante a drenagem foi aprovada e formalizada na ADR-0015. Ela complementa a política geral de desativação com drenagem e não altera o bloqueio de novas admissões enquanto o módulo estiver inativo.
+
+Nenhuma implementação foi realizada em código, banco, filas, workflows ou infraestrutura. Nenhuma alteração foi realizada no Supabase.
+
+#### 4. Pendências técnicas
+- Definir critérios determinísticos para classificar falhas temporárias e permanentes.
+- Definir limites de tentativas e intervalos/backoff por classe de execução.
+- Definir timeouts e tratamento de execução presa ou sem confirmação de resultado.
+- Definir persistência do estado e da identidade da execução entre retries.
+- Criar testes de falha temporária, falha permanente, timeout, retry e concorrência com desativação.
