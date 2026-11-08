@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 1.0.0  
+**Versão:** 1.1.0  
 **Data-base:** 2026-11-08
 
 ## 1. Resumo executivo
@@ -110,7 +110,21 @@ Foi criado `documentacao/MODELO_LOGICO_DADOS_OPERACAO.md`, versão 0.1.0. O docu
 
 **Estado:** proposta técnica para validação, não aprovada como modelo físico. Nenhuma alteração foi realizada no Supabase. A ordem de implementação é recomendação, não autorização para DDL.
 
-## 8. Modelo para relatórios futuros
+## 8. Atualização do modelo lógico operacional — 2026-11-08
+
+Foram consolidadas novas definições funcionais:
+- catálogo de tipos de tarefa inicialmente global, com personalização independente por empresa;
+- orçamento com vínculo opcional e exclusivo a OS, visita ou tarefa, ou sem vínculo;
+- execução e sessões no nível da visita; tarefas não possuem sessões nem estados de execução;
+- nova visita finaliza a visita anterior mediante relato do técnico;
+- afastamento a partir de 200 m (configurável) pausa a execução; retorno a até 50 m (configurável) permite retomada;
+- máquina de estados reutilizável pertence ao módulo Chat e não deve ser confundida com o ciclo operacional da visita.
+
+O modelo lógico foi atualizado para v0.2.0. A estratégia física de personalização do catálogo, os detalhes de GPS/jornada e o desenho de auditoria imutável permanecem pendentes. A arquitetura append-only foi registrada como recomendação, não como decisão aprovada.
+
+**Estado:** especificação em evolução. Nenhuma alteração no Supabase, SQL ou aplicação.
+
+## 9. Modelo para relatórios futuros
 
 Cada relatório deverá conter:
 - Período e data.
@@ -126,7 +140,7 @@ Cada relatório deverá conter:
 - Documentos oficiais atualizados.
 - Commits, PRs e evidências.
 
-## 9. Status por módulo
+## 10. Status por módulo
 
 Usar apenas estes estados:
 - NOT_STARTED
@@ -142,6 +156,7 @@ Não marcar DONE sem critérios de aceite e evidências.
 
 ## Histórico de alterações
 
+- 2026-11-08 — v1.1.0: registra a revisão do modelo lógico v0.2.0 e as definições funcionais de execução por visita, GPS, catálogo global editável por empresa e vínculo de orçamento.
 - 2026-11-08 — v1.0.0: registra o modelo lógico proposto e a matriz de conformidade da Operação.\n- 2026-11-08 — v0.9.0: registra o modelo funcional operacional do MVP e o confronto somente leitura com o schema Supabase atual.
 - 2026-11-07 — v0.8.0: registra retries limitados para falhas temporárias, estados terminais para falhas permanentes/timeouts e conclusão da drenagem por estados terminais.
 - 2026-11-07 — v0.7.0: registra desativação com drenagem das execuções já aceitas e bloqueio de novas entradas até reativação nos dois níveis.
