@@ -2,11 +2,11 @@
 
 **Projeto:** ERP Winservice  
 **Data da inspeção:** 2026-11-08  
-**Versão:** 0.1.0  
+**Versão:** 0.2.0  
 **Estado:** PROPOSTA TÉCNICA PARA APROVAÇÃO — NÃO EXECUTADA  
 **Ambiente:** Supabase PostgreSQL 17.6, projeto `voaovwphncwbrwtcqnsc`, região `sa-east-1`  
 **Branch documental:** `main`  
-**Commit de referência:** `18fe2fa29cfb4171812b1146ebfb45cbe27f8756`
+**Commit-base desta revisão:** `7b51e642b3ac814f209113c10ac994740bea2204`
 
 > Este documento detalha somente a Parte A: estrutura física, backfill, constraints, chaves e integridade referencial. A Parte B — contexto autenticado da empresa, funções de autorização, grants e policies RLS — permanece separada e bloqueada até que o contrato confiável de contexto transacional no backend seja definido. Nenhum SQL deste documento foi executado.
 
@@ -108,7 +108,7 @@ Também foram desativados, sem exclusão, 11 endereços ativos excedentes em gru
 
 ### 2.3 Situação das visitas
 
-`visits` possui 26 registros e ainda não possui `company_identifier`.
+`visits` possui 26 registros e ainda não possui `company_identifier`. O responsável pelo projeto confirmou expressamente que todas as 26 visitas existentes pertencem à Winservice.
 
 | Verificação | Resultado |
 |---|---:|
@@ -119,11 +119,9 @@ Também foram desativados, sem exclusão, 11 endereços ativos excedentes em gru
 | Com cliente e endereço associados | 25 |
 | Sem cliente e sem endereço | 1 |
 
-Nas 25 visitas com cliente, o cliente possui `company_identifier` e não foi encontrado conflito entre a empresa do cliente e a do endereço associado. Essas linhas possuem evidência relacional para receber o tenant do cliente.
+Nas 25 visitas com cliente, o cliente possui `company_identifier` e não foi encontrado conflito entre a empresa do cliente e a do endereço associado. A visita restante não possui cliente, endereço ou OS, mas seu tenant foi confirmado diretamente pelo responsável do projeto: **todas as 26 visitas pertencem à Winservice**. O backfill de `visits.company_identifier` deverá, portanto, atribuir o identificador da Winservice às 26 linhas. A visita sem cliente/endereço permanece sem esses vínculos; não serão criados dados artificiais para completá-los.
 
-A 26ª visita não possui cliente, endereço, OS nem referência externa; criador e responsável também não forneceram vínculo verificável com `company_users`. Seu tenant não pode ser inferido com segurança. Essa linha bloqueia `NOT NULL` em `visits.company_identifier` até decisão e evidência adicionais.
-
-**Não criar OS automaticamente para as 26 visitas.** `work_orders` está vazia e a documentação proíbe inventar relações ou agrupar visitas por cliente. A FK composta para OS poderá ser criada mantendo `work_order_identifier` nullable durante a reconciliação; a obrigatoriedade funcional de OS deverá ser concluída antes de liberar o fluxo operacional.
+**A OS é opcional para uma visita.** `work_order_identifier` permanecerá nullable. Quando preenchido, deverá apontar para uma OS da mesma empresa por FK composta. Não criar OS automaticamente nem agrupar visitas por cliente.
 
 ### 2.4 Associação de papéis
 
@@ -135,7 +133,7 @@ Estado verificado:
 - As duas linhas de `company_user_roles` não coincidem com o `role_identifier` legado.
 - Não foi encontrado relacionamento de papel entre empresas diferentes.
 
-A empresa de cada linha de `company_user_roles` pode ser derivada do vínculo pai. Entretanto, a diferença entre o campo legado e a tabela de associação é uma divergência funcional. O pacote preservará os dois formatos durante a transição e não escolherá, promoverá ou removerá papéis automaticamente.
+A ADR-0017 estabelece que o contexto de autorização é próprio de cada vínculo usuário–empresa e inclui papéis. A tabela `company_user_roles` representa a associação N:N de papéis ao vínculo e é compatível com esse requisito. Entretanto, **não foi localizada decisão aprovada que declare formalmente `company_user_roles` como fonte única e determine a remoção de `company_users.role_identifier`**. O plano, portanto, não removerá essa coluna nem escolherá automaticamente entre os dados divergentes. A definição exige deliberação documental específica, além de reconciliação das duas associações existentes e auditoria de dependências (inclusive funções legadas).
 
 ### 2.5 Clientes e CPF/CNPJ
 
@@ -159,6 +157,10 @@ A migration deverá substituir a unicidade global pela unicidade tenant-scoped a
 
 ---
 
+### Referência adicional — catálogo de permissões
+
+A definição física proposta para o catálogo global versionado e sua adoção/customização por empresa está em [Proposta de modelo físico do catálogo de permissões — MVP](PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md). Esse desenho permanece sujeito à aprovação e não autoriza DDL. A tabela atual `permissions` não deverá ser migrada ou removida até aprovação, mapeamento do registro existente e auditoria de dependências.
+
 ## 3. Classificação das tabelas para a Parte A
 
 ### 3.1 Entidades tenant-scoped existentes a preparar
@@ -170,7 +172,7 @@ A migration deverá substituir a unicidade global pela unicidade tenant-scoped a
 | `addresses` | Manter coluna; impor NOT NULL; FK composta para cliente quando associado | Backfill anterior concluído |
 | `equipments` | Adicionar `company_identifier NOT NULL`; FK composta para cliente | Tabela vazia |
 | `work_orders` | Adicionar tenant; cliente obrigatório; remover default aleatório | Tabela vazia |
-| `visits` | Adicionar coluna; backfill de 25; resolver uma linha antes de NOT NULL; FKs compostas | 1 linha sem evidência |
+| `visits` | Adicionar coluna; backfill de 26 para Winservice; impor NOT NULL; FKs compostas; OS opcional | Empresa confirmada pelo responsável |
 | `quotations` | Adicionar tenant; FKs compostas para cliente, OS e visita | Tabela vazia |
 | `approval_events` | Manter coluna; impor NOT NULL; FKs compostas para orçamento, OS e cliente | Tabela vazia |
 | `company_users` | Manter tenant; chave composta para referência por vínculo | Já possui tenant |
@@ -205,7 +207,7 @@ A Parte A não alterará essas quatro tabelas até que o modelo físico de catá
 | `companies` | Raiz do tenant; não adicionar tenant |
 | `auth.users` | Identidade do provedor; não adicionar tenant |
 | `modules`, `screens` | Catálogos globais; não adicionar tenant nesta etapa |
-| `permissions` | Respeitar ADR-0011; estrutura atual não representa integralmente catálogo global versionado e adoção local. Não redesenhar implicitamente |
+| `permissions` | Não migrar nesta etapa sem aprovação do modelo físico global versionado e adoção local; seguir proposta específica |
 | `documents`, `contact_channels` | Inclusão no MVP pendente |
 | `phonenumbers` | Suspensa até resolver sobreposição |
 | `expenses`, `entity_types`, `entity_status` | Fora do MVP |
@@ -247,7 +249,7 @@ Não adicionar tenant diretamente aos catálogos globais da seção 3.2.
 
 ### Fase A2 — backfill baseado em relações verificáveis
 
-1. `visits`: copiar tenant do cliente nas 25 visitas com cliente; validar que endereço e cliente pertencem à mesma empresa. A visita sem cliente/endereço ficará pendente.
+1. `visits`: atribuir o `company_identifier` da Winservice às 26 visitas, conforme confirmação expressa do responsável. Validar separadamente que referências de cliente/endereço preenchidas não cruzam empresas; não inventar cliente, endereço ou OS para a visita que não os possui.
 2. `company_user_roles`: copiar tenant do vínculo pai em `company_users`; exigir que o papel pertença à mesma empresa.
 3. `role_modules` e `role_screens`: copiar tenant do papel.
 4. `user_modules` e `user_screens`: copiar tenant do vínculo de empresa.
@@ -286,7 +288,7 @@ Criar FKs compostas depois das chaves únicas compostas e da validação dos dad
 | `approval_events` | `(company_identifier, quotation_uuid)` | `quotations` | `(company_identifier, identifier)` |
 | `company_user_roles` | `(company_identifier, company_user_identifier)` | `company_users` | `(company_identifier, identifier)` |
 | `company_user_roles` | `(company_identifier, role_identifier)` | `roles` | `(company_identifier, identifier)` |
-| `company_users` | `(company_identifier, role_identifier)` | `roles` | `(company_identifier, identifier)` — somente enquanto o campo legado existir |
+| `company_users` | `(company_identifier, role_identifier)` | `roles` | `(company_identifier, identifier)` — dependente de decisão formal sobre o campo legado; não executar enquanto pendente |
 | `role_permissions` | `(company_identifier, role_identifier)` | `roles` | `(company_identifier, identifier)` |
 | `role_permissions` | `(company_identifier, permission_identifier)` | `permissions` | `(company_identifier, identifier)` — sujeito ao desenho final ADR-0011 |
 | `user_permissions` | `(company_identifier, company_user_identifier)` | `company_users` | `(company_identifier, identifier)` |
@@ -348,7 +350,7 @@ Outras correções:
 - tornar `work_orders.customer_identifier NOT NULL` (tabela vazia e cliente obrigatório no modelo de OS);
 - tornar `user_permissions.allow NOT NULL` (tabela vazia);
 - tornar `company_user_roles.identifier NOT NULL` somente após confirmar ausência de NULL e criar unicidade apropriada;
-- não remover `company_users.role_identifier` nesta etapa. O campo será mantido até reconciliar formalmente as duas associações divergentes.
+- manter `company_users.role_identifier` sem alteração até deliberação formal sobre a fonte única de papéis, reconciliação dos dados e auditoria das dependências.
 
 ---
 
@@ -486,18 +488,18 @@ O corpo final depende da confirmação da regra para endereços sem `customer_id
 
 | Bloqueio | Evidência | Tratamento necessário |
 |---|---|---|
-| Uma visita sem tenant inferível | Sem cliente, endereço, OS, referência externa ou vínculo verificável do criador/responsável | Identificar tenant manualmente ou aprovar estratégia explícita de quarentena |
-| 26 visitas sem OS | `work_order_identifier` nulo em todas; `work_orders` vazia | Reconstruir vínculos com evidência; não criar OS fictícia |
+| Visita sem cliente/endereço | Uma das 26 visitas não possui cliente, endereço ou OS | Tenant confirmado como Winservice; manter vínculos ausentes sem fabricar dados |
+| Visitas sem OS | `work_order_identifier` nulo em todas; `work_orders` vazia | Permitido: OS é opcional; não criar OS fictícia |
 | Papéis legados divergentes | Duas associações na tabela de junção diferem de `company_users.role_identifier` | Decidir fonte operacional e reconciliar sem perda |
 | Catálogos globais e adoção local | Catálogos têm registros, mas modelo físico de adoção não está aplicado | Individualizar desenho e preservar distinção global/tenant |
-| Catálogo de permissões | `permissions` atual é tenant-scoped; ADR-0011 exige catálogo global versionado e customizações | Especificar migração antes de fechar FKs de permissão |
+| Catálogo de permissões | `permissions` atual é tenant-scoped; ADR-0011 exige catálogo global versionado e customizações | Avaliar e aprovar a proposta física específica antes de fechar FKs de permissão |
 | Identidade Auth/ERP | `users` global; `auth_user_identifier` pode exigir unicidade 1:1; `approval_events.created_by` referencia `auth.users` | Validar mapeamento e unicidade sem presumir equivalência entre IDs |
 | Trigger de endereço | Função consulta colunas inexistentes | Inspecionar trigger e fechar regra para endereço genérico |
 | Baseline de migrations | Nenhuma migration registrada; repositório de implementação não identificado | Definir local versionado oficial antes da execução |
 
 ### 6.1 Papéis — tratamento proposto
 
-A migration pode adicionar `company_identifier` a `company_user_roles` a partir do vínculo pai e criar chaves compostas, porque a empresa do vínculo e do papel é verificável. Isso não autoriza:
+A migration pode adicionar `company_identifier` a `company_user_roles` a partir do vínculo pai e criar chaves compostas, porque a empresa do vínculo e do papel é verificável. A ADR-0017 exige papéis no contexto do vínculo, mas a documentação ainda não declarou a tabela de associação como fonte única nem aprovou a remoção do campo legado. Portanto, até deliberação formal, isso não autoriza:
 - remover `company_users.role_identifier`;
 - apagar associações;
 - escolher uma das duas fontes;
