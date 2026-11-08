@@ -116,3 +116,31 @@ Esses pontos devem ser verificados antes da especificação final de migração.
 ## 11. Consultas de referência
 
 As consultas executadas foram SELECTs sobre `information_schema.columns` e agregações/leitura nas tabelas citadas. Os resultados completos permanecem no registro de execução da auditoria desta conversa; este documento consolida os achados relevantes sem expor e-mails, telefones ou identificadores pessoais.
+
+## 12. Dependências técnicas e segurança — complemento da auditoria
+
+### 12.1 Função dependente do campo legado
+
+Foi localizada a função `public.can_view_expense(p_expense_identifier uuid)`, definida como `SECURITY DEFINER`, que:
+- consulta `company_users.role_identifier`;
+- considera `superuser` e `financial` como autorizados na regra de visualização;
+- não consulta `company_user_roles`;
+- pode ser executada por `anon`, `authenticated` e `service_role`, conforme `has_function_privilege`.
+
+Consequência: `company_users.role_identifier` possui dependência funcional concreta no banco e não pode ser removido ou descontinuado sem substituir e validar essa função. A exposição de execução a `anon` deve ser revisada como achado de segurança; esta auditoria não alterou grants nem a função.
+
+### 12.2 Policies RLS nas tabelas de autorização
+
+Todas as sete tabelas examinadas têm RLS habilitado. Foram encontradas policies somente em:
+- `users`: INSERT para authenticated e SELECT do próprio registro;
+- `company_users`: SELECT do vínculo do próprio usuário.
+
+Não foram encontradas policies em `company_user_roles`, `roles`, `permissions`, `role_permissions` e `user_permissions`. Isso precisa ser avaliado com os privilégios SQL e os caminhos de acesso das aplicações. RLS habilitado sem policy tende a negar acesso aos papéis sujeitos a RLS, mas não protege contra funções privilegiadas ou papéis com bypass RLS.
+
+### 12.3 Identidade e triggers
+
+Os cinco registros de `users` têm `identifier = auth_user_identifier`, alinhamento observado que torna coerente a comparação atual da policy de `company_users` com `auth.uid()` para os registros existentes. Não foram encontrados triggers nas sete tabelas examinadas.
+
+### 12.4 Limitações
+
+A busca de dependências por catálogo não identificou dependência relacional registrada para a função SQL; a dependência foi confirmada pela leitura do corpo da função. Ainda falta examinar grants de tabela, demais funções e views, código das aplicações e workflows.
