@@ -1,6 +1,6 @@
 # Índice de decisões arquiteturais — ERP Winservice
 
-**Versão:** 0.6.0
+**Versão:** 0.7.0
 **Data de atualização:** 2026-11-08
 
 Este documento é o índice consolidado das decisões arquiteturais e de produto aprovadas. Cada decisão deverá possuir uma ficha individual em `documentacao/decisoes/`, identificada por um código sequencial `ADR-NNNN`.
@@ -48,6 +48,7 @@ As decisões abaixo constavam como aprovadas na versão anterior deste documento
 | ADR-0015 | Drenagem e falhas de execuções | Bloqueio de novas admissões durante desativação; retry limitado para falhas temporárias e estados terminais para falhas permanentes/timeouts. | Aprovada — [ficha individual](decisoes/ADR-0015-drenagem-e-falhas-de-execucoes.md) |
 | ADR-0016 | Histórico imutável | Histórico append-only de alterações relevantes; correções geram novos eventos/revisões, sem sobrescrita ou exclusão do histórico original. | Aprovada — [ficha individual](decisoes/ADR-0016-historico-append-only.md) |
 | ADR-0017 | Tenancy e autorização multiempresa | Banco e schema compartilhados; isolamento lógico por empresa; vínculo multiempresa; seleção da empresa ativa na sessão; RLS e backend como barreiras complementares. | Aprovada — [ficha individual](decisoes/ADR-0017-tenancy-compartilhada-autorizacao-multiempresa.md) |
+| ADR-0018 | Fonte única de atribuição de papéis | `company_user_roles` é a única fonte de papéis por vínculo; `company_users.role_identifier` e seus dados legados são desconsiderados e a coluna será removida após tratamento das dependências. | Aprovada — [ficha individual](decisoes/ADR-0018-company-user-roles-fonte-unica-de-papeis.md) |
 
 **Nota de rastreabilidade:** os IDs antigos `ADR-001` a `ADR-014` foram renumerados neste índice para `ADR-0001` a `ADR-0014`. A numeração nova é a referência canônica daqui em diante. O histórico Git preserva a versão anterior do índice.
 
@@ -99,6 +100,7 @@ Consultar a ficha [ADR-0011](decisoes/ADR-0011-catalogo-permissoes-global-versio
 
 ## 7. Registro de alteração
 
+- **2026-11-08 — v0.7.0:** inclusão da ADR-0018, aprovada, que define `company_user_roles` como fonte única de papéis por vínculo e descarta `company_users.role_identifier` e seus dados legados.
 - **2026-11-08 — v0.6.0:** inclusão da ADR-0017, aprovada, sobre tenancy compartilhada e autorização multiempresa; definição da seleção da empresa ativa na sessão para usuários com múltiplos vínculos.
 - **2026-11-08 — v0.5.0:** inclusão da ADR-0016, aprovada, sobre histórico imutável append-only.
 - **2026-11-07 — v0.4.0:** inclusão da ADR-0015, aprovada, sobre drenagem de execuções e tratamento de falhas durante a drenagem.
