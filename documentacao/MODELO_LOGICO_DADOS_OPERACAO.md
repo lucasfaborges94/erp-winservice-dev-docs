@@ -1,6 +1,6 @@
 # Modelo lógico de dados e matriz de conformidade — Operação MVP
 
-**Versão:** 0.2.0  
+**Versão:** 0.3.0  
 **Data:** 2026-11-08  
 **Estado:** proposta técnica para validação; não aprovada como modelo físico  
 **Projeto Supabase avaliado:** Winservice — `voaovwphncwbrwtcqnsc`  
@@ -232,7 +232,7 @@ Os campos atuais `chekin_at`, `checkout_at` e coordenadas em `visits` podem ser 
 
 #### `audit_events` — trilha geral de auditoria
 
-Registro append-only de alterações relevantes em OS, visitas, tarefas, equipamentos, relatos e sessões.
+Registro append-only obrigatório, conforme diretriz arquitetural aprovada, de alterações relevantes em OS, visitas, tarefas, equipamentos, relatos e sessões. Correções geram novos eventos/revisões, sem sobrescrever ou apagar eventos históricos.
 
 Campos conceituais:
 - `identifier`, `company_identifier`;
@@ -244,6 +244,29 @@ Campos conceituais:
 - `source`, `reason`, `correlation_identifier`.
 
 A referência polimórfica (`entity_type` + `entity_identifier`) não possui FK convencional para todas as tabelas. A integridade e a imutabilidade precisam ser garantidas por mecanismo confiável no backend/banco. Alternativa: tabelas de revisão específicas por entidade, se a exigência de FK for prioritária. Não conceder UPDATE/DELETE direto para papéis operacionais sobre eventos históricos.
+
+#### `technician_gps_positions` — histórico de posições dos técnicos
+
+Tabela append-only de amostras GPS recebidas dos dispositivos dos técnicos. Campos conceituais:
+- `identifier`, `company_identifier`, `technician_user_identifier`;
+- `latitude`, `longitude`, `accuracy_meters`;
+- `captured_at`: instante informado pelo dispositivo para a captura;
+- `received_at`: instante de recebimento pelo backend;
+- `source`, `device_identifier` quando disponível;
+- `metadata` técnico e identificador idempotente da amostra, quando disponível.
+
+A posição mais recente é a última amostra válida recebida, acompanhada de idade e precisão. Em perda de sinal, a última posição permanece como referência histórica, não como prova da localização atual. Não produzir transições GPS automáticas usando amostra desatualizada. Frequência, retenção, particionamento e acesso precisam ser definidos considerando volume e sensibilidade dos dados.
+
+#### Repositório de catálogos globais e versões — proposta lógica
+
+Recomenda-se separar o catálogo global publicado da configuração efetivamente utilizada por cada empresa. Estruturas conceituais:
+- `global_catalogs`: identidade e domínio do catálogo;
+- `global_catalog_versions`: versões globais publicadas, imutáveis;
+- `global_catalog_items`: itens de cada versão;
+- `company_catalogs` e `company_catalog_items`: versão adotada e personalizações por empresa, com referência ao item e versão de origem;
+- histórico de alterações e snapshots das personalizações.
+
+A empresa edita apenas sua camada local. A plataforma publica novas versões globais sem modificar versões anteriores. A empresa escolhe quando atualizar; o processo deve mostrar diferenças, preservar personalizações e exigir resolução explícita de conflitos. Esta é uma recomendação para o modelo físico, não uma ADR aprovada. Deve suportar outros catálogos sem duplicar tabelas por domínio.
 
 #### `quotations` — vínculo contextual exclusivo do orçamento
 
@@ -341,7 +364,12 @@ Não definir a lista de estados ativos até fechar a máquina de estados da visi
 - GPS automático deve ser idempotente: repetição de callback/localização não pode criar início, pausa ou retomada duplicados.
 - Visita finalizada não deve ser silenciosamente reativada por mera chegada GPS.
 - Precisão mínima, frequência de amostragem, tolerância, perda de sinal, localização simulada/antifraude e tratamento de ausência de coordenadas continuam pendentes.
-- O check-in inicial dentro de 50 metros por 5 minutos permanece a confirmar em separado; não foi substituído automaticamente pela regra de retomada.
+- Check-in inicial confirmado: permanência de 5 minutos dentro do raio configurável de 50 metros.
+- Limite inicial de aceitação da precisão GPS: até 50 metros de incerteza reportada, configurável; valores menores indicam maior precisão.
+- Manter histórico de posições GPS dos técnicos em entidade própria, registrando captura, recebimento, precisão, origem e idade da posição.
+- Em perda de sinal, usar a última posição recebida como última referência conhecida, sem tratá-la como leitura atual. Não disparar pausa/retomada automática com base apenas em posição desatualizada.
+- Finalizar a visita quando outra tarefa que exija transição para fora da visita atual iniciar, quando novo deslocamento iniciar ou quando terminar a jornada do técnico responsável. Transições por tarefa/deslocamento exigem relato textual, atualização de status e motivo de abandono/interrupção.
+- No fim da jornada, somente execução pausada pode ser fechada automaticamente; execução ativa não deve ser encerrada automaticamente.
 
 ## 6. Diagrama de fluxo do histórico
 
@@ -390,8 +418,9 @@ Legenda:
 | Relatos por tarefa | Nenhuma tabela dedicada encontrada | Não há instância de tarefa nem relatório | Criar `task_reports` | P0 |
 | Sessões de execução da visita | Nenhuma tabela dedicada encontrada | `visits` possui um único conjunto de check-in/checkout | Criar `visit_execution_sessions` | P0 |
 | Eventos GPS/execução da visita | Nenhuma tabela dedicada encontrada | Sem histórico de múltiplas pausas/retomadas | Criar `visit_execution_events` | P0 |
+| Histórico de posições GPS | Nenhuma tabela dedicada encontrada | `visits` mantém apenas coordenadas pontuais | Criar `technician_gps_positions` append-only, com captura/recebimento/precisão | P0 |
 | Eventos do ciclo da visita | Nenhuma tabela dedicada encontrada | Colunas atuais armazenam poucos marcos | Criar `visit_events`; manter colunas atuais como projeção temporária | P0 |
-| Auditoria de alterações | Nenhuma trilha append-only dedicada encontrada | Campos created/updated em algumas tabelas | Criar `audit_events` ou revisões por entidade; imutabilidade | P0 |
+| Auditoria de alterações | Nenhuma trilha append-only dedicada encontrada | Campos created/updated em algumas tabelas | Criar `audit_events` e/ou revisões por entidade; append-only obrigatório | P0 |
 | Associação OS-equipamento | `work_order_equipment` | Associação simples; defaults UUID suspeitos em FKs e autoria | Revisar; não usar como tarefa; corrigir defaults ou descontinuar após análise | P1 |
 | Orçamentos | `quotations` | Relaciona OS, cliente e visita | Ajustar para vínculo opcional exclusivo: OS OU visita OU tarefa OU nenhum; sanear vínculos simultâneos existentes | P1 |
 | Eventos de aprovação | `approval_events` | Evento, versão, hash, decisão e referências a orçamento/OS/cliente | Aproveitar; garantir consistência empresa e vincular versão/escopo da tarefa quando aplicável | P1 |
@@ -403,6 +432,7 @@ Legenda:
 
 - `work_order_equipment` não pode ser reaproveitada como entidade de tarefa. A tarefa precisa pertencer a uma visita e ter tipo, relatos, sessões e vínculo opcional a equipamento.
 - `task_types` é catálogo, não registro de tarefa executada.
+- O catálogo global deve ser versionado e separado das personalizações locais das empresas; uma atualização global não pode sobrescrever personalizações.
 - `visit_types` e `visit_type_requirement` descrevem tipo/requisitos de visita; não substituem requisitos de tarefa.
 - `documents` pode continuar como repositório de metadados de arquivos, mas precisa de uma relação explícita e segura com a entidade operacional correspondente.
 - `quotations` já tem FKs para OS e visita. O modelo funcional agora exige vínculo exclusivo e opcional com OS, visita ou tarefa; a migração precisa tratar os registros atuais com mais de um vínculo preenchido.
@@ -441,8 +471,10 @@ Não executar essa sequência sem aprovação do modelo físico, plano de migra�
 - A função `set_visit_address_snapshot` foi identificada na auditoria anterior como incompatível com colunas existentes em `addresses`; corrigir e testar antes de depender do snapshot.
 - Os defaults `gen_random_uuid()` em FKs de `work_order_equipment` e campos de autoria são suspeitos e devem ser investigados.
 - O schema consultado é estado observado em 2026-11-08; não foram inspecionados dados de produção, código de aplicação, workflows, políticas novamente nesta etapa ou testes de comportamento.
-- As tabelas propostas não devem ser criadas até fechar as decisões pendentes, especialmente tenancy, requisitos dinâmicos, execução/GPS, jornada e auditoria.
-- A proposta de histórico append-only é recomendação técnica; ainda depende de validação explícita do responsável.
+- As tabelas propostas não devem ser criadas até fechar as decisões pendentes, especialmente tenancy, requisitos dinâmicos, execução/GPS, jornada e desenho físico de auditoria.
+- A diretriz append-only está aprovada; a estrutura física e os controles técnicos ainda não estão aprovados.
+- A proposta de repositório de catálogos globais versionados com camada local por empresa permanece pendente de aprovação.
+- O padrão append-only foi aprovado como diretriz arquitetural; implementação, retenção, proteção contra adulteração e mecanismo de revisão ainda precisam ser projetados.
 - A definição de tipos globais editáveis por empresa e o vínculo exclusivo opcional de orçamento já foram recebidos como requisitos funcionais, mas a estratégia física ainda não está aprovada.
 
 ## 11. Evidência e limites da inspeção
@@ -455,5 +487,6 @@ Não executar essa sequência sem aprovação do modelo físico, plano de migra�
 
 ## Histórico de alterações
 
+- 2026-11-08 — v0.3.0: inclusão do histórico GPS de técnicos, precisão configurável de até 50 m, posição mais recente sem inferência a partir de amostra obsoleta, gatilhos de finalização por nova tarefa/deslocamento/fim de jornada, confirmação do check-in inicial e aprovação da diretriz append-only; detalhada proposta de repositório global de catálogos versionados.
 - 2026-11-08 — v0.2.0: revisão após decisões funcionais sobre catálogo global editável por empresa, vínculo exclusivo opcional de orçamento, execução/sessões no nível da visita, limiares GPS de pausa/retomada e transição entre visitas. Removidas sessões de tarefa; máquina de estados do módulo Chat mantida separada. Histórico append-only registrado como recomendação pendente de validação.
 - 2026-11-08 — v0.1.0: criação do modelo lógico proposto e matriz de conformidade inicial com o schema Supabase.
