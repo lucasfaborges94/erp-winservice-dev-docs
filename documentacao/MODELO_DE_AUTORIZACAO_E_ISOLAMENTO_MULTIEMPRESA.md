@@ -1,7 +1,7 @@
 # Modelo de autorização e isolamento multiempresa — ERP Winservice
 
 **Documento:** Modelo de autorização e isolamento multiempresa  
-**Versão:** 0.1.5  
+**Versão:** 0.1.6  
 **Data:** 2026-11-07  
 **Estado:** PROPOSTA PARA DISCUSSÃO — não aprovada como decisão arquitetural  
 **Projeto Supabase consultado:** Winservice (`voaovwphncwbrwtcqnsc`)  
@@ -259,6 +259,8 @@ Durante a drenagem, etapas internas necessárias para concluir uma execução j�
 
 A desativação não deverá apagar automaticamente dados, configurações, históricos ou registros anteriormente produzidos. A retomada da admissão dependerá de o módulo voltar a estar disponível globalmente e habilitado para a empresa, além das demais condições de autorização.
 
+**Falhas durante a drenagem:** falhas temporárias permitem novas tentativas da mesma execução, respeitando limite de tentativas e política de backoff. Os valores concretos deverão ser definidos na especificação técnica. Falhas permanentes encerram a execução em estado terminal `FAILED`, com registro do motivo. Timeouts encerram a execução em estado terminal `TIMEOUT`, com registro do ocorrido. Retries preservam a identidade e o contexto da execução original e não constituem nova execução nem nova admissão independente. Para fins de drenagem, consideram-se terminais `COMPLETED`, `FAILED` e `TIMEOUT`. Não será permitido retry ilimitado. Os critérios para classificar falhas temporárias/permanentes, limites, backoff e timeouts deverão ser definidos antes da implementação.
+
 Esta regra é transversal e deverá ser aplicada de forma consistente a todos os módulos, APIs, workflows, aplicações e canais de acesso. Um módulo não poderá contornar o controle por meio de chamadas diretas, funções privilegiadas ou automações técnicas.
 
 ### 10.7 Ciclo de vida do superadmin
@@ -353,6 +355,7 @@ Os itens abaixo precisam de resposta do responsável antes de transformar esta p
 
 ## Histórico de alterações
 
+- 2026-11-07 — v0.1.6: define retry limitado para falhas temporárias, preservação da identidade da execução, estados terminais para falhas permanentes/timeouts e conclusão da drenagem por estados terminais.
 - 2026-11-07 — v0.1.5: define desativação com drenagem: bloquear novas admissões e enfileiramentos, concluir normalmente todas as execuções já aceitas e reabrir a entrada somente após reativação nos dois níveis.
 - 2026-11-07 — v0.1.4: generaliza a ativação em dois níveis para todos os módulos; define que o primeiro usuário da empresa será humano e superadmin; proíbe agentes de IA como superadmin; exige a manutenção de ao menos um superadmin humano ativo.
 - 2026-11-07 — v0.1.3: define que desenvolvedores do ERP controlam a disponibilidade global, superadmin controla a ativação por empresa, cada empresa mantém ao menos um superadmin e toda execução de IA depende do módulo efetivamente ativo.
