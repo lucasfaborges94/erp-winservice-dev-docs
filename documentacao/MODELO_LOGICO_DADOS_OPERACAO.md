@@ -1,8 +1,8 @@
 # Modelo lógico de dados e matriz de conformidade — Operação MVP
 
-**Versão:** 0.5.0  
+**Versão:** 0.6.0  
 **Data:** 2026-11-08  
-**Estado:** proposta técnica para validação; não aprovada como modelo físico  
+**Estado:** proposta técnica parcialmente aprovada como especificação; não aprovada como modelo físico  
 **Projeto Supabase avaliado:** Winservice — `voaovwphncwbrwtcqnsc`  
 **Schema:** `public`
 
@@ -570,12 +570,69 @@ Legenda:
 2. **Núcleo operacional:** ajustar `customers`, `addresses`, `equipments`, `work_orders` e `visits`.
 3. **Tarefas e catálogo:** `visit_tasks`, escopo/versionamento de `task_types` e requisitos por tipo.
 4. **Relatos e evidências:** `visit_reports`, `task_reports`, vínculo de documentos e regra de encerramento com relato.
-5. **Execução e GPS:** sessões e eventos da visita, histórico de posições dos técnicos, idempotência, exclusividade, pausa/retomada e finalização por transição/jornada.
+5. **Execução e GPS:** eventos append-only da visita, histórico de posições dos técnicos, idempotência, exclusividade, pausa/retomada e finalização por transição/jornada.
 6. **Histórico e auditoria:** snapshots, eventos imutáveis e revisões, autoria de humano/agente/sistema.
 7. **Comercial:** vínculo exclusivo opcional de orçamento a OS, visita ou tarefa, versões e aprovação.
 8. **Migração e testes:** plano de migração de dados, constraints, RLS, concorrência, GPS simulado, falhas offline e regressão.
 
 Não executar essa sequência sem aprovação do modelo físico, plano de migração e testes.
+
+
+## 8.1 Especificação técnica aprovada — eventos e sincronização offline (2026-11-08)
+
+**Estado:** especificação técnica aprovada pelo responsável; implementação física ainda não autorizada.
+
+### Estrutura conceitual de `visit_events`
+
+Cada linha representa um acontecimento operacional efetivamente aceito pelo servidor. Campos propostos:
+
+- `identifier uuid`, `company_identifier uuid`, `visit_identifier uuid`;
+- `sequence_number bigint`, atribuído pelo servidor em sequência por visita;
+- `event_type text`, `previous_status text`, `new_status text`;
+- `occurred_at timestamptz` (instante informado como ocorrência no dispositivo/origem) e `recorded_at timestamptz` (instante oficial de registro no servidor);
+- `actor_kind` (`human`, `agent`, `system`), `actor_user_identifier uuid` quando aplicável;
+- `source`, `reason_code`, `description`;
+- `latitude`, `longitude`, `accuracy_meters`, `distance_from_visit_meters`, quando aplicáveis;
+- `idempotency_key`, `correlation_identifier`, `device_identifier`, `metadata jsonb`.
+
+Restrições e índices a implementar após validação física:
+- PK em `identifier`; FKs para empresa e visita, com integridade composta que impeça associação cruzada entre empresas;
+- unicidade de `(visit_identifier, sequence_number)`;
+- unicidade da chave idempotente no escopo da empresa/visita;
+- CHECKs para tipos, estados, coerência de coordenadas e campos obrigatórios de transição;
+- índices para histórico por visita/sequência e consulta por empresa/período;
+- bloqueio de UPDATE/DELETE no fluxo operacional, conforme ADR-0016.
+
+A atualização do estado da visita e a inclusão do evento devem ocorrer na mesma transação. O servidor serializa a sequência por visita e aplica a validação de transição contra o estado efetivamente persistido.
+
+### Exclusividade do técnico
+
+Os estados `in_displacement`, `in_progress` e `paused` ocupam a disponibilidade do técnico. `pending` e estados terminais não ocupam. A regra é global por identidade do técnico, inclusive quando ele estiver associado a mais de uma empresa.
+
+A implementação deverá combinar serialização transacional por técnico com uma restrição única parcial no conjunto de visitas ativas. A troca de responsável de visita ativa também deverá passar por operação transacional validada; não poderá contornar a exclusividade por UPDATE direto.
+
+### Sincronização offline e relógio do dispositivo
+
+- O dispositivo preserva identificador idempotente da operação, `occurred_at`, tipo do evento e contexto observado.
+- O servidor define `recorded_at`, valida autorização, empresa, idempotência, estado atual e transição; gera `sequence_number`; grava evento e estado atomicamente.
+- Repetições idempotentes retornam o resultado original. Eventos incompatíveis com o estado atual não sobrescrevem nem são aplicados retroativamente; retornam conflito para tratamento.
+- `occurred_at` e `recorded_at` são preservados separadamente.
+- Antes de disponibilizar uma nova visita recebida ao técnico, o aplicativo compara o relógio do dispositivo com o horário oficial do ERP/servidor. Se houver diferença, apresenta aviso ao usuário; a divergência, isoladamente, não bloqueia a disponibilização. O horário do servidor é a referência para `recorded_at`.
+- O aviso de divergência não torna confiável, por si só, o relógio do dispositivo; a reconciliação continua sendo responsabilidade do servidor.
+
+### Comandos rejeitados e autorização de revisão
+
+`visit_events` contém somente eventos canônicos aceitos. Comandos offline recebidos e rejeitados/conflitantes devem ser auditados separadamente, em estrutura própria proposta (por exemplo, `visit_event_sync_attempts`), com chave idempotente, empresa/visita quando identificáveis, dispositivo, horários, conteúdo mínimo necessário e motivo/resultado da validação. Essa estrutura não representa o comando rejeitado como acontecimento operacional.
+
+A revisão e eventual resolução de eventos antigos ou conflitantes fica restrita a gestores e atendentes/usuários expressamente autorizados. Técnicos não podem aprovar, dispensar ou reclassificar conflitos.
+
+### Idade dos eventos offline — recomendação ainda não aprovada
+
+Recomenda-se que a idade do evento não seja critério isolado de rejeição. A validação deve considerar também sequência, estado atual, identidade/origem e consistência temporal. Como ponto de partida para discussão, recomenda-se janela configurável de até 24 horas para reconciliação automática quando todos os demais critérios forem satisfeitos; eventos mais antigos seriam encaminhados à revisão autorizada. **O limite de 24 horas permanece pendente de aprovação explícita** e não deve ser implementado como regra vigente.
+
+### Pré-condições obrigatórias
+
+A implementação de `visit_events` depende da correção e validação de tenancy, chaves compostas, RLS e autorização multiempresa. Também depende da correção/teste da função de snapshot de endereço e das inconsistências atuais de `visits` identificadas na auditoria. A aprovação desta especificação não autoriza DDL, migrações ou alterações no Supabase.
 
 ## 9. Decisões e perguntas ainda abertas
 
@@ -617,6 +674,8 @@ Não executar essa sequência sem aprovação do modelo físico, plano de migra�
 - A matriz é uma avaliação de conformidade estrutural, não um relatório de teste de execução.
 
 ## Histórico de alterações
+
+- 2026-11-08 — v0.6.0: especificação técnica aprovada de visit_events, transação atômica estado/evento, exclusividade global do técnico, sincronização offline com occurred_at/recorded_at, comparação do relógio do dispositivo com o horário oficial e trilha separada para comandos rejeitados; tenancy e RLS registrados como pré-condições. Janela de 24 horas permanece apenas recomendação pendente.
 
 - 2026-11-08 — v0.5.0: remoção da Máquina B e das entidades de sessão; unificação dos eventos operacionais/temporais diretamente em visit_events; inclusão da Máquina A aprovada, transições por revogação e jornada sem encerramento automático; revisão de cardinalidades, integridade e perguntas abertas.
 - 2026-11-08 — v0.4.0: inclusão das avaliações históricas por tentativa, pendências obrigatórias/opcionais, tratamento por gestor/atendente, evidências com uploads idempotentes e confirmação no backend, metadados temporais/GPS e proposta lógica de resumo/aceite digital versionado com coleta remota, presencial e offline.
