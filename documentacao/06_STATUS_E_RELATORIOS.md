@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 1.1.0  
+**Versão:** 1.2.0  
 **Data-base:** 2026-11-08
 
 ## 1. Resumo executivo
@@ -124,7 +124,13 @@ O modelo lógico foi atualizado para v0.2.0. A estratégia física de personaliz
 
 **Estado:** especificação em evolução. Nenhuma alteração no Supabase, SQL ou aplicação.
 
-## 9. Modelo para relatórios futuros
+## 9. Atualização do modelo operacional — 2026-11-08 (GPS, histórico e catálogos)
+
+Definições incorporadas: check-in inicial de 5 minutos/50 m; precisão GPS inicial de até 50 m de incerteza reportada; histórico persistente de posições; posição mais recente como última referência, sem inferência a partir de amostra obsoleta; finalização de visita por nova tarefa, deslocamento ou fim de jornada; relato textual, mudança de status e motivo de abandono/interrupção; histórico append-only aprovado na ADR-0016. A proposta de repositório global de catálogos versionados com personalização por empresa permanece pendente de aprovação.
+
+Modelo funcional v0.4.0 e modelo lógico v0.3.0. Nenhuma alteração foi realizada no Supabase.
+
+## 10. Modelo para relatórios futuros
 
 Cada relatório deverá conter:
 - Período e data.
@@ -140,7 +146,7 @@ Cada relatório deverá conter:
 - Documentos oficiais atualizados.
 - Commits, PRs e evidências.
 
-## 10. Status por módulo
+## 11. Status por módulo
 
 Usar apenas estes estados:
 - NOT_STARTED
@@ -156,6 +162,7 @@ Não marcar DONE sem critérios de aceite e evidências.
 
 ## Histórico de alterações
 
+- 2026-11-08 — v1.2.0: registra GPS/histórico de posições, transições de visita, aprovação do histórico append-only (ADR-0016) e proposta de catálogos globais versionados.
 - 2026-11-08 — v1.1.0: registra a revisão do modelo lógico v0.2.0 e as definições funcionais de execução por visita, GPS, catálogo global editável por empresa e vínculo de orçamento.
 - 2026-11-08 — v1.0.0: registra o modelo lógico proposto e a matriz de conformidade da Operação.\n- 2026-11-08 — v0.9.0: registra o modelo funcional operacional do MVP e o confronto somente leitura com o schema Supabase atual.
 - 2026-11-07 — v0.8.0: registra retries limitados para falhas temporárias, estados terminais para falhas permanentes/timeouts e conclusão da drenagem por estados terminais.
