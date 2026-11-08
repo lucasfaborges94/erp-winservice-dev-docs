@@ -1,7 +1,7 @@
 # Modelo de autorização e isolamento multiempresa — ERP Winservice
 
 **Documento:** Modelo de autorização e isolamento multiempresa  
-**Versão:** 0.1.1  
+**Versão:** 0.1.2  
 **Data:** 2026-11-07  
 **Estado:** PROPOSTA PARA DISCUSSÃO — não aprovada como decisão arquitetural  
 **Projeto Supabase consultado:** Winservice (`voaovwphncwbrwtcqnsc`)  
@@ -242,6 +242,23 @@ Workflows e integrações de infraestrutura, como n8n e conectores externos, nã
 
 Não reutilizar indiscriminadamente a identidade de um administrador ou a chave `service_role`. O uso de `service_role` ou de funções `SECURITY DEFINER` deve ser excepcional, restrito e justificado; essas vias não podem contornar silenciosamente as regras de negócio e de isolamento.
 
+### 10.6 Módulo de Inteligência Artificial
+
+O ERP deverá possuir um **Módulo de Inteligência Artificial (IA)** próprio, cuja disponibilidade e ativação serão controladas em dois níveis independentes:
+
+1. **Disponibilidade global pela plataforma:** a administração da plataforma controla se o módulo de IA está disponibilizado para uso no produto.
+2. **Ativação individual por empresa:** cada empresa controla se habilita ou desabilita o módulo em seu próprio ambiente, respeitando a disponibilidade global e as condições de contratação.
+
+A condição efetiva de utilização será a conjunção dos dois controles: o módulo somente estará disponível para uma empresa quando estiver disponibilizado globalmente pela plataforma **e** habilitado para aquela empresa. A habilitação individual não poderá sobrepor uma indisponibilidade global.
+
+A ativação do módulo não ativa automaticamente os agentes. Cada usuário autônomo/agente deverá possuir estado próprio e somente poderá executar operações quando, cumulativamente, o módulo estiver efetivamente disponível para a empresa, o módulo estiver habilitado para ela, o agente estiver ativo e as permissões e demais condições de autorização forem satisfeitas.
+
+A desativação do módulo por uma empresa deverá bloquear novas execuções de seus agentes, sem apagar identidades, configurações, históricos ou registros anteriormente produzidos. A indisponibilidade global também deverá impedir novas execuções em todas as empresas afetadas, preservando os dados e permitindo retomada conforme as regras da plataforma.
+
+O módulo de IA deverá ser tratado como módulo funcional/comercial do ERP. Provedores de modelos, workflows de execução, n8n e demais componentes de infraestrutura são serviços de suporte e não se confundem com o módulo nem com a identidade dos agentes.
+
+**Escopo desta definição:** está acordada a existência dos dois níveis de controle e a regra lógica de disponibilidade efetiva. Permanecem para especificação a identidade do papel autorizado a alterar cada controle, o comportamento de execuções já iniciadas no momento da desativação, a política de contratação/limites e os requisitos operacionais de retomada.
+
 ## 11. Estratégia de tenancy — alternativas em avaliação
 
 O índice de ADRs registra que a estratégia exata ainda está aberta.
@@ -316,5 +333,6 @@ Os itens abaixo precisam de resposta do responsável antes de transformar esta p
 
 ## Histórico de alterações
 
+- 2026-11-07 — v0.1.2: registra o Módulo de Inteligência Artificial com disponibilidade global pela plataforma e ativação individual por empresa; define a conjunção dos controles e a independência do estado de cada agente.
 - 2026-11-07 — v0.1.1: esclarece usuários autônomos como usuários ERP operados por IA, configuráveis por empresa; diferencia agentes de negócio de workflows técnicos; delimita a ADR-0012 à configuração da Isa e registra questões de implementação pendentes.
 - 2026-11-07 — v0.1.0: criação da proposta inicial com base no Project Charter, ADR-0001, ADR-0011, ADR-0012 e inspeção somente leitura do schema e das policies do Supabase.
