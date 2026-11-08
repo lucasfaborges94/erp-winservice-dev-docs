@@ -426,14 +426,14 @@ Resumo: 1 empresa; 5 usuários (1 ativo, 4 inativos); 1 vínculo empresarial; 3 
 
 ## 17. Complemento da auditoria técnica — 2026-11-08
 
-A auditoria identificou que `public.can_view_expense(uuid)` é `SECURITY DEFINER`, consulta `company_users.role_identifier` e é executável por `anon`, `authenticated` e `service_role`. Portanto, o campo legado tem dependência funcional real e não pode ser removido sem substituição e validação da função. A função e a permissão de execução de `anon` são achados para revisão de segurança, não corrigidos nesta etapa.
+A auditoria histórica identificou que `public.can_view_expense(uuid)` é `SECURITY DEFINER`, consulta `company_users.role_identifier` e é executável por `anon`, `authenticated` e `service_role`. A função foi posteriormente classificada como obsoleta e fora do escopo atual, reservada ao futuro módulo Financeiro. Esses dados ficam registrados para contexto histórico e futura reavaliação, sem bloquear a especificação atual. Nenhuma alteração foi feita na função, nos grants ou no campo legado.
 
 Nas sete tabelas de autorização examinadas, RLS está habilitado; policies foram encontradas somente em `users` e `company_users`. Não foram encontradas policies em `company_user_roles`, `roles`, `permissions`, `role_permissions` e `user_permissions`. Os cinco usuários têm `identifier = auth_user_identifier`; não foram encontrados triggers nas tabelas examinadas. Detalhes e limitações constam no relatório de auditoria. Nenhuma alteração foi feita no banco.
 
 
 ## 18. Complemento de segurança da auditoria — 2026-11-08
 
-A auditoria de privilégios encontrou grants amplos para `anon`, `authenticated` e `service_role` nas sete tabelas de autorização examinadas. RLS é camada adicional, mas a combinação de grants amplos, ausência de policies em cinco tabelas e funções `SECURITY DEFINER` acessíveis exige revisão coordenada. Os Security Advisors retornaram 26 tabelas com RLS sem policies, 7 funções com `search_path` mutável, 2 funções `SECURITY DEFINER` executáveis por `anon`, 2 por `authenticated` e proteção contra senhas vazadas desabilitada. Views públicas examinadas não mostraram referências aos campos legados; a função `can_view_expense` permanece dependência confirmada de `company_users.role_identifier`. Nenhuma correção ou alteração de privilégios foi executada. Detalhes em `documentacao/auditorias/AUDITORIA_DADOS_AUTORIZACAO_2026-11-08.md`.
+A auditoria de privilégios encontrou grants amplos para `anon`, `authenticated` e `service_role` nas sete tabelas de autorização examinadas. RLS é camada adicional, mas a combinação de grants amplos, ausência de policies em cinco tabelas e funções `SECURITY DEFINER` acessíveis exige revisão coordenada. Os Security Advisors retornaram 26 tabelas com RLS sem policies, 7 funções com `search_path` mutável, 2 funções `SECURITY DEFINER` executáveis por `anon`, 2 por `authenticated` e proteção contra senhas vazadas desabilitada. Views públicas examinadas não mostraram referências aos campos legados. A função `can_view_expense` foi classificada como obsoleta e reservada ao futuro módulo Financeiro; seus achados permanecem apenas como contexto para essa retomada. Nenhuma correção ou alteração de privilégios foi executada. Detalhes em `documentacao/auditorias/AUDITORIA_DADOS_AUTORIZACAO_2026-11-08.md`.
 
 
 ## 19. Linha de base e backend — complemento da auditoria — 2026-11-08
@@ -442,7 +442,7 @@ A listagem do projeto Supabase retornou zero migrations registradas e nenhuma Ed
 
 ## Histórico de alterações
 
-- 2026-11-08 — v0.3.1: adota `superuser` em substituição a `superadmin` na nomenclatura conceitual; classifica `public.can_view_expense(uuid)` como obsoleta e fora do escopo atual, reservada ao futuro módulo Financeiro. Nenhuma alteração no Supabase.
+- 2026-11-08 — v0.3.1: adota `superuser` como nomenclatura conceitual vigente; classifica `public.can_view_expense(uuid)` como obsoleta e fora do escopo atual, reservada ao futuro módulo Financeiro. Nenhuma alteração no Supabase.
 
 - 2026-11-08 — v0.3.4: registra ausência de migrations e Edge Functions no projeto Supabase auditado.
 - 2026-11-08 — v0.3.3: registra grants SQL e achados dos Security Advisors identificados na auditoria.
