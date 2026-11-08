@@ -167,3 +167,10 @@ A consulta aos Security Advisors em 2026-11-08 retornou:
 - proteção contra senhas vazadas desabilitada.
 
 Entre as funções destacadas estão `public.can_view_expense` e `public.authorize_integration_sync_event`. A lista completa de tabelas sem policies e as referências de remediação estão no resultado dos advisors da execução desta auditoria. Estes achados são para avaliação e não foram corrigidos nesta etapa.
+
+## 14. Migrations e Edge Functions
+
+- A listagem de migrations do projeto Supabase retornou vazia.
+- A listagem de Edge Functions retornou vazia.
+
+A ausência de migrations registradas no Supabase dificulta reconstruir a evolução do schema exclusivamente pelo histórico nativo de migrations. Antes de alterações futuras, será necessário estabelecer uma linha de base documental do schema real e reconciliá-la com os arquivos versionados de migrations, se existirem em outro repositório/ambiente. A ausência de Edge Functions no projeto consultado significa que não foi identificada essa camada de backend neste levantamento; não exclui APIs ou serviços hospedados externamente.
