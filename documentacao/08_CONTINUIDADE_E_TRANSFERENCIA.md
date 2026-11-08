@@ -1,7 +1,7 @@
 # Continuidade e transferência de trabalho — ERP Winservice
 
 **Documento:** Procedimento de continuidade e transferência  
-**Versão:** 1.6.0  
+**Versão:** 1.7.0  
 **Data:** 2026-11-07  
 **Estado:** procedimento estabelecido; registro inicial de referência
 
@@ -1146,3 +1146,38 @@ A inspeção de colunas confirmou `company_users.role_identifier` nullable e `co
 6. Manter a Parte B bloqueada até definir contrato confiável de contexto transacional no backend.
 
 **Limites:** nenhum DDL, DML, migration, policy, grant, função, trigger ou dado foi alterado no Supabase. A criação/atualização dos documentos é documental e não autoriza execução.
+
+
+### Complemento da sessão — aprovação da ADR-0018: fonte única de papéis (2026-11-08)
+
+**Estado:** decisão aprovada e registrada; implementação física pendente.
+
+O responsável confirmou que o ERP deverá ignorar integralmente `company_users.role_identifier` e o valor armazenado nessa coluna. Não haverá reconciliação nem migração do papel legado. A tabela `company_user_roles` será a única fonte oficial de atribuição de papéis por vínculo usuário–empresa.
+
+A ADR-0018 foi criada e aprovada. A decisão complementa a ADR-0017 e estabelece:
+- preservar e validar as associações existentes em `company_user_roles`;
+- garantir tenant por `company_identifier` e FKs compostas para vínculo e papel;
+- não usar o campo legado como fallback, fonte de autorização ou dado de migração;
+- remover a coluna do schema físico após tratar dependências.
+
+#### Auditoria somente leitura das dependências
+
+A inspeção do PostgreSQL 17.6 identificou:
+- constraint `company_users_role_identifier_fkey` sobre a coluna;
+- referência a `company_users.role_identifier` no corpo da função `public.can_view_expense(uuid)`.
+
+A função `can_view_expense` está classificada no modelo de autorização como obsoleta e fora do escopo atual do MVP. Seu destino deverá ser resolvido antes da remoção da coluna; não deixar função inválida nem assumir que sua referência pode permanecer. A consulta de dependências não executou alterações.
+
+#### Artefatos atualizados/criados
+
+- `documentacao/decisoes/ADR-0018-company-user-roles-fonte-unica-de-papeis.md` — criada e aprovada.
+- `documentacao/02_DECISOES_ARQUITETURA.md` — v0.7.0.
+- `documentacao/MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md` — v0.3.2.
+- `documentacao/relatorios/PLANO_MIGRACAO_FUNDACAO_MULTIEMPRESA_PARTE_A_MVP.md` — v0.3.0.
+- `documentacao/06_STATUS_E_RELATORIOS.md` — v1.9.0.
+
+#### Próxima atividade
+
+Atualizar o pacote de migrations da Parte A para implementar a ADR-0018: preservar as associações da tabela de relacionamento, adicionar tenant e FKs compostas, remover a constraint e dependências do campo legado e, por fim, remover `company_users.role_identifier`. A execução continuará condicionada à revisão do SQL final e autorização operacional específica. A proposta física do catálogo de permissões permanece aguardando aprovação.
+
+**Limites:** nenhum DDL, DML, migration, policy, grant, função, trigger ou dado foi alterado no Supabase.
