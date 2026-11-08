@@ -1,7 +1,7 @@
 # Continuidade e transferência de trabalho — ERP Winservice
 
 **Documento:** Procedimento de continuidade e transferência  
-**Versão:** 1.5.0  
+**Versão:** 1.6.0  
 **Data:** 2026-11-07  
 **Estado:** procedimento estabelecido; registro inicial de referência
 
@@ -1045,3 +1045,28 @@ Preparar o pacote de migrations/DDL detalhado, por fases e em ordem executável,
 #### Segurança e limites
 
 Nenhuma conexão de escrita ao Supabase foi usada e nenhuma alteração de banco foi executada. A aprovação é documental e arquitetural, não autorização operacional.
+
+
+### Complemento da sessão — decisão sobre unicidade de CPF/CNPJ
+
+**Data:** 2026-11-08  
+**Estado:** decisão confirmada e registrada na especificação física; implementação ainda não autorizada.
+
+O responsável confirmou expressamente que:
+- um mesmo CPF/CNPJ poderá existir em empresas diferentes;
+- dentro de uma mesma empresa, o CPF/CNPJ não poderá se repetir.
+
+A regra lógica é unicidade por empresa, equivalente a uma constraint/índice único sobre `(company_identifier, cpf_cnpj)`, após definir canonicalização para impedir duplicidade por diferenças de pontuação, espaços ou formatação. A migration deverá tratar explicitamente valores nulos/vazios e registros legados, sem normalização destrutiva ou correção presumida.
+
+#### Artefatos atualizados
+
+- `documentacao/ESPECIFICACAO_FISICA_FUNDACAO_MULTIEMPRESA_MVP.md`: v0.3.0.
+- Este documento: v1.6.0.
+
+#### Próxima atividade
+
+Continuar a preparação do pacote de migrations/DDL. Ainda dependem de definição ou validação: canonicalização de CPF/CNPJ; política para nulos/vazios; reconciliação do backfill multiempresa; mecanismo confiável de contexto transacional no backend; identificação do repositório e stack da aplicação.
+
+#### Limites
+
+Esta confirmação não autoriza executar SQL, DDL, migration ou DML no Supabase. Nenhuma alteração de banco foi realizada nesta sessão.
