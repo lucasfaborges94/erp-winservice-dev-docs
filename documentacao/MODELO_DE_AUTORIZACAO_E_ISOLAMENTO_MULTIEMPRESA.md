@@ -1,9 +1,9 @@
 # Modelo de autorização e isolamento multiempresa — ERP Winservice
 
 **Documento:** Modelo de autorização e isolamento multiempresa  
-**Versão:** 0.1.6  
-**Data:** 2026-11-07  
-**Estado:** PROPOSTA PARA DISCUSSÃO — não aprovada como decisão arquitetural  
+**Versão:** 0.2.0  
+**Data:** 2026-11-08  
+**Estado:** PROPOSTA PARA DISCUSSÃO — consolidação funcional apresentada para aprovação documental; não substitui ADRs aprovadas nem autoriza implementação  
 **Projeto Supabase consultado:** Winservice (`voaovwphncwbrwtcqnsc`)  
 **Schema consultado:** `public`  
 **Base técnica:** estrutura e policies observadas em 2026-11-07; consultar novamente antes de implementar.
@@ -12,7 +12,7 @@
 
 Definir o modelo conceitual e os requisitos de autorização que deverão orientar a identidade, o vínculo de usuários com empresas, o catálogo de permissões, a autorização de operações, o isolamento dos dados, as APIs, as políticas RLS e a atuação da Isa.
 
-Este documento é uma proposta de especificação. Não altera ADRs aprovadas, não aprova por si só uma estratégia de tenancy e não autoriza alterações no banco.
+Este documento é uma proposta de especificação. Não altera ADRs aprovadas nem autoriza alterações no banco.
 
 ## 2. Autoridade e decisões relacionadas
 
@@ -23,7 +23,7 @@ Este modelo deve respeitar:
 - **ADR-0011:** catálogo padrão global versionado; cada empresa mantém catálogo próprio e escolhe quando aderir a novas versões; personalizações devem ser preservadas, rastreadas e restauráveis.
 - **ADR-0012:** a Isa consulta somente informações do cliente identificado no atendimento atual; pode criar clientes, equipamentos, ordens de serviço e visitas; não pode excluir; só pode alterar registros criados por ela; enforcement no backend/API e autorização, não apenas em prompt ou interface.
 
-O índice arquitetural registra como questões ainda abertas a estratégia exata de tenancy e a matriz definitiva de papéis e permissões. Este documento não as trata como decisões já aprovadas.
+A estratégia de tenancy foi aprovada pela ADR-0017: banco e schema compartilhados, com isolamento lógico por empresa, vínculo multiempresa, seleção da empresa ativa na sessão e RLS/backend como barreiras complementares. A matriz definitiva de papéis e permissões está sendo consolidada neste documento, sem alterar a ADR-0017.
 
 ## 3. Evidências do estado atual consultado
 
@@ -70,8 +70,10 @@ Esses pontos são observações estruturais. Não se conclui, sem análise adici
 - **Recurso tenant-scoped:** dado pertencente a uma empresa e isolado pelo identificador dessa empresa.
 - **Recurso global:** dado mantido pela plataforma e compartilhado entre empresas segundo regras explícitas.
 - **Autoria:** identidade do usuário ou agente autônomo que criou um registro, distinta do ator que o atualizou posteriormente.
-- **Usuário humano:** usuário ERP operado diretamente por uma pessoa.
-- **Usuário autônomo:** usuário ERP cuja execução é realizada por um agente de IA, com identidade, função, configuração e permissões próprias.
+- **Usuário humano (`human`):** usuário ERP operado diretamente por uma pessoa.
+- **Usuário agente (`agent`):** usuário ERP cuja execução é realizada por um agente de IA, com identidade, função, configuração e permissões próprias.
+- **`company_admin`:** designação de responsabilidade pela contratação do SaaS e pela relação administrativa/comercial da conta da empresa; não é, por si só, um papel de autorização nem concede privilégios no nível da plataforma.
+- **`superadmin`:** papel de autorização atribuído a usuário humano de uma empresa, com todas as permissões disponíveis no âmbito daquela empresa, respeitados os limites globais da plataforma.
 - **Agente autônomo:** configuração operacional e de IA associada a um usuário autônomo; inclui nome de exibição, perfil, função, comportamento, conhecimento autorizado e limites de atuação.
 
 ## 5. Princípios propostos
@@ -154,9 +156,20 @@ A estrutura atual de `permissions` com `company_identifier` obrigatório não co
 
 ### 8.2 Semântica de múltiplos papéis e exceções
 
-Ainda não está decidido se permissões de múltiplos papéis serão agregadas por união, se haverá negações explícitas, como será resolvido conflito entre concessão e negação e qual será a precedência de exceções individuais.
+A regra para usuários comuns é a agregação por união: uma permissão é concedida quando qualquer um dos papéis atribuídos ao vínculo a concede. A avaliação não depende da ordem de consulta dos papéis.
 
-**Recomendação para discussão:** definir uma regra determinística, documentada e testável, evitando precedências implícitas ou dependentes da ordem de consulta.
+As exceções individuais são avaliadas por vínculo usuário–empresa e seguem estas regras:
+
+- `user_permissions.allow = true`: concessão explícita da permissão ao usuário naquele vínculo.
+- `user_permissions.allow = false`: negação explícita da permissão, prevalecendo sobre concessões provenientes de qualquer papel.
+- Ausência de exceção individual: aplica-se a união das permissões concedidas pelos papéis.
+- Ausência de concessão por papel ou exceção: acesso negado por padrão.
+
+Para usuários com papel `superadmin`, a negação explícita individual (`allow = false`) não se aplica. O `superadmin` possui todas as permissões disponíveis no âmbito da própria empresa, sem depender de concessões individuais por papel. A concessão ampla não ultrapassa os limites de disponibilidade global dos módulos, ativação do módulo pela empresa, vínculo com a empresa, isolamento multiempresa ou restrições globais obrigatórias de segurança.
+
+A regra de `superadmin` não concede acesso a controles exclusivos da plataforma SaaS nem a outra empresa. Agentes autônomos não podem receber ou exercer esse papel.
+
+A forma física de armazenamento e a implementação da avaliação permanecem pendentes de especificação técnica.
 
 ## 9. Isolamento e integridade dos dados
 
@@ -184,7 +197,9 @@ A decisão sobre quais tabelas devem carregar `company_identifier` diretamente n
 
 ### 10.1 Conceito de usuário autônomo
 
-A Isa é concebida como um **usuário do ERP operado autonomamente por IA**, e não como um papel fixo do sistema, uma permissão global ou uma integração externa privilegiada.
+O ERP distinguirá conceitualmente dois tipos de usuário: **humanos (`human`)** e **agentes (`agent`)**. Ambos são usuários do ERP, possuem identidade própria, podem ter vínculos com empresas e recebem papéis e permissões próprios. A distinção de tipo não substitui a autorização por empresa.
+
+A Isa é concebida como um **usuário do tipo agente (`agent`) operado autonomamente por IA**, e não como um papel fixo do sistema, uma permissão global ou uma integração externa privilegiada.
 
 O modelo deverá permitir que cada empresa cadastre e configure seus próprios usuários autônomos para funções específicas. A empresa poderá personalizar, no mínimo, o nome de exibição e o perfil operacional de cada agente. A configuração poderá contemplar função, comportamento, tom de comunicação, instruções, documentos/fontes de conhecimento autorizados e permissões compatíveis com a atividade.
 
@@ -194,7 +209,7 @@ A Isa é a primeira instância desse conceito na Winservice, configurada para at
 
 ### 10.2 Identidade, vínculo e autorização
 
-Cada usuário autônomo deve possuir identidade própria no contexto da empresa, vínculo explícito com a empresa proprietária e permissões limitadas à sua função. Agentes de IA nunca poderão receber, ocupar ou exercer o papel de superadmin, independentemente de sua função ou configuração. Não deve operar com a identidade pessoal do usuário que o cadastrou, nem herdar automaticamente os privilégios desse usuário.
+Cada usuário autônomo deve possuir identidade própria no contexto da empresa, vínculo explícito com a empresa proprietária e permissões limitadas à sua função. Agentes de IA nunca poderão receber, ocupar ou exercer o papel de `superadmin`, independentemente de sua função ou configuração. Não deve operar com a identidade pessoal do usuário que o cadastrou, nem herdar automaticamente os privilégios desse usuário.
 
 A autorização de um agente deve considerar:
 
@@ -208,7 +223,7 @@ A autorização de um agente deve considerar:
 
 A empresa pode personalizar o perfil do agente, mas não pode ampliar permissões além dos módulos contratados, das capacidades disponibilizadas pela plataforma ou dos limites de segurança obrigatórios.
 
-O conceito de `superuser` permanece no âmbito da empresa: não concede acesso a outras empresas nem a módulos não contratados. Quando a empresa adquire/habilita um módulo, o acesso correspondente segue as regras de atribuição aprovadas para aquele módulo. Um agente autônomo também deve respeitar esse limite.
+O papel `superadmin` permanece no âmbito da empresa: não concede acesso a outras empresas nem a módulos não contratados. Quando a empresa adquire/habilita um módulo, o acesso correspondente segue as regras de atribuição aprovadas para aquele módulo. Um agente autônomo também deve respeitar esse limite.
 
 ### 10.3 Limites específicos da Isa e da ADR-0012
 
@@ -263,13 +278,20 @@ A desativação não deverá apagar automaticamente dados, configurações, hist
 
 Esta regra é transversal e deverá ser aplicada de forma consistente a todos os módulos, APIs, workflows, aplicações e canais de acesso. Um módulo não poderá contornar o controle por meio de chamadas diretas, funções privilegiadas ou automações técnicas.
 
-### 10.7 Ciclo de vida do superadmin
+### 10.7 Administração empresarial e ciclo de vida do superadmin
+
+A designação `company_admin` e o papel `superadmin` representam conceitos distintos:
+
+- **`company_admin`:** identifica a pessoa responsável pela contratação do SaaS e pela relação administrativa/comercial da conta da empresa. Essa designação não concede, por si só, privilégios de autorização no ERP nem acesso a controles exclusivos da plataforma SaaS.
+- **`superadmin`:** papel de autorização de um usuário humano da empresa. Concede todas as permissões disponíveis no âmbito da própria empresa, incluindo as configurações que a plataforma permite que uma empresa individual administre. Não concede acesso administrativo ao SaaS, a outras empresas ou a módulos indisponíveis.
+
+O primeiro usuário humano provisionado para a empresa será o responsável `company_admin` e receberá o papel `superadmin`. A designação de responsável comercial e o papel de autorização devem permanecer semanticamente distintos, ainda que sejam inicialmente atribuídos à mesma pessoa. Uma empresa poderá possuir mais de um `superadmin` humano.
 
 Cada empresa deverá manter pelo menos um **superadmin humano ativo**. Agentes de IA nunca poderão receber, ocupar ou exercer esse papel, independentemente de sua função, perfil ou configuração.
 
-**Provisionamento inicial:** o primeiro usuário criado para uma empresa deverá ser obrigatoriamente um usuário humano e receberá o papel de superadmin. Essa atribuição deverá ocorrer no fluxo confiável de criação/provisionamento da empresa, sem depender de seleção livre pelo cliente ou de ação de um agente de IA.
+O `superadmin` é imune a negações explícitas individuais de permissões no âmbito da empresa, mas continua sujeito à disponibilidade global dos módulos, à ativação de cada módulo pela empresa, ao isolamento multiempresa e às restrições globais obrigatórias de segurança.
 
-O sistema deverá impedir a remoção, suspensão ou rebaixamento do último superadmin humano ativo, bem como qualquer outra operação que deixe a empresa sem esse responsável administrativo. O procedimento de recuperação de acesso administrativo ainda deverá ser especificado.
+O sistema deverá impedir a remoção, suspensão ou rebaixamento do último superadmin humano ativo, bem como qualquer outra operação que deixe a empresa sem esse responsável administrativo. A garantia sob operações concorrentes e o procedimento de recuperação de acesso administrativo ainda deverão ser especificados tecnicamente.
 
 ### 10.8 Regras específicas do Módulo de Inteligência Artificial
 
@@ -281,17 +303,15 @@ A admissão de novas execuções de IA deverá ser bloqueada quando o módulo es
 
 Provedores de modelos, workflows de execução, n8n e demais componentes de infraestrutura são serviços de suporte e não se confundem com o Módulo de IA nem com a identidade dos agentes.
 
-## 11. Estratégia de tenancy — alternativas em avaliação
+## 11. Estratégia de tenancy aprovada
 
-O índice de ADRs registra que a estratégia exata ainda está aberta.
+A estratégia de tenancy não é uma questão em aberto. A ADR-0017 está aprovada e determina que o ERP utilizará banco PostgreSQL compartilhado e schema compartilhado, com isolamento lógico por empresa nas entidades aplicáveis.
 
-| Alternativa | Vantagens | Custos e riscos |
-|---|---|---|
-| Banco compartilhado, schema compartilhado, isolamento por linha (`company_identifier` + RLS) | Compatível com a estrutura atual; menor complexidade operacional inicial; facilita evolução incremental | Exige disciplina rigorosa em RLS, constraints, funções e testes; risco de falha de isolamento se houver policy incorreta |
-| Schema por empresa | Separação lógica maior entre tenants | Migrações e manutenção mais complexas; compartilhamento de catálogo e evolução de módulos exigem coordenação |
-| Banco por empresa | Maior isolamento operacional e possibilidade de configuração dedicada | Maior custo e complexidade de provisionamento, observabilidade, migrações, backup e operação SaaS |
+A autorização deverá respeitar cumulativamente o vínculo ativo do usuário com a empresa, a empresa selecionada como contexto da sessão, as permissões aplicáveis e a disponibilidade/ativação dos módulos envolvidos. RLS e backend/API serão barreiras complementares; constraints e relacionamentos deverão preservar a integridade entre empresas.
 
-**Recomendação preliminar, não aprovada:** manter banco e schema compartilhados com isolamento por linha, desde que a revisão de RLS, constraints, funções e testes demonstre isolamento robusto. A estrutura atual já concentra entidades em `public` e utiliza `company_identifier` em parte delas, mas isso é apenas evidência de compatibilidade inicial, não prova suficiente para decidir.
+A ADR-0017 não significa que essa arquitetura já esteja implementada ou validada no banco atual. A auditoria estrutural identificou pontos que exigem correção e testes antes da liberação. A classificação das entidades globais e tenant-scoped, a revisão de RLS, as constraints e a implementação permanecem atividades técnicas pendentes.
+
+As alternativas de schema por empresa e banco por empresa não são a arquitetura aprovada para a V1.
 
 ## 12. Matriz mínima de testes de autorização
 
@@ -316,20 +336,20 @@ Antes de produção, devem existir testes positivos e negativos para pelo menos 
 
 Os testes devem ser executados com identidades e empresas distintas em ambiente controlado, sem usar dados reais de clientes como fixtures.
 
-## 13. Decisões pendentes para aprovação
+## 13. Decisões funcionais consolidadas e questões técnicas pendentes
 
-Os itens abaixo precisam de resposta do responsável antes de transformar esta proposta em especificação normativa ou implementar mudanças estruturais:
+As deliberações funcionais sobre tenancy, vínculo multiempresa, seleção da empresa na sessão, múltiplos papéis, exceções individuais e escopo empresarial do `superadmin` foram consolidadas nas ADRs aplicáveis e nesta proposta. Permanecem pendentes os detalhes de implementação que não foram decididos:
 
-1. **Tenancy:** adotar banco/schema compartilhado com isolamento por linha como arquitetura da V1?
-2. **Usuários multiempresa:** permitir que um mesmo usuário tenha vínculos ativos com várias empresas, com papéis independentes em cada uma?
-3. **Contexto da empresa:** a aplicação seleciona a empresa ativa, e o backend valida o vínculo em toda operação? Qual mecanismo técnico será usado para transportar o contexto?
-4. **Múltiplos papéis:** as permissões dos papéis devem ser agregadas por união? Deve existir negação explícita com precedência sobre concessões?
-5. **Exceções individuais:** `user_permissions.allow` deve representar concessão/negação explícita por vínculo, ou será adotado outro modelo?
-6. **Papéis administrativos:** `company_admin` deve ser um atributo de conveniência ou uma função de autorização formal? Deve existir papel de proprietário/administrador da empresa separado de papéis operacionais?
-7. **Dados globais:** quais catálogos e recursos serão globais da plataforma e quais serão sempre isolados por empresa?
-8. **Implementação dos usuários autônomos:** o conceito será representado por registros na entidade `users` com tipo/modo de execução, por entidade complementar ou por outro arranjo? Como serão vinculados ao usuário/empresa que os cadastra?
-9. **Identidades de infraestrutura:** n8n e demais integrações técnicas terão identidades de serviço distintas, cada uma com escopo próprio?
-10. **Identidade Auth ↔ ERP:** confirmar que `users.auth_user_identifier` é a relação canônica com `auth.users.id` e que `users.identifier` é o ID interno do ERP.
+1. **Contexto da empresa:** definir o mecanismo técnico para transportar e validar o contexto entre sessão, aplicação, backend e banco, conforme a ADR-0017.
+2. **Identidade Auth ↔ ERP:** confirmar no fluxo real que `users.auth_user_identifier` implementa a relação canônica com `auth.users.id` e que `users.identifier` é o identificador interno do ERP.
+3. **Tipo físico de usuário:** definir como `human` e `agent` serão representados no schema, sem presumir que a estrutura atual já suporte a distinção.
+4. **Garantia do último superadmin:** especificar proteção transacional/concorrente para impedir remoção, suspensão ou rebaixamento do último superadmin humano ativo.
+5. **Recuperação administrativa:** definir procedimento seguro de recuperação quando houver perda de acesso dos superadmins.
+6. **Dados globais e tenant-scoped:** concluir a classificação de todas as entidades e catálogos.
+7. **Identidades de infraestrutura:** especificar identidades e escopos próprios para n8n e demais integrações técnicas.
+8. **Implementação da autorização:** definir avaliação backend/RLS, estrutura física das exceções e testes automatizados, preservando as regras funcionais consolidadas.
+
+A forma física das tabelas, constraints, funções, policies e APIs não é aprovada por este documento.
 
 ## 14. Próximas atividades após aprovação
 
@@ -355,6 +375,7 @@ Os itens abaixo precisam de resposta do responsável antes de transformar esta p
 
 ## Histórico de alterações
 
+- 2026-11-08 — v0.2.0: consolida a união das permissões de múltiplos papéis para usuários comuns; define concessões e negações individuais, com negação prevalecendo para usuários comuns; define a imunidade do `superadmin` a negações individuais dentro do escopo empresarial; distingue `company_admin` de `superadmin`; formaliza os tipos conceituais `human` e `agent`; registra que o primeiro usuário humano provisionado recebe a designação `company_admin` e o papel `superadmin`; corrige a referência à tenancy para refletir a ADR-0017 aprovada; explicita questões técnicas ainda pendentes. Nenhuma alteração no Supabase.
 - 2026-11-07 — v0.1.6: define retry limitado para falhas temporárias, preservação da identidade da execução, estados terminais para falhas permanentes/timeouts e conclusão da drenagem por estados terminais.
 - 2026-11-07 — v0.1.5: define desativação com drenagem: bloquear novas admissões e enfileiramentos, concluir normalmente todas as execuções já aceitas e reabrir a entrada somente após reativação nos dois níveis.
 - 2026-11-07 — v0.1.4: generaliza a ativação em dois níveis para todos os módulos; define que o primeiro usuário da empresa será humano e superadmin; proíbe agentes de IA como superadmin; exige a manutenção de ao menos um superadmin humano ativo.
