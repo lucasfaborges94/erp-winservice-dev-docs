@@ -1,7 +1,7 @@
 # Continuidade e transferência de trabalho — ERP Winservice
 
 **Documento:** Procedimento de continuidade e transferência  
-**Versão:** 1.2.0  
+**Versão:** 1.3.0  
 **Data:** 2026-11-07  
 **Estado:** procedimento estabelecido; registro inicial de referência
 
@@ -979,3 +979,25 @@ A autorização não decorre do conhecimento. Backend/API/RLS continuam sendo re
 #### Segurança e limites
 
 Atualização exclusivamente documental. Nenhum código, SQL, DDL, DML, migration, policy, função, trigger, dado, configuração ou infraestrutura Supabase foi alterado. O modelo lógico permanece proposta técnica, não aprovada como modelo físico. Não foram executados testes funcionais, de GPS, concorrência, autenticação, RLS ou sincronização offline.
+
+
+### Sessão — 2026-11-08 — aprovação da especificação técnica de visit_events
+
+**Estado:** especificação técnica aprovada; implementação física não autorizada.
+
+#### Aprovações e definições confirmadas
+
+- A especificação de `visit_events` foi aprovada, condicionada à correção prévia de tenancy, integridade multiempresa e RLS.
+- `in_displacement`, `in_progress` e `paused` ocupam a disponibilidade do técnico; a exclusividade deve ser global por identidade e garantida no backend/banco.
+- A sincronização offline será validada no servidor, preservando `occurred_at` e `recorded_at`; sequência e idempotência serão controladas pelo servidor.
+- Ao receber uma nova visita, antes de disponibilizá-la ao técnico, o dispositivo comparará seu relógio com o horário oficial do ERP e avisará se houver divergência. A divergência isolada não bloqueia a visita.
+- `visit_events` conterá apenas eventos aceitos. Comandos rejeitados/conflitantes terão trilha de auditoria separada.
+- Revisão de conflitos e eventos antigos será restrita a gestores e atendentes/usuários expressamente autorizados.
+
+#### Recomendação ainda pendente
+
+Foi recomendada janela configurável inicial de 24 horas para reconciliação automática de eventos offline, desde que os demais critérios de consistência sejam satisfeitos. Eventos mais antigos seriam encaminhados à revisão autorizada. O prazo não foi aprovado e não pode ser tratado como requisito vigente.
+
+#### Pré-condições e limites
+
+A implementação depende de corrigir e validar tenancy, FKs compostas, RLS e autorização multiempresa, além das inconsistências de schema/função de visita já identificadas. Nenhuma alteração de DDL, migration, policy, função, trigger ou dado foi executada nesta sessão.
