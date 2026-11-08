@@ -100,7 +100,7 @@ Restrições:
 
 #### `company_permissions`
 
-Catálogo efetivo materializado de cada empresa. É a fonte consultada por `role_permissions` e `user_permissions).
+Catálogo efetivo materializado de cada empresa. É a fonte consultada por `role_permissions` e `user_permissions`.
 
 Campos mínimos:
 - `identifier uuid PK`;
@@ -242,7 +242,7 @@ Esses números são baseline observado, não autorização para excluir ou recla
 
 ## 7. Regras multiempresa e índices
 
-Todas as tabelas de catálogo local e histórico recebem `company_identifier NOT NULL). Exceção: as tabelas do catálogo global não pertencem a uma empresa.
+Todas as tabelas de catálogo local e histórico recebem `company_identifier NOT NULL`. Exceção: as tabelas do catálogo global não pertencem a uma empresa.
 
 Índices e constraints mínimos:
 - `company_permission_catalogs(company_identifier)` UNIQUE;
