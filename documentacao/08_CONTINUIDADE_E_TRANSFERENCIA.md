@@ -1104,3 +1104,45 @@ O responsável concordou em separar:
 A proposta não é migration executável aprovada e não autoriza DDL/DML. A execução depende da aprovação do documento e da resolução dos bloqueios listados nele, além de backup restaurável e definição do repositório oficial de migrations. A Parte B permanece separada.
 
 Nenhuma alteração foi realizada no Supabase nesta sessão.
+
+
+### Sessão — 2026-11-08 — revisão das deliberações da Parte A e desenho do catálogo de permissões
+
+**Etapa:** fundação multiempresa, integridade e autorização  
+**Estado:** plano Parte A v0.2.0 atualizado; proposta física do catálogo de permissões v0.1.0 criada para aprovação. Nenhuma alteração no Supabase executada.
+
+#### Deliberações recebidas
+
+1. O responsável confirmou que **todas as 26 visitas existentes pertencem à Winservice**. O backfill de `visits.company_identifier` deverá preencher todas as linhas com o identificador da empresa Winservice (`a4de8fcf-95fc-432e-88ef-96eaa45a91fc`). A visita sem cliente/endereço/OS permanece sem esses vínculos; não criar registros artificiais.
+2. **Uma visita não precisa estar vinculada a uma OS.** `work_order_identifier` permanecerá nullable. Se preenchido, a FK composta deverá garantir que a OS pertence à mesma empresa.
+3. A ADR-0017 determina que o vínculo usuário–empresa possui contexto de autorização próprio, incluindo papéis. Entretanto, não foi encontrada decisão aprovada que formalize `company_user_roles` como fonte única e determine a remoção de `company_users.role_identifier`. A auditoria identificou duas associações em `company_user_roles` divergentes do campo legado. Nenhum campo ou associação será removido/selecionado automaticamente. A remoção exige deliberação documental, reconciliação dos dados e auditoria de dependências.
+4. Foi elaborado o desenho físico proposto para a ADR-0011: versões globais imutáveis, catálogo efetivo materializado por empresa, cópia na adoção, personalizações preservadas, adoção voluntária, histórico e restauração. O desenho está sujeito à aprovação; não altera a ADR-0011 nem autoriza implementação.
+
+#### Inspeção somente leitura do Supabase
+
+Contagens observadas:
+- `permissions`: 1 registro;
+- `role_permissions`: 0 registros;
+- `user_permissions`: 0 registros;
+- `roles`: 3 registros;
+- `company_users`: 1 vínculo;
+- `company_user_roles`: 2 associações.
+
+A inspeção de colunas confirmou `company_users.role_identifier` nullable e `company_user_roles.role_identifier` obrigatório. Não foram executadas alterações no banco.
+
+#### Artefatos atualizados/criados
+
+- `documentacao/relatorios/PLANO_MIGRACAO_FUNDACAO_MULTIEMPRESA_PARTE_A_MVP.md` — v0.2.0; corrigido backfill de visitas, OS opcional e tratamento da divergência de papéis.
+- `documentacao/relatorios/PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md` — v0.1.0; proposta física para aprovação.
+- `documentacao/06_STATUS_E_RELATORIOS.md` — v1.8.0.
+
+#### Pendências e próxima atividade
+
+1. Responsável revisar/aprovar ou ajustar a proposta física do catálogo de permissões.
+2. Deliberar formalmente se `company_user_roles` será a fonte única de papéis e se `company_users.role_identifier` será removida após reconciliação e auditoria de dependências.
+3. Prosseguir com a definição física de catálogos globais de tarefa/requisito.
+4. Inspecionar trigger/função de snapshot de endereço.
+5. Definir repositório oficial de migrations e preparar SQL final numerado com rollback.
+6. Manter a Parte B bloqueada até definir contrato confiável de contexto transacional no backend.
+
+**Limites:** nenhum DDL, DML, migration, policy, grant, função, trigger ou dado foi alterado no Supabase. A criação/atualização dos documentos é documental e não autoriza execução.
