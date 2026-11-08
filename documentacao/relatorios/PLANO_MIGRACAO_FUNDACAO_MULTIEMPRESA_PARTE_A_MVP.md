@@ -296,7 +296,7 @@ Criar FKs compostas depois das chaves únicas compostas e da validação dos dad
 | `user_modules` | `(company_identifier, company_user_identifier)` | `company_users` | `(company_identifier, identifier)` |
 | `user_screens` | `(company_identifier, company_user_identifier)` | `company_users` | `(company_identifier, identifier)` |
 
-Relações com entidades globais, como `users`, `modules` e `screens`, permanecem FKs simples. A FK simples existente poderá ser mantida se não causar redundância ou conflito; sua remoção não é requisito para obter a barreira composta.
+Além das FKs compostas, cada nova coluna `company_identifier` deverá possuir FK para `companies(identifier)` quando essa relação não estiver já garantida por uma FK composta para uma entidade tenant. Relações com entidades globais, como `users`, `modules` e `screens`, permanecem FKs simples. A FK simples existente poderá ser mantida se não causar redundância ou conflito; sua remoção não é requisito para obter a barreira composta.
 
 Relações com catálogos de tarefa/requisito permanecem pendentes até a separação entre definição global e adoção local.
 
@@ -402,6 +402,16 @@ Os blocos abaixo são referências para a migration final. Não foram executados
            OR cu.company_identifier <> r.company_identifier
       ) THEN
         RAISE EXCEPTION 'Preflight: associação de papel órfã ou cross-tenant.';
+      END IF;
+
+      IF EXISTS (
+        SELECT 1
+        FROM public.visits v
+        WHERE v.customer_identifier IS NULL
+          AND v.address_identifier IS NULL
+          AND v.company_identifier IS NULL
+      ) THEN
+        RAISE EXCEPTION 'Preflight: existe visita sem evidência de tenant; resolver antes da fase NOT NULL.';
       END IF;
 
       IF EXISTS (
