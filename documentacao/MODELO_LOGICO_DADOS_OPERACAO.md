@@ -1,12 +1,14 @@
 # Modelo lógico de dados e matriz de conformidade — Operação MVP
 
-**Versão:** 0.7.0  
+**Versão:** 0.7.1  
 **Data:** 2026-11-08  
 **Estado:** proposta técnica parcialmente aprovada como especificação; não aprovada como modelo físico  
 **Projeto Supabase avaliado:** Winservice — `voaovwphncwbrwtcqnsc`  
 **Schema:** `public`
 
 > Este documento traduz o baseline funcional de Operação em uma proposta de modelo lógico e compara essa proposta com o schema efetivamente inspecionado. Não é uma ADR, não autoriza alterações no banco e não representa uma migração pronta para execução. Os nomes de tabelas e colunas propostos são conceituais até aprovação.
+
+> **Limite de escopo:** consultar o [inventário de itens ignorados, futuros e obsoletos](CONTROLE_ESCOPO_MVP_IGNORADOS_E_OBSOLETOS.md) antes de ampliar o MVP. A tabela existente `public.expenses` e a função `public.can_view_expense(uuid)` estão fora do MVP operacional e reservadas ao futuro módulo Financeiro. Não devem ser incluídas no modelo ou implementação desta etapa; esta classificação não autoriza remoção ou alteração no banco.
 
 ## 1. Objetivos e limites
 
