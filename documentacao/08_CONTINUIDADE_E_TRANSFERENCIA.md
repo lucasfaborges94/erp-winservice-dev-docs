@@ -432,3 +432,39 @@ As regras foram registradas na proposta documental e no status. Não foram criad
 - Definir interrupção/cancelamento seguro de operações em andamento para qualquer módulo.
 - Especificar recuperação de acesso administrativo.
 - Formalizar as decisões em ADRs, após revisão e aprovação explícita do pacote correspondente.
+
+
+### Sessão — 2026-11-07 — Desativação de módulos com drenagem de execuções
+
+**Responsável/agente:** ChatGPT, sob orientação do responsável pelo projeto  
+**Ferramenta/ambiente:** GitHub — repositório documental, branch main  
+**Etapa do roadmap:** definição arquitetural / governança transversal de módulos  
+**Módulo/processo:** ciclo de vida de execuções e filas  
+**Estado:** CONCLUÍDA para atualização documental; implementação não iniciada
+
+#### 1. Definição fornecida pelo responsável
+Quando qualquer módulo for desativado em qualquer um dos níveis de controle, todas as execuções já aceitas deverão terminar normalmente, inclusive as que estiverem em andamento e as que estiverem aguardando processamento na fila. Nenhuma nova execução poderá ser aceita ou entrar na fila até que o módulo volte a estar ativo globalmente e para a empresa.
+
+#### 2. Regra registrada
+- Fechar imediatamente a admissão de novas execuções no escopo afetado.
+- Não cancelar nem interromper abruptamente execuções já aceitas.
+- Continuar processando e concluir as execuções em andamento e as já enfileiradas.
+- Drenar a fila existente até sua conclusão.
+- Não admitir nem enfileirar novas execuções enquanto o módulo estiver inativo, inclusive após a fila esvaziar.
+- Reabrir a admissão somente quando os dois níveis estiverem ativos e as demais condições de autorização forem atendidas.
+- Aplicar a regra a todos os módulos, inclusive IA.
+
+#### 3. Artefatos alterados
+- `documentacao/MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md`: versão 0.1.5.
+- `documentacao/06_STATUS_E_RELATORIOS.md`: versão 0.7.0.
+- Este registro de continuidade.
+
+#### 4. Estado e limites
+A regra foi registrada na proposta documental. Nenhuma ADR foi criada ou alterada nesta sessão. Nenhuma implementação foi realizada em código, banco, filas, workflows ou infraestrutura. Nenhuma alteração foi realizada no Supabase.
+
+#### 5. Pendências técnicas
+- Definir mecanismo atômico de fechamento da admissão para evitar corrida entre desativação e enfileiramento.
+- Definir como identificar e preservar o conjunto de execuções aceitas antes do fechamento.
+- Definir política de retry para execuções já aceitas sem permitir admissão indevida de novas execuções.
+- Definir comportamento de falhas permanentes, timeouts e execuções que não conseguem terminar normalmente, sem contrariar a regra de drenagem.
+- Criar testes concorrentes para desativação enquanto há execuções ativas e aguardando na fila.
