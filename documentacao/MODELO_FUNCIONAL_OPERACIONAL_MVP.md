@@ -1,6 +1,6 @@
 # Modelo funcional operacional do MVP — ERP Winservice
 
-**Versão:** 0.2.0  
+**Versão:** 0.3.0  
 **Data da consolidação:** 2026-11-08  
 **Estado:** baseline funcional em consolidação  
 **Escopo:** clientes, equipamentos, ordens de serviço, visitas, tarefas, relatos, execução técnica por GPS, orçamentos e aprovações.
@@ -194,7 +194,25 @@ O histórico da visita deve manter versões anteriores de dados da visita e de s
 
 A estrutura técnica de auditoria, retenção, proteção contra adulteração e granularidade dos snapshots ainda precisa ser projetada.
 
-## 7. Confronto com o schema Supabase consultado em 2026-11-08
+## 7. Vínculo funcional dos orçamentos
+
+Cada orçamento poderá:
+- pertencer a uma Ordem de Serviço; ou
+- pertencer a uma visita; ou
+- pertencer a uma tarefa; ou
+- não estar relacionado a nenhuma dessas entidades.
+
+O vínculo é opcional e exclusivo: um orçamento não poderá estar simultaneamente vinculado a OS, visita e/ou tarefa. Quando vinculado a visita ou tarefa, sua relação com a OS poderá ser obtida pela hierarquia operacional, sem duplicar o vínculo no orçamento. O cliente e a empresa deverão ser coerentes com a entidade de contexto, quando houver vínculo.
+
+A migração do schema atual deverá tratar registros que hoje tenham simultaneamente vínculo de OS e visita, sem escolher automaticamente qual deles deve prevalecer.
+
+## 8. Máquina de estados e histórico
+
+A máquina de estados reutilizável definida para o projeto pertence ao módulo Chat. Ela não deve ser confundida com o ciclo operacional das visitas nem usada como substituta dos eventos de execução da visita.
+
+Como recomendação técnica ainda sujeita à validação do responsável, o histórico imutável pode ser implementado com eventos append-only e snapshots/revisões versionadas. Correções devem gerar novos registros de correção/revisão, sem sobrescrever o conteúdo histórico original. A política definitiva de retenção, integridade e proteção contra alteração ainda não foi aprovada.
+
+## 9. Confronto com o schema Supabase consultado em 2026-11-08
 
 **Projeto:** Winservice — `voaovwphncwbrwtcqnsc`  
 **Schema:** `public`  
@@ -246,7 +264,7 @@ O Supabase possui uma fundação cadastral e relacionamentos iniciais para clien
 
 A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de conformidade detalhada antes de qualquer DDL ou migração. Não adicionar tabelas/colunas por inferência nem adaptar `work_order_equipment` para representar tarefas.
 
-## 8. Pendências de especificação
+## 10. Pendências de especificação
 
 1. Definir campos, relatos e evidências obrigatórios para cada tipo de tarefa.
 2. Definir o esquema de tarefa e a distinção persistente entre equipamento não identificado e tarefa sem equipamento.
@@ -263,7 +281,7 @@ A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de con
 13. Definir como a seleção da OS existente ou criação de nova OS será apresentada no fluxo do técnico.
 14. Definir tratamento de falha/indisponibilidade do GPS e ações manuais excepcionais, sem permitir fraude ou perda de rastreabilidade.
 
-## 9. Segurança e limites desta análise
+## 11. Segurança e limites desta análise
 
 - A inspeção do Supabase foi somente leitura.
 - Nenhuma tabela, coluna, policy, função, trigger, dado ou configuração foi alterada.
@@ -275,5 +293,6 @@ A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de con
 
 ## Histórico de alterações
 
+- 2026-11-08 — v0.3.0: inclusão do vínculo opcional e exclusivo de orçamento e separação entre máquina de estados do módulo Chat e ciclo operacional da visita; histórico append-only registrado como recomendação pendente de validação.
 - 2026-11-08 — v0.2.0: atualização para execução/sessões no nível da visita, finalização da visita anterior mediante relato, limiares GPS de 200 m/50 m e catálogo global de tipos editável independentemente por empresa.
 - 2026-11-08 — v0.1.0: criação do baseline funcional de Operação e confronto inicial com o schema Supabase consultado em tempo real, somente leitura.
