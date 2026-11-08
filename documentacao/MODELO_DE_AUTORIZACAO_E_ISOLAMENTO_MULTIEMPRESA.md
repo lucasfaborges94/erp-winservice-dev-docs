@@ -1,7 +1,7 @@
 # Modelo de autorização e isolamento multiempresa — ERP Winservice
 
 **Documento:** Modelo de autorização e isolamento multiempresa  
-**Versão:** 0.3.0  
+**Versão:** 0.3.1  
 **Data:** 2026-11-08  
 **Estado:** PROPOSTA PARA DISCUSSÃO — inclui diretrizes e sugestões recentes ainda em avaliação; não substitui ADRs aprovadas nem autoriza implementação  
 **Projeto Supabase consultado:** Winservice (`voaovwphncwbrwtcqnsc`)  
@@ -73,7 +73,7 @@ Esses pontos são observações estruturais. Não se conclui, sem análise adici
 - **Usuário humano (`human`):** usuário ERP operado diretamente por uma pessoa.
 - **Usuário agente (`agent`):** usuário ERP cuja execução é realizada por um agente de IA, com identidade, função, configuração e permissões próprias.
 - **`company_admin`:** designação de responsabilidade pela contratação do SaaS e pela relação administrativa/comercial da conta da empresa; não é, por si só, um papel de autorização nem concede privilégios no nível da plataforma.
-- **`superadmin`:** papel de autorização atribuído a usuário humano de uma empresa, com todas as permissões disponíveis no âmbito daquela empresa, respeitados os limites globais da plataforma.
+- **`superuser`:** papel de autorização atribuído a usuário humano de uma empresa, com todas as permissões disponíveis no âmbito daquela empresa, respeitados os limites globais da plataforma.
 - **Agente autônomo:** configuração operacional e de IA associada a um usuário autônomo; inclui nome de exibição, perfil, função, comportamento, conhecimento autorizado e limites de atuação.
 
 ## 5. Princípios propostos
@@ -165,11 +165,15 @@ As exceções individuais são avaliadas por vínculo usuário–empresa e segue
 - Ausência de exceção individual: aplica-se a união das permissões concedidas pelos papéis.
 - Ausência de concessão por papel ou exceção: acesso negado por padrão.
 
-Para usuários com papel `superadmin`, a negação explícita individual (`allow = false`) não se aplica. O `superadmin` possui todas as permissões disponíveis no âmbito da própria empresa, sem depender de concessões individuais por papel. A concessão ampla não ultrapassa os limites de disponibilidade global dos módulos, ativação do módulo pela empresa, vínculo com a empresa, isolamento multiempresa ou restrições globais obrigatórias de segurança.
+Para usuários com papel `superuser`, a negação explícita individual (`allow = false`) não se aplica. O `superuser` possui todas as permissões disponíveis no âmbito da própria empresa, sem depender de concessões individuais por papel. A concessão ampla não ultrapassa os limites de disponibilidade global dos módulos, ativação do módulo pela empresa, vínculo com a empresa, isolamento multiempresa ou restrições globais obrigatórias de segurança.
 
-A regra de `superadmin` não concede acesso a controles exclusivos da plataforma SaaS nem a outra empresa. Agentes autônomos não podem receber ou exercer esse papel.
+A regra de `superuser` não concede acesso a controles exclusivos da plataforma SaaS nem a outra empresa. Agentes autônomos não podem receber ou exercer esse papel.
 
 A forma física de armazenamento e a implementação da avaliação permanecem pendentes de especificação técnica.
+
+### 8.3. Função legada de despesas fora do escopo atual
+
+A função SQL `public.can_view_expense(uuid)` foi classificada como **obsoleta e fora do escopo atual**. Sua lógica pertence ao futuro módulo Financeiro e não deve orientar nem bloquear a especificação do modelo geral de autorização nesta etapa. O tema deverá ser retomado quando o módulo Financeiro for especificado, incluindo a revisão da função, de suas permissões de execução e de eventuais dependências do campo legado `company_users.role_identifier`. Esta classificação é documental: não autoriza nem representa alteração, revogação ou exclusão da função, de grants ou de campos no Supabase.
 
 ## 9. Isolamento e integridade dos dados
 
@@ -209,7 +213,7 @@ A Isa é a primeira instância desse conceito na Winservice, configurada para at
 
 ### 10.2 Identidade, vínculo e autorização
 
-Cada usuário autônomo deve possuir identidade própria no contexto da empresa, vínculo explícito com a empresa proprietária e permissões limitadas à sua função. Agentes de IA nunca poderão receber, ocupar ou exercer o papel de `superadmin`, independentemente de sua função ou configuração. Não deve operar com a identidade pessoal do usuário que o cadastrou, nem herdar automaticamente os privilégios desse usuário.
+Cada usuário autônomo deve possuir identidade própria no contexto da empresa, vínculo explícito com a empresa proprietária e permissões limitadas à sua função. Agentes de IA nunca poderão receber, ocupar ou exercer o papel de `superuser`, independentemente de sua função ou configuração. Não deve operar com a identidade pessoal do usuário que o cadastrou, nem herdar automaticamente os privilégios desse usuário.
 
 A autorização de um agente deve considerar:
 
@@ -223,7 +227,7 @@ A autorização de um agente deve considerar:
 
 A empresa pode personalizar o perfil do agente, mas não pode ampliar permissões além dos módulos contratados, das capacidades disponibilizadas pela plataforma ou dos limites de segurança obrigatórios.
 
-O papel `superadmin` permanece no âmbito da empresa: não concede acesso a outras empresas nem a módulos não contratados. Quando a empresa adquire/habilita um módulo, o acesso correspondente segue as regras de atribuição aprovadas para aquele módulo. Um agente autônomo também deve respeitar esse limite.
+O papel `superuser` permanece no âmbito da empresa: não concede acesso a outras empresas nem a módulos não contratados. Quando a empresa adquire/habilita um módulo, o acesso correspondente segue as regras de atribuição aprovadas para aquele módulo. Um agente autônomo também deve respeitar esse limite.
 
 ### 10.3 Limites específicos da Isa e da ADR-0012
 
@@ -262,7 +266,7 @@ Não reutilizar indiscriminadamente a identidade de um administrador ou a chave 
 A regra de ativação em dois níveis aplica-se **a todos os módulos do ERP**, e não somente ao Módulo de Inteligência Artificial. Cada módulo deverá possuir controles independentes de disponibilidade global pela plataforma e de ativação individual por empresa.
 
 1. **Disponibilidade global pela plataforma:** somente os desenvolvedores responsáveis pelo ERP — inicialmente o responsável pelo projeto e, futuramente, membros autorizados de sua equipe — poderão ativar ou desativar globalmente a disponibilidade de cada módulo.
-2. **Ativação individual por empresa:** o superadmin da própria empresa poderá ativar ou desativar cada módulo para aquela empresa.
+2. **Ativação individual por empresa:** o superuser da própria empresa poderá ativar ou desativar cada módulo para aquela empresa.
 
 Um módulo somente estará efetivamente disponível para uma empresa quando estiver disponibilizado globalmente pela plataforma **e** habilitado para aquela empresa. A ativação individual não poderá sobrepor uma indisponibilidade global.
 
@@ -278,20 +282,20 @@ A desativação não deverá apagar automaticamente dados, configurações, hist
 
 Esta regra é transversal e deverá ser aplicada de forma consistente a todos os módulos, APIs, workflows, aplicações e canais de acesso. Um módulo não poderá contornar o controle por meio de chamadas diretas, funções privilegiadas ou automações técnicas.
 
-### 10.7 Administração empresarial e ciclo de vida do superadmin
+### 10.7 Administração empresarial e ciclo de vida do superuser
 
-A designação `company_admin` e o papel `superadmin` representam conceitos distintos:
+A designação `company_admin` e o papel `superuser` representam conceitos distintos:
 
 - **`company_admin`:** identifica a pessoa responsável pela contratação do SaaS e pela relação administrativa/comercial da conta da empresa. Essa designação não concede, por si só, privilégios de autorização no ERP nem acesso a controles exclusivos da plataforma SaaS.
-- **`superadmin`:** papel de autorização de um usuário humano da empresa. Concede todas as permissões disponíveis no âmbito da própria empresa, incluindo as configurações que a plataforma permite que uma empresa individual administre. Não concede acesso administrativo ao SaaS, a outras empresas ou a módulos indisponíveis.
+- **`superuser`:** papel de autorização de um usuário humano da empresa. Concede todas as permissões disponíveis no âmbito da própria empresa, incluindo as configurações que a plataforma permite que uma empresa individual administre. Não concede acesso administrativo ao SaaS, a outras empresas ou a módulos indisponíveis.
 
-O primeiro usuário humano provisionado para a empresa será o responsável `company_admin` e receberá o papel `superadmin`. A designação de responsável comercial e o papel de autorização devem permanecer semanticamente distintos, ainda que sejam inicialmente atribuídos à mesma pessoa. Uma empresa poderá possuir mais de um `superadmin` humano.
+O primeiro usuário humano provisionado para a empresa será o responsável `company_admin` e receberá o papel `superuser`. A designação de responsável comercial e o papel de autorização devem permanecer semanticamente distintos, ainda que sejam inicialmente atribuídos à mesma pessoa. Uma empresa poderá possuir mais de um `superuser` humano.
 
-Cada empresa deverá manter pelo menos um **superadmin humano ativo**. Agentes de IA nunca poderão receber, ocupar ou exercer esse papel, independentemente de sua função, perfil ou configuração.
+Cada empresa deverá manter pelo menos um **superuser humano ativo**. Agentes de IA nunca poderão receber, ocupar ou exercer esse papel, independentemente de sua função, perfil ou configuração.
 
-O `superadmin` é imune a negações explícitas individuais de permissões no âmbito da empresa, mas continua sujeito à disponibilidade global dos módulos, à ativação de cada módulo pela empresa, ao isolamento multiempresa e às restrições globais obrigatórias de segurança.
+O `superuser` é imune a negações explícitas individuais de permissões no âmbito da empresa, mas continua sujeito à disponibilidade global dos módulos, à ativação de cada módulo pela empresa, ao isolamento multiempresa e às restrições globais obrigatórias de segurança.
 
-O sistema deverá impedir a remoção, suspensão ou rebaixamento do último superadmin humano ativo, bem como qualquer outra operação que deixe a empresa sem esse responsável administrativo. A garantia sob operações concorrentes e o procedimento de recuperação de acesso administrativo ainda deverão ser especificados tecnicamente.
+O sistema deverá impedir a remoção, suspensão ou rebaixamento do último superuser humano ativo, bem como qualquer outra operação que deixe a empresa sem esse responsável administrativo. A garantia sob operações concorrentes e o procedimento de recuperação de acesso administrativo ainda deverão ser especificados tecnicamente.
 
 ### 10.8 Regras específicas do Módulo de Inteligência Artificial
 
@@ -338,13 +342,13 @@ Os testes devem ser executados com identidades e empresas distintas em ambiente 
 
 ## 13. Decisões funcionais consolidadas e questões técnicas pendentes
 
-As deliberações funcionais sobre tenancy, vínculo multiempresa, seleção da empresa na sessão, múltiplos papéis, exceções individuais e escopo empresarial do `superadmin` foram consolidadas nas ADRs aplicáveis e nesta proposta. Permanecem pendentes os detalhes de implementação que não foram decididos:
+As deliberações funcionais sobre tenancy, vínculo multiempresa, seleção da empresa na sessão, múltiplos papéis, exceções individuais e escopo empresarial do `superuser` foram consolidadas nas ADRs aplicáveis e nesta proposta. Permanecem pendentes os detalhes de implementação que não foram decididos:
 
 1. **Contexto da empresa:** definir o mecanismo técnico para transportar e validar o contexto entre sessão, aplicação, backend e banco, conforme a ADR-0017.
 2. **Identidade Auth ↔ ERP:** confirmar no fluxo real que `users.auth_user_identifier` implementa a relação canônica com `auth.users.id` e que `users.identifier` é o identificador interno do ERP.
 3. **Tipo físico de usuário:** definir como `human` e `agent` serão representados no schema, sem presumir que a estrutura atual já suporte a distinção.
-4. **Garantia do último superadmin:** especificar proteção transacional/concorrente para impedir remoção, suspensão ou rebaixamento do último superadmin humano ativo.
-5. **Recuperação administrativa:** definir procedimento seguro de recuperação quando houver perda de acesso dos superadmins.
+4. **Garantia do último superuser:** especificar proteção transacional/concorrente para impedir remoção, suspensão ou rebaixamento do último superuser humano ativo.
+5. **Recuperação administrativa:** definir procedimento seguro de recuperação quando houver perda de acesso dos superusers.
 6. **Dados globais e tenant-scoped:** concluir a classificação de todas as entidades e catálogos.
 7. **Identidades de infraestrutura:** especificar identidades e escopos próprios para n8n e demais integrações técnicas.
 8. **Implementação da autorização:** definir avaliação backend/RLS, estrutura física das exceções e testes automatizados, preservando as regras funcionais consolidadas.
@@ -392,10 +396,10 @@ Recomendação em avaliação: infraestrutura conceitual compartilhada para vers
 
 ### 15.3 Titularidade da conta
 Nomenclatura solicitada para avaliação: account_owner em substituição a company_owner/company_admin como conceito de titularidade da conta. Grafia recomendada: account_owner (não accont_owner).
-Recomendação em avaliação: manter titularidade separada do papel superadmin e avaliar representação própria, sem transformá-la em role. Titular humano, titularidade única, transferência protegida e exigência de superadmin permanecem sujeitos a aprovação específica.
+Recomendação em avaliação: manter titularidade separada do papel superuser e avaliar representação própria, sem transformá-la em role. Titular humano, titularidade única, transferência protegida e exigência de superuser permanecem sujeitos a aprovação específica.
 
 ### 15.4 Papéis iniciais sugeridos
-Papéis informados para avaliação: superadmin, gerente, supervisor, atendente, técnico, suporte e vendedor. A lista é preliminar e não define permissões, hierarquia, exclusividade, escopo por módulo, atribuição padrão ou se os papéis serão globais ou customizáveis por empresa. Recomenda-se identificadores técnicos em inglês e rótulos de apresentação em português.
+Papéis informados para avaliação: superuser, gerente, supervisor, atendente, técnico, suporte e vendedor. A lista é preliminar e não define permissões, hierarquia, exclusividade, escopo por módulo, atribuição padrão ou se os papéis serão globais ou customizáveis por empresa. Recomenda-se identificadores técnicos em inglês e rótulos de apresentação em português.
 
 ### 15.5 Levantamento obrigatório antes da migração
 Antes de qualquer migração de autorização, levantar em modo somente leitura:
@@ -403,7 +407,7 @@ Antes de qualquer migração de autorização, levantar em modo somente leitura:
 - associações entre papéis e permissões;
 - vínculos usuário–empresa ativos, inativos ou suspensos;
 - valores e significado operacional de company_users.role_identifier e company_users.company_admin;
-- titulares/administradores atuais e usuários com superadmin ou equivalentes;
+- titulares/administradores atuais e usuários com superuser ou equivalentes;
 - usuários sem vínculo, vínculos sem usuário correspondente e referências órfãs;
 - sessões existentes e mecanismos atuais de autenticação;
 - dependências em views, funções, triggers, policies RLS, APIs, workflows e aplicações.
@@ -438,16 +442,18 @@ A listagem do projeto Supabase retornou zero migrations registradas e nenhuma Ed
 
 ## Histórico de alterações
 
+- 2026-11-08 — v0.3.1: adota `superuser` em substituição a `superadmin` na nomenclatura conceitual; classifica `public.can_view_expense(uuid)` como obsoleta e fora do escopo atual, reservada ao futuro módulo Financeiro. Nenhuma alteração no Supabase.
+
 - 2026-11-08 — v0.3.4: registra ausência de migrations e Edge Functions no projeto Supabase auditado.
 - 2026-11-08 — v0.3.3: registra grants SQL e achados dos Security Advisors identificados na auditoria.
 - 2026-11-08 — v0.3.2: registra achados técnicos complementares da auditoria RLS e dependência da função can_view_expense no campo legado.
 - 2026-11-08 — v0.3.1: registra referência à auditoria somente leitura dos papéis, vínculos, administradores e permissões atuais. Nenhuma migração autorizada.
 - 2026-11-08 — v0.3.0: registra diretrizes em avaliação sobre sessões por aplicação, arquitetura extensível de catálogos, account_owner, papéis iniciais e levantamento de dados/dependências antes da migração. Não altera ADRs nem autoriza implementação.
-- 2026-11-08 — v0.2.0: consolida a união das permissões de múltiplos papéis para usuários comuns; define concessões e negações individuais, com negação prevalecendo para usuários comuns; define a imunidade do `superadmin` a negações individuais dentro do escopo empresarial; distingue `company_admin` de `superadmin`; formaliza os tipos conceituais `human` e `agent`; registra que o primeiro usuário humano provisionado recebe a designação `company_admin` e o papel `superadmin`; corrige a referência à tenancy para refletir a ADR-0017 aprovada; explicita questões técnicas ainda pendentes. Nenhuma alteração no Supabase.
+- 2026-11-08 — v0.2.0: consolida a união das permissões de múltiplos papéis para usuários comuns; define concessões e negações individuais, com negação prevalecendo para usuários comuns; define a imunidade do `superuser` a negações individuais dentro do escopo empresarial; distingue `company_admin` de `superuser`; formaliza os tipos conceituais `human` e `agent`; registra que o primeiro usuário humano provisionado recebe a designação `company_admin` e o papel `superuser`; corrige a referência à tenancy para refletir a ADR-0017 aprovada; explicita questões técnicas ainda pendentes. Nenhuma alteração no Supabase.
 - 2026-11-07 — v0.1.6: define retry limitado para falhas temporárias, preservação da identidade da execução, estados terminais para falhas permanentes/timeouts e conclusão da drenagem por estados terminais.
 - 2026-11-07 — v0.1.5: define desativação com drenagem: bloquear novas admissões e enfileiramentos, concluir normalmente todas as execuções já aceitas e reabrir a entrada somente após reativação nos dois níveis.
-- 2026-11-07 — v0.1.4: generaliza a ativação em dois níveis para todos os módulos; define que o primeiro usuário da empresa será humano e superadmin; proíbe agentes de IA como superadmin; exige a manutenção de ao menos um superadmin humano ativo.
-- 2026-11-07 — v0.1.3: define que desenvolvedores do ERP controlam a disponibilidade global, superadmin controla a ativação por empresa, cada empresa mantém ao menos um superadmin e toda execução de IA depende do módulo efetivamente ativo.
+- 2026-11-07 — v0.1.4: generaliza a ativação em dois níveis para todos os módulos; define que o primeiro usuário da empresa será humano e superuser; proíbe agentes de IA como superuser; exige a manutenção de ao menos um superuser humano ativo.
+- 2026-11-07 — v0.1.3: define que desenvolvedores do ERP controlam a disponibilidade global, superuser controla a ativação por empresa, cada empresa mantém ao menos um superuser e toda execução de IA depende do módulo efetivamente ativo.
 - 2026-11-07 — v0.1.2: registra o Módulo de Inteligência Artificial com disponibilidade global pela plataforma e ativação individual por empresa; define a conjunção dos controles e a independência do estado de cada agente.
 - 2026-11-07 — v0.1.1: esclarece usuários autônomos como usuários ERP operados por IA, configuráveis por empresa; diferencia agentes de negócio de workflows técnicos; delimita a ADR-0012 à configuração da Isa e registra questões de implementação pendentes.
 - 2026-11-07 — v0.1.0: criação da proposta inicial com base no Project Charter, ADR-0001, ADR-0011, ADR-0012 e inspeção somente leitura do schema e das policies do Supabase.
