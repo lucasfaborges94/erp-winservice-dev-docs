@@ -204,7 +204,7 @@ Não existe estado de execução separado que possa divergir do estado da visita
 - Uma visita em paused continua ocupando a disponibilidade operacional do técnico.
 - Antes de iniciar outra visita, a anterior precisa alcançar estado terminal e ter o relato exigido registrado.
 - A nova visita não pode iniciar enquanto a finalização anterior e o relato exigido não forem confirmados.
-- Uma reabertura, quando permitida pela regra vigente, também deve respeitar a exclusividade.
+- Estados terminais não são reabertos; a continuidade exige nova visita, que deve respeitar a exclusividade do técnico.
 
 ### 4.3 Check-in e início da execução
 
