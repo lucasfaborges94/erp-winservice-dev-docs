@@ -1,7 +1,7 @@
 # Modelo de autorização e isolamento multiempresa — ERP Winservice
 
 **Documento:** Modelo de autorização e isolamento multiempresa  
-**Versão:** 0.3.2  
+**Versão:** 0.3.3  
 **Data:** 2026-11-08  
 **Estado:** PROPOSTA PARA DISCUSSÃO — inclui diretrizes e sugestões recentes ainda em avaliação; não substitui ADRs aprovadas nem autoriza implementação  
 **Projeto Supabase consultado:** Winservice (`voaovwphncwbrwtcqnsc`)  
@@ -419,12 +419,12 @@ Antes de qualquer migração de autorização, levantar em modo somente leitura:
 - papéis existentes, identificadores, nomes, escopo global/empresarial e duplicidades;
 - associações entre papéis e permissões;
 - vínculos usuário–empresa ativos, inativos ou suspensos;
-- valores e significado operacional de company_users.role_identifier e company_users.company_admin;
+- significado operacional de `company_users.company_admin`; `company_users.role_identifier` está fora do modelo conforme ADR-0018 e não deve ser migrado;
 - titulares/administradores atuais e usuários com superuser ou equivalentes;
 - usuários sem vínculo, vínculos sem usuário correspondente e referências órfãs;
 - sessões existentes e mecanismos atuais de autenticação;
 - dependências em views, funções, triggers, policies RLS, APIs, workflows e aplicações.
-O inventário estrutural do repositório não substitui a consulta dos dados reais. A fotografia atual dos registros ainda não foi levantada. A migração deverá preservar identificadores, vínculos, papéis, permissões e responsabilidades, com relatório de mapeamento, reconciliação, contagens antes/depois e plano de reversão. Nenhuma linha deve ser descartada ou reinterpretada silenciosamente.
+O inventário estrutural do repositório não substitui a consulta dos dados reais. A fotografia de 2026-11-08 está registrada na auditoria citada. A migração deverá preservar identificadores, vínculos e atribuições oficiais em `company_user_roles`, com relatório de mapeamento, contagens antes/depois e plano de reversão. Exceção expressamente aprovada pela ADR-0018: o valor de `company_users.role_identifier` será descartado, sem reconciliação ou migração.
 
 ### 15.6 Estado desta seção
 Todos os itens acima são diretrizes, sugestões ou questões em avaliação. Não foram aprovados como especificação física, não alteram ADRs e não autorizam DDL, alterações de dados ou implantação.
@@ -434,7 +434,7 @@ Todos os itens acima são diretrizes, sugestões ou questões em avaliação. N�
 
 Foi concluída auditoria somente leitura no Supabase do projeto documentado, schema public. A consolidação está em `documentacao/auditorias/AUDITORIA_DADOS_AUTORIZACAO_2026-11-08.md`.
 
-Resumo: 1 empresa; 5 usuários (1 ativo, 4 inativos); 1 vínculo empresarial; 3 papéis globais (`financial`, `superuser`, `technician`); 2 atribuições via `company_user_roles`; 1 permissão; nenhuma linha em `role_permissions` ou `user_permissions`. O vínculo existente tem `company_admin=true), `company_users.role_identifier` apontando para `superuser`, enquanto `company_user_roles` atribui `financial` e `technician`. Os achados não autorizam conversão automática; o mapeamento precisa de aprovação. Nenhum DDL ou dado foi alterado.
+Resumo histórico da auditoria: 1 empresa; 5 usuários (1 ativo, 4 inativos); 1 vínculo empresarial; 3 papéis globais (`financial`, `superuser`, `technician`); 2 atribuições via `company_user_roles`; 1 permissão; nenhuma linha em `role_permissions` ou `user_permissions`. O vínculo observado tinha `company_admin=true`; `company_users.role_identifier` apontava para `superuser`, enquanto `company_user_roles` atribuía `financial` e `technician`. **A conclusão de que seria necessário aprovar um mapeamento foi superada pela ADR-0018:** o responsável determinou que o campo legado e seu valor sejam ignorados, sem conversão. As duas associações em `company_user_roles` permanecem como fonte oficial e devem ser validadas quanto à integridade do vínculo e do tenant. Nenhum DDL ou dado foi alterado.
 
 
 ## 17. Complemento da auditoria técnica — 2026-11-08
