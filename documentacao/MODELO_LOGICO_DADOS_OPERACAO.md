@@ -465,7 +465,7 @@ Não executar essa sequência sem aprovação do modelo físico, plano de migra�
 4. **GPS:** definir frequência de amostragem, idade máxima operacional, retenção, localização simulada/antifraude e tratamento de leituras inconsistentes.
 5. **Jornada:** definir horário de corte, fuso, dias úteis e exceções para finalização da visita e sua sessão de execução.
 6. **Visita:** definir estados e transições operacionais próprios, sem confundi-los com a máquina de estados reutilizável do módulo Chat.
-7. **Relato de transição:** definir conteúdo mínimo e obrigatoriedade do relato ao finalizar a visita anterior para iniciar outra; esclarecer também o fluxo quando o técnico não consegue registrar o relato imediatamente.
+7. **Relato de transição:** definir status de destino, motivos padronizados e tratamento quando o técnico não consegue registrar o relato imediatamente.
 8. **Auditoria imutável:** detalhar retenção, correções, proteção contra UPDATE/DELETE e estratégia de integridade, conforme ADR-0016 aprovada.
 9. **Documentos:** definir relação e armazenamento de fotos/documentos por tarefa e visita.
 10. **Identidade:** normalizar referências de autoria para usuário humano, agente autônomo e sistema.
