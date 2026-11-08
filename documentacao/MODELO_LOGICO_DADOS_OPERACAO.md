@@ -1,0 +1,438 @@
+# Modelo lógico de dados e matriz de conformidade — Operação MVP
+
+**Versão:** 0.1.0  
+**Data:** 2026-11-08  
+**Estado:** proposta técnica para validação; não aprovada como modelo físico  
+**Projeto Supabase avaliado:** Winservice — `voaovwphncwbrwtcqnsc`  
+**Schema:** `public`
+
+> Este documento traduz o baseline funcional de Operação em uma proposta de modelo lógico e compara essa proposta com o schema efetivamente inspecionado. Não é uma ADR, não autoriza alterações no banco e não representa uma migração pronta para execução. Os nomes de tabelas e colunas propostos são conceituais até aprovação.
+
+## 1. Objetivos e limites
+
+O modelo deve:
+- preservar a história completa de cada atendimento na Ordem de Serviço (OS);
+- registrar cada comparecimento em uma visita própria;
+- registrar tarefas específicas dentro de cada visita, sem status de execução ou conclusão na tarefa;
+- relacionar opcionalmente cada tarefa a um equipamento identificado, ainda não identificado ou não aplicável;
+- registrar relatos gerais da visita e relatos próprios de cada tarefa;
+- registrar períodos de trabalho em sessões independentes, com eventos GPS;
+- preservar autoria, versões anteriores e histórico de alterações;
+- permitir navegação cliente → equipamento/OS → visita → tarefa → relatos/sessões;
+- garantir coerência entre empresa, cliente, OS, visita, equipamento e usuários.
+
+Fora do escopo desta proposta: DDL, migrações, políticas RLS, implementação de GPS no aplicativo, contratos de API, workflow n8n e definição completa de todos os estados de visita.
+
+## 2. Decisões funcionais consideradas como entrada
+
+1. A OS preserva o histórico completo do atendimento e pode conter várias visitas.
+2. Uma nova data de atendimento gera uma nova visita. Em regra, a nova visita permanece na mesma OS; o técnico poderá optar por criar uma nova OS.
+3. Cada visita possui suas próprias tarefas. Uma tarefa não é transferida para outra visita.
+4. Se o atendimento continuar em outra data, cria-se nova visita e nova tarefa, normalmente vinculada ao mesmo equipamento e podendo referenciar a tarefa anterior.
+5. A tarefa não possui status de execução ou conclusão.
+6. Cada tipo de tarefa pode exigir campos, relatos e evidências próprios.
+7. A visita precisa ter pelo menos um relato geral ou um relato de alguma tarefa antes de ser encerrada.
+8. O equipamento da tarefa é opcional. Deve ser possível registrar equipamento ainda não identificado sem criar um equipamento fictício.
+9. O trabalho temporal é representado por sessões de execução associadas à tarefa.
+10. O técnico pode ter somente uma visita em execução por vez.
+11. Check-in automático inicial: visita em `in_displacement`, técnico dentro de 50 metros por 5 minutos (ambos configuráveis); inicia a primeira tarefa ainda sem sessão iniciada.
+12. O afastamento pausa a sessão; o retorno pode retomá-la automaticamente. Os parâmetros de afastamento e retomada ainda precisam ser definidos.
+13. Somente sessões pausadas podem ser finalizadas automaticamente pelo limite da jornada. A hora efetiva de encerramento é a hora da pausa; coordenadas são as capturadas na pausa. O horário em que o sistema processou a finalização deve ser armazenado separadamente.
+14. A visita finalizada automaticamente pode exigir relato posterior do técnico antes de ele prosseguir no aplicativo ou iniciar novo deslocamento/visita.
+15. Reabertura de visita finalizada é exclusiva do técnico dentro de 200 metros do endereço. Gestor e atendente não podem reabrir.
+16. Gestor pode editar visita finalizada. Edição por técnico e atendente é configurável pelo gestor.
+17. Alterações devem preservar dados anteriores e registrar autoria e temporalidade.
+
+## 3. Modelo conceitual e cardinalidades
+
+```mermaid
+erDiagram
+    COMPANIES ||--o{ CUSTOMERS : owns
+    CUSTOMERS ||--o{ CUSTOMER_CONTACTS : has
+    CUSTOMERS ||--o{ ADDRESSES : has
+    CUSTOMERS ||--o{ EQUIPMENTS : owns
+    CUSTOMERS ||--o{ WORK_ORDERS : requests
+    WORK_ORDERS ||--o{ VISITS : contains
+    ADDRESSES o|--o{ VISITS : destination
+    VISITS ||--o{ VISIT_TASKS : contains
+    TASK_TYPES ||--o{ VISIT_TASKS : classifies
+    EQUIPMENTS o|--o{ VISIT_TASKS : identifies
+    VISIT_TASKS o|--o{ VISIT_TASKS : previous_task
+    VISITS ||--o{ VISIT_REPORTS : records
+    VISIT_TASKS ||--o{ TASK_REPORTS : records
+    VISIT_TASKS ||--o{ TASK_EXECUTION_SESSIONS : executed_in
+    TASK_EXECUTION_SESSIONS ||--o{ TASK_EXECUTION_EVENTS : emits
+    VISITS ||--o{ VISIT_EVENTS : emits
+    WORK_ORDERS ||--o{ QUOTATIONS : groups
+    VISIT_TASKS o|--o{ QUOTATION_TASKS : quoted
+    QUOTATIONS ||--o{ QUOTATION_TASKS : includes
+```
+
+O diagrama é conceitual. As relações opcionais e as restrições multiempresa devem ser formalizadas por chaves compostas e regras adicionais, não apenas pelo desenho.
+
+### Cardinalidades principais
+
+| Relação | Cardinalidade | Regra |
+|---|---|---|
+| Empresa → clientes | 1:N | Cliente pertence a uma empresa |
+| Cliente → equipamentos | 1:N | Equipamento pertence a um cliente |
+| Cliente → OS | 1:N | OS pertence a um cliente |
+| OS → visitas | 1:N | Visita pertence a uma única OS |
+| Visita → tarefas | 1:N | Tarefa pertence a uma única visita |
+| Tipo de tarefa → tarefas | 1:N | Toda tarefa possui um tipo |
+| Equipamento → tarefas | 1:N | Uma tarefa pode não ter equipamento |
+| Tarefa → tarefa anterior | 0..1:N | Uma tarefa pode apontar para uma tarefa anterior; uma tarefa pode originar várias continuidades |
+| Visita → relatos | 1:N | Relato geral é opcional individualmente; conjunto deve satisfazer regra mínima de encerramento |
+| Tarefa → relatos | 1:N | Uma tarefa pode ter vários relatos |
+| Tarefa → sessões | 1:N | Uma tarefa pode ter vários períodos/sessões |
+| Sessão → eventos | 1:N | Eventos formam a trilha temporal/GPS da sessão |
+| OS → orçamentos | 1:N | A OS agrupa orçamentos |
+| Orçamento ↔ tarefas | N:M (proposta) | Um orçamento pode contemplar uma ou mais tarefas; validar no MVP |
+
+## 4. Entidades lógicas propostas
+
+Os nomes abaixo são sugestões. Não criar essas tabelas antes de aprovar o modelo e conferir convenções do projeto.
+
+### 4.1 Entidades existentes a aproveitar conceitualmente
+
+#### `customers` — clientes
+Identidade do cliente e vínculo obrigatório com a empresa. Deve ser a origem do relacionamento com equipamentos e OS.
+
+Campos relevantes existentes: `identifier`, `name`, `cpf_cnpj`, `status`, `created_by`, `updated_by`, `company_identifier`, `created_at`, `updated_at`.
+
+Ajustes a avaliar:
+- tornar `company_identifier` obrigatório após saneamento;
+- garantir unicidade e coerência de identificadores dentro da empresa;
+- revisar política RLS e FKs compostas.
+
+#### `customer_contacts` — contatos
+Preservar contatos associados ao cliente. Confirmar se telefone/e-mail serão normalizados nesta tabela ou em `phonenumbers`; evitar duplicidade de fonte de verdade.
+
+#### `addresses` — endereços
+Preservar cadastro de endereços do cliente. A visita deverá manter referência ao endereço e snapshot dos dados relevantes no momento do atendimento, incluindo endereço textual e coordenadas, para que alteração posterior do cadastro não reescreva o destino histórico.
+
+#### `equipments` — equipamentos
+Preservar o cadastro do equipamento vinculado ao cliente. Acrescentar autoria completa e vínculo multiempresa coerente. O equipamento poderá ser associado a tarefas diferentes em visitas e OS diferentes.
+
+#### `work_orders` — ordens de serviço
+Preservar a entidade como agregador histórico. O cliente deve ser obrigatório; empresa deve ser identificável e consistente com o cliente. A OS não deve ser reconstruída quando houver uma nova visita na mesma continuidade.
+
+#### `visits` — visitas
+Preservar a entidade de visita, mas revisar seu modelo. A relação canônica deve ser visita → OS → cliente → empresa. Se `customer_identifier` for mantido por desempenho ou consulta, precisa de constraint que garanta correspondência com o cliente da OS. Manter snapshot de endereço e responsável conforme necessário. Colunas únicas de check-in/checkout não substituem o histórico de múltiplos eventos.
+
+### 4.2 Novas entidades propostas
+
+#### `visit_tasks` — tarefas da visita
+
+Uma linha representa uma atividade técnica específica registrada naquela visita.
+
+Campos conceituais:
+- `identifier` UUID PK;
+- `company_identifier` UUID NOT NULL;
+- `visit_identifier` UUID NOT NULL;
+- `task_type_identifier` FK NOT NULL;
+- `equipment_identifier` UUID NULL;
+- `equipment_link_state` enum/text NOT NULL: `identified`, `unidentified`, `not_applicable`;
+- `description` / `customer_request` para descrever a solicitação;
+- `previous_task_identifier` UUID NULL para continuidade de outra visita;
+- `sequence_number` para ordenação dentro da visita;
+- `created_at`, `created_by`, `updated_at`, `updated_by`.
+
+Restrições:
+- não criar coluna `status` de execução/conclusão na tarefa;
+- `identified` exige `equipment_identifier` preenchido;
+- `unidentified` e `not_applicable` exigem `equipment_identifier` nulo;
+- equipamento vinculado deve pertencer ao mesmo cliente e empresa da OS da visita;
+- tarefa anterior deve pertencer ao mesmo cliente e empresa, mas pode estar em outra OS se o atendimento tiver sido separado;
+- impedir autorreferência e ciclos na cadeia de tarefas anteriores;
+- tipo de tarefa deve estar habilitado para a empresa no momento do registro.
+
+**Distinção obrigatória:** `unidentified` significa que o cliente informou um equipamento, mas ainda não foi possível identificá-lo/cadastrá-lo. `not_applicable` significa que a atividade não depende de equipamento, por exemplo uma cobrança.
+
+#### `task_type_requirements` — requisitos por tipo de tarefa
+
+Define campos, relatos e evidências obrigatórios para cada tipo de tarefa. Campos conceituais:
+- `identifier`;
+- `company_identifier` ou referência ao escopo global/empresa do tipo;
+- `task_type_identifier`;
+- `requirement_code`;
+- `requirement_kind` (campo, relato, foto, documento, assinatura etc.);
+- `label`, `description`, `configuration` JSONB;
+- `is_required`, `is_active`, `display_order`;
+- autoria e temporalidade.
+
+A configuração JSONB deve descrever validação e apresentação, mas não substituir colunas relacionais para dados críticos de negócio. Deve existir versionamento ou snapshot dos requisitos aplicados à tarefa, para que uma alteração futura no tipo não modifique retroativamente o que era obrigatório no momento do atendimento.
+
+Ainda precisa ser decidido se tipos de tarefa são globais, personalizados por empresa ou uma combinação de catálogo global com extensões locais.
+
+#### `visit_reports` — relatos gerais da visita
+
+Campos conceituais:
+- `identifier`, `company_identifier`, `visit_identifier`;
+- `report_type`, `content`;
+- `created_at`, `created_by`;
+- referência à versão/formulário de relato, se aplicável.
+
+Relatos devem ser append-only: correções geram novo registro ou revisão vinculada, sem sobrescrever o texto original.
+
+#### `task_reports` — relatos da tarefa
+
+Mesma lógica de `visit_reports`, com `task_identifier` obrigatório. Deve suportar relatos de orçamento, coleta, cobrança, retorno/garantia, vistoria e outros tipos. Os requisitos aplicáveis dependem do tipo da tarefa.
+
+#### `task_execution_sessions` — sessões de execução
+
+Representa um período lógico de trabalho sobre uma tarefa. Uma tarefa pode ter várias sessões. A sessão, e não a tarefa, possui estado operacional.
+
+Campos conceituais:
+- `identifier`, `company_identifier`;
+- `task_identifier`;
+- `state`: `active`, `paused`, `closed`;
+- `started_at`, `paused_at`, `closed_at` como projeções do estado atual;
+- `effective_closed_at`: horário efetivo do encerramento;
+- `recorded_closed_at`: horário em que o sistema registrou o encerramento;
+- `closure_reason`: manual, limite_jornada, substituição_de_sessão etc.;
+- `created_at`, `created_by`, `updated_at`, `updated_by`.
+
+A sessão poderá ter vários ciclos de pausa/retomada. O estado atual é uma projeção operacional para consulta e concorrência; a fonte histórica são os eventos append-only. Uma sessão pausada finalizada automaticamente no limite da jornada deve usar como `effective_closed_at` o instante da pausa e preservar `recorded_closed_at` como instante do processamento automático.
+
+#### `task_execution_events` — eventos das sessões
+
+Registro append-only de cada início, pausa, retomada, checkout e encerramento automático.
+
+Campos conceituais:
+- `identifier`, `company_identifier`, `session_identifier`;
+- `event_type`: `started`, `paused`, `resumed`, `checked_out`, `auto_closed_at_day_end`;
+- `occurred_at`: quando o evento efetivamente ocorreu;
+- `recorded_at`: quando o backend recebeu/registrou o evento;
+- `latitude`, `longitude`, `accuracy_meters`;
+- `source`: manual, gps_automatic, system;
+- `actor_user_identifier`;
+- `metadata` para dados técnicos não normalizados.
+
+Para encerramento automático de sessão pausada, o evento deve preservar o instante e coordenadas originais da pausa como dados efetivos, além do horário real de processamento. Não fabricar coordenadas no horário de processamento.
+
+#### `visit_events` — eventos do ciclo da visita
+
+Registro append-only dos eventos de deslocamento, check-in da visita, saída temporária, retorno, finalização, finalização automática e reabertura.
+
+Campos conceituais:
+- `identifier`, `company_identifier`, `visit_identifier`;
+- `event_type`;
+- `occurred_at`, `recorded_at`;
+- `latitude`, `longitude`, `accuracy_meters`;
+- `source`, `actor_user_identifier`;
+- `metadata`.
+
+Os campos atuais `chekin_at`, `checkout_at` e coordenadas em `visits` podem ser mantidos temporariamente como projeções/compatibilidade, mas a trilha completa deverá estar em eventos. Corrigir a grafia de `chekin_at` somente em migração planejada, com compatibilidade e atualização de consumidores.
+
+#### `audit_events` — trilha geral de auditoria
+
+Registro append-only de alterações relevantes em OS, visitas, tarefas, equipamentos, relatos e sessões.
+
+Campos conceituais:
+- `identifier`, `company_identifier`;
+- `entity_type`, `entity_identifier`;
+- `event_type`;
+- `before_snapshot` JSONB, `after_snapshot` JSONB;
+- `occurred_at`, `recorded_at`;
+- `actor_user_identifier`, `actor_kind` (humano/agente/sistema);
+- `source`, `reason`, `correlation_identifier`.
+
+A referência polimórfica (`entity_type` + `entity_identifier`) não possui FK convencional para todas as tabelas. A integridade e a imutabilidade precisam ser garantidas por mecanismo confiável no backend/banco. Alternativa: tabelas de revisão específicas por entidade, se a exigência de FK for prioritária. Não conceder UPDATE/DELETE direto para papéis operacionais sobre eventos históricos.
+
+#### `quotation_tasks` — associação orçamento ↔ tarefa (condicional)
+
+Proposta N:M se um orçamento puder incluir várias tarefas e uma tarefa puder receber mais de uma versão/orçamento. Campos: `quotation_identifier`, `task_identifier`, `company_identifier`, `created_at`, `created_by`.
+
+Se o MVP definir rigorosamente um orçamento para uma única tarefa, pode-se preferir `task_identifier` diretamente em `quotations`. A decisão deve ser tomada antes do modelo físico.
+
+### 4.3 Entidades existentes que exigem decisão
+
+#### `work_order_equipment`
+
+Não representa tarefa e não deve ser adaptada para isso. Pode continuar como associação de equipamentos abrangidos pela OS, se houver utilidade administrativa independente. Se a relação OS-equipamento puder ser totalmente derivada das tarefas, a tabela pode ser redundante e deverá ser avaliada antes de mantê-la.
+
+Os defaults atuais `gen_random_uuid()` em `created_by`, `last_updated_by`, `work_order_identifier` e `equipment_identifier` são suspeitos: geram UUIDs sem correspondência garantida com usuários/entidades. Corrigir somente após revisar dados, constraints e consumidores.
+
+#### `task_types`
+
+Aproveitar como catálogo inicial, mas revisar:
+- chave atual `id` é integer, não UUID;
+- `name` e `code` aceitam NULL;
+- não foi observada coluna de empresa/escopo, versão ou configuração de obrigatoriedades;
+- autoria usa `last_updated_by`, diferente da convenção geral `updated_by`.
+
+Não migrar o identificador sem necessidade. É possível manter integer como PK do catálogo e usar FK correspondente em `visit_tasks`, desde que a estratégia de catálogo global/empresa seja decidida.
+
+## 5. Regras de integridade e constraints
+
+### 5.1 Identidade e chaves
+
+- Manter UUID `identifier` como chave pública/relacional de domínio onde já é convenção.
+- Não confundir PK técnica bigint `id` com identificador de domínio UUID.
+- Para tabelas multiempresa, usar `company_identifier NOT NULL` após saneamento.
+- Criar unicidade composta `(identifier, company_identifier)` onde necessária para FKs compostas.
+- Evitar referências independentes que permitam combinar registros de empresas ou clientes diferentes.
+
+### 5.2 Coerência entre cliente, OS, visita, tarefa e equipamento
+
+A cadeia canônica recomendada é:
+- `work_orders`: `(identifier, company_identifier, customer_identifier)`;
+- `visits`: `(identifier, company_identifier, work_order_identifier)`;
+- `visit_tasks`: `(identifier, company_identifier, visit_identifier, equipment_identifier)`;
+- `equipments`: `(identifier, company_identifier, customer_identifier)`.
+
+Constraints compostas devem impedir:
+- visita ligada a OS de outra empresa;
+- equipamento de outro cliente/empresa associado à tarefa;
+- tarefa anterior de outro cliente/empresa;
+- relato, sessão ou evento associado a registro de outro tenant.
+
+O cliente da visita deve ser herdado da OS como fonte canônica. Se a coluna `visits.customer_identifier` for mantida por compatibilidade, precisa ser validada contra `work_orders.customer_identifier`.
+
+### 5.3 Autoria
+
+Todos os registros de negócio devem identificar criador e última alteração, quando mutáveis:
+- `created_at`, `created_by`;
+- `updated_at`, `updated_by`.
+
+Eventos e relatos append-only identificam autor e horário de criação; não precisam de `updated_by` se não puderem ser editados. O ator deve distinguir humano, agente autônomo e sistema. O usuário que configurou um agente não substitui a identidade do agente que executou a operação.
+
+### 5.4 Relatos e encerramento de visita
+
+A regra “visita precisa de pelo menos um relato geral ou de tarefa” envolve mais de uma tabela. Um simples CHECK constraint não consegue validar diretamente registros em outras tabelas. Recomenda-se:
+- validar atomicamente no serviço/backend de finalização;
+- complementar com função/trigger transacional no banco, se a regra precisar ser inviolável em todos os caminhos;
+- impedir encerramento se não existir ao menos um relato válido associado à visita ou a uma tarefa dela.
+
+### 5.5 Exclusividade de visita por técnico
+
+A regra de uma visita ativa por técnico precisa de garantia transacional no backend e constraint/índice no banco. A forma exata depende dos estados finais de visita. Alternativas:
+- índice único parcial sobre `responsible_id` para os estados de visita considerados ativos; ou
+- tabela de alocação/claim ativo com uma linha única por técnico e referência à visita.
+
+Não definir a lista de estados ativos até fechar a máquina de estados da visita. Reabertura deve disputar a mesma exclusividade, sem janela de concorrência.
+
+### 5.6 Sessões de execução
+
+- Uma tarefa pode ter várias sessões históricas.
+- No máximo uma sessão ativa por tarefa.
+- A regra de uma visita por técnico e a regra de uma sessão ativa por técnico devem ser coordenadas transacionalmente.
+- Eventos de sessão são append-only e ordenados por `occurred_at` e `recorded_at`.
+- GPS automático deve ser idempotente: repetição de callback/localização não pode criar início, pausa ou retomada duplicados.
+- A retomada automática exige visita ainda operacional e técnico elegível; visita finalizada automaticamente não deve ser silenciosamente reativada por mera chegada GPS.
+- Sessão fechada não pode voltar a ativa; uma nova sessão pode ser aberta conforme as regras operacionais.
+
+## 6. Diagrama de fluxo do histórico
+
+```mermaid
+flowchart TD
+    C[Cliente] --> E[Equipamentos]
+    C --> WO[Ordem de Serviço]
+    WO --> V1[Visita em uma data]
+    WO --> V2[Visita em outra data]
+    V1 --> T1[Tarefa da visita 1]
+    V2 --> T2[Nova tarefa da visita 2]
+    T2 -.continuidade.-> T1
+    T1 --> R1[Relatos da tarefa]
+    T1 --> S1[Sessões de execução]
+    S1 --> X1[Eventos GPS e execução]
+    V1 --> RV1[Relatos da visita]
+    T2 --> R2[Relatos da tarefa]
+    T2 --> S2[Sessões de execução]
+    T1 -.equipamento opcional.-> E
+    T2 -.mesmo equipamento, quando identificado.-> E
+```
+
+## 7. Matriz de conformidade com o Supabase atual
+
+**Base de evidência:** inspeção somente leitura da listagem de tabelas, colunas, PKs e FKs do schema `public`, realizada em 2026-11-08. A classificação não substitui consulta de dados, policies, funções, triggers, código cliente ou testes.
+
+Legenda:
+- **Aproveitar:** estrutura conceitualmente alinhada, sujeita a validações.
+- **Ajustar:** estrutura existe, mas precisa de alteração/fortalecimento.
+- **Criar:** não foi encontrada estrutura dedicada ao requisito.
+- **Revisar:** utilidade, redundância ou integridade ainda não determinada.
+
+| Requisito/entidade lógica | Objeto atual | Evidência observada | Ação proposta | Prioridade |
+|---|---|---|---|---|
+| Cliente | `customers` | UUID `identifier`, dados cadastrais, `company_identifier`, autoria | Aproveitar; sanear obrigatoriedade e integridade multiempresa | P0 |
+| Contatos | `customer_contacts`, `phonenumbers` | Duas estruturas de contato/telefone | Revisar sobreposição e definir fonte canônica; completar autoria | P1 |
+| Endereços | `addresses` | Cliente, empresa, coordenadas, autoria | Aproveitar; constraints compostas e corrigir fluxo de snapshot de visita | P0 |
+| Equipamentos | `equipments` | Cliente, tipo, fabricante, modelo, série; sem empresa/autoria visível | Ajustar: empresa derivada/garantida pelo cliente ou coluna própria; autoria e unicidade | P0 |
+| OS | `work_orders` | UUID, status, cliente; sem empresa/autoria visível; FK cliente | Ajustar: cliente obrigatório, empresa, autoria, integridade e regras de status | P0 |
+| Visitas | `visits` | OS, cliente, status, responsável, endereço, GPS e timestamps únicos | Ajustar: coerência cliente/OS, snapshots, autoria e ciclo de eventos | P0 |
+| Tarefas por visita | Nenhuma tabela dedicada encontrada | Existe catálogo `task_types`, mas não entidade de instância | Criar `visit_tasks` | P0 |
+| Tipos de tarefa | `task_types` | `id` integer, `name`/`code` nullable, autoria parcial | Aproveitar e ajustar; definir escopo global/empresa e versão | P0 |
+| Requisitos por tipo de tarefa | Nenhuma estrutura dedicada encontrada | `visit_requirements` relaciona-se a `visit_types`, não `task_types` | Criar `task_type_requirements` e snapshot/versionamento | P1 |
+| Equipamento não identificado/não aplicável | Nenhuma representação dedicada encontrada | `visit_tasks` não existe; equipamento só é ligado a cliente/OS | Criar estado de associação na tarefa + equipamento opcional | P0 |
+| Continuidade entre tarefas de visitas distintas | Nenhuma relação encontrada | Sem entidade tarefa | Criar FK opcional `previous_task_identifier` em `visit_tasks` | P1 |
+| Relatos gerais da visita | Nenhuma tabela dedicada encontrada | `visits` não tem relato estruturado observado | Criar `visit_reports` | P0 |
+| Relatos por tarefa | Nenhuma tabela dedicada encontrada | Não há instância de tarefa nem relatório | Criar `task_reports` | P0 |
+| Sessões de execução | Nenhuma tabela dedicada encontrada | `visits` possui um único conjunto de check-in/checkout | Criar `task_execution_sessions` | P0 |
+| Eventos GPS de sessão | Nenhuma tabela dedicada encontrada | Sem histórico de múltiplas pausas/retomadas | Criar `task_execution_events` | P0 |
+| Eventos do ciclo da visita | Nenhuma tabela dedicada encontrada | Colunas atuais armazenam poucos marcos | Criar `visit_events`; manter colunas atuais como projeção temporária | P0 |
+| Auditoria de alterações | Nenhuma trilha append-only dedicada encontrada | Campos created/updated em algumas tabelas | Criar `audit_events` ou revisões por entidade; imutabilidade | P0 |
+| Associação OS-equipamento | `work_order_equipment` | Associação simples; defaults UUID suspeitos em FKs e autoria | Revisar; não usar como tarefa; corrigir defaults ou descontinuar após análise | P1 |
+| Orçamentos | `quotations` | Relaciona OS, cliente e visita; não tarefa | Ajustar para vincular a tarefa ou criar `quotation_tasks`; definir cardinalidade | P1 |
+| Eventos de aprovação | `approval_events` | Evento, versão, hash, decisão e referências a orçamento/OS/cliente | Aproveitar; garantir consistência empresa e vincular versão/escopo da tarefa quando aplicável | P1 |
+| Documentos/evidências | `documents` | Metadados e uploader, sem vínculo operacional direto observado | Criar relação explícita de documentos com visita/tarefa; não usar referência polimórfica sem integridade | P1 |
+| Autoria uniforme | Diversas tabelas | Autoria ausente em equipamentos, OS, telefones e orçamento; padrões divergentes | Ajustar convenção e garantir identidade de humano/agente/sistema | P0 |
+| Isolamento multiempresa | Várias tabelas | Auditoria anterior encontrou RLS/policies e FKs com riscos | Corrigir desenho de tenancy, FKs compostas, RLS e testes antes de produção | P0 |
+
+### 7.1 Notas específicas sobre objetos atuais
+
+- `work_order_equipment` não pode ser reaproveitada como entidade de tarefa. A tarefa precisa pertencer a uma visita e ter tipo, relatos, sessões e vínculo opcional a equipamento.
+- `task_types` é catálogo, não registro de tarefa executada.
+- `visit_types` e `visit_type_requirement` descrevem tipo/requisitos de visita; não substituem requisitos de tarefa.
+- `documents` pode continuar como repositório de metadados de arquivos, mas precisa de uma relação explícita e segura com a entidade operacional correspondente.
+- `quotations` já tem FK para OS e visita. A ligação a tarefa deve ser definida sem perder histórico de orçamento e aprovação.
+- `approval_events` contém `created_by` apontando a `auth.users.id`, enquanto outras entidades apontam a `public.users.identifier`. Essa diferença de identidade deve ser normalizada/documentada antes de expandir auditoria.
+
+## 8. Ordem recomendada de implementação (ainda não autorizada)
+
+1. **Fundação e integridade:** definir tenancy, chaves compostas, autoria, convenções de UUID, RLS e regras de acesso.
+2. **Núcleo operacional:** ajustar `customers`, `addresses`, `equipments`, `work_orders` e `visits`.
+3. **Tarefas e catálogo:** `visit_tasks`, escopo/versionamento de `task_types` e requisitos por tipo.
+4. **Relatos e evidências:** `visit_reports`, `task_reports`, vínculo de documentos e regra de encerramento com relato.
+5. **Execução e GPS:** sessões, eventos, idempotência, exclusividade do técnico, pausa/retomada e limite de jornada.
+6. **Histórico e auditoria:** snapshots, eventos imutáveis, autoria de humano/agente/sistema.
+7. **Comercial:** vínculo de orçamento a tarefas, versões e aprovação.
+8. **Migração e testes:** plano de migração de dados, constraints, RLS, concorrência, GPS simulado, falhas offline e regressão.
+
+Não executar essa sequência sem aprovação do modelo físico, plano de migração e testes.
+
+## 9. Decisões e perguntas ainda abertas
+
+1. **Catálogo de tipos:** os tipos de tarefa serão globais, por empresa ou catálogo global com extensões locais?
+2. **Requisitos dinâmicos:** quais tipos de campos serão suportados inicialmente (texto, seleção, número, data, foto, documento, assinatura etc.)?
+3. **Equipamento indefinido:** confirmar os três valores propostos: identificado, não identificado e não aplicável.
+4. **Orçamento:** uma cotação pode conter várias tarefas ou cada orçamento pertence a uma única tarefa?
+5. **Sessões:** ao iniciar outra tarefa, uma sessão ativa anterior será automaticamente pausada, bloqueada ou poderá continuar? A exclusividade atual é uma visita por técnico; simultaneidade de tarefas ainda não foi definida.
+6. **GPS:** definir raio/tempo para afastamento e retomada, precisão mínima, tolerância, tratamento de perda de sinal e antifraude.
+7. **Jornada:** definir horário de corte, fuso, dias úteis e exceções.
+8. **Visita:** fechar estados e transições, inclusive quando e como uma visita é finalizada automaticamente.
+9. **Relato pendente:** definir quais eventos exigem relato posterior e o que constitui relato adequado.
+10. **Auditoria:** escolher trilha genérica com referência polimórfica protegida ou tabelas de revisão por entidade com FKs convencionais.
+11. **Documentos:** definir relação e armazenamento de fotos/documentos por tarefa e visita.
+12. **Identidade:** normalizar referências de autoria para usuário humano, agente autônomo e sistema.
+
+## 10. Riscos e pré-condições antes de DDL
+
+- A auditoria técnica de 2026-11-07 encontrou policies RLS permissivas sem filtro por empresa em entidades relevantes, grants amplos e problemas de integridade multiempresa. Esses pontos precisam ser tratados antes de expor o novo modelo.
+- A função `set_visit_address_snapshot` foi identificada na auditoria anterior como incompatível com colunas existentes em `addresses`; corrigir e testar antes de depender do snapshot.
+- Os defaults `gen_random_uuid()` em FKs de `work_order_equipment` e campos de autoria são suspeitos e devem ser investigados.
+- O schema consultado é estado observado em 2026-11-08; não foram inspecionados dados de produção, código de aplicação, workflows, políticas novamente nesta etapa ou testes de comportamento.
+- As tabelas propostas não devem ser criadas até fechar as decisões pendentes, especialmente tenancy, catálogo de tipos, sessões e auditoria.
+
+## 11. Evidência e limites da inspeção
+
+- Inspeção de metadados de tabelas, colunas, PKs e FKs do schema `public`, em 2026-11-08.
+- Nenhuma consulta de conteúdo pessoal de clientes foi executada.
+- Nenhum DDL, DML, policy, função, trigger, migration, configuração ou dado foi alterado.
+- Não foram executados testes de RLS, GPS, concorrência, workflows, API ou aplicativo.
+- A matriz é uma avaliação de conformidade estrutural, não um relatório de teste de execução.
+
+## Histórico de alterações
+
+- 2026-11-08 — v0.1.0: criação do modelo lógico proposto e matriz de conformidade inicial com o schema Supabase.
