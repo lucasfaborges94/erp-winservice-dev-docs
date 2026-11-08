@@ -162,6 +162,28 @@ Fazer uma auditoria de consistência documental do repositório: validar links r
 
 ## 8. Histórico de sessões
 
+### 2026-11-07 — Governança dos controles e condição de execução do Módulo de IA
+
+**Estado:** CONCLUÍDA para registro das regras conceituais; especificação técnica e implementação pendentes.
+
+**Definições fornecidas pelo responsável:**
+- O controle global de disponibilidade do Módulo de IA pertence aos desenvolvedores responsáveis pelo ERP (inicialmente o responsável pelo projeto ou futura equipe).
+- O superadmin de cada empresa poderá ativar ou desativar o módulo dentro da própria empresa.
+- Cada empresa deverá possuir no mínimo um superadmin.
+- Nenhuma execução de IA poderá ocorrer enquanto o módulo não estiver efetivamente ativo, isto é, disponível globalmente e habilitado para a empresa.
+
+**Regras derivadas registradas na proposta:**
+- O sistema deverá impedir que a remoção, suspensão ou rebaixamento do último superadmin deixe a empresa sem superadmin ativo.
+- Se o módulo for desativado durante uma execução, a execução não poderá continuar realizando novas ações; o mecanismo técnico de interrupção/cancelamento ainda precisa ser especificado.
+
+**Arquivo alterado:**
+- `documentacao/MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md` — versão 0.1.3.
+
+**Banco Supabase:** nenhuma alteração realizada.
+
+**Próxima ação:** especificar provisionamento e recuperação do superadmin e o mecanismo de bloqueio/interrupção das execuções quando qualquer nível do módulo for desativado.
+
+
 ### 2026-11-07 — Definição dos níveis de controle do Módulo de IA
 
 **Estado:** CONCLUÍDA para registro da definição conceitual; especificação operacional e implementação pendentes.  
