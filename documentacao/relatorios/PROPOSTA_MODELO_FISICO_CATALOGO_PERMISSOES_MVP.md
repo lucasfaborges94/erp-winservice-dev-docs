@@ -7,7 +7,7 @@
 **Base arquitetural:** ADR-0011, ADR-0017 e modelo de autorização multiempresa  
 **Banco avaliado:** Supabase PostgreSQL 17.6 — projeto `voaovwphncwbrwtcqnsc`
 
-> Esta proposta fecha uma lacuna de modelagem física da ADR-0011. Não altera a ADR, não aprova DDL/DML e não autoriza migrations ou alterações no Supabase. O desenho deverá ser aprovado antes de virar especificação executável.
+> Esta especificação detalha a modelagem física da ADR-0011 e foi aprovada pelo responsável em 2026-11-08. A aprovação valida o desenho descrito neste documento, mas não autoriza DDL/DML, migrations, alteração de dados, RLS, grants ou qualquer alteração no Supabase. Itens listados como decisões não tomadas permanecem pendentes.
 
 ---
 
@@ -290,6 +290,13 @@ Esses itens não devem ser presumidos como aprovados.
 - `documentacao/ESPECIFICACAO_FISICA_FUNDACAO_MULTIEMPRESA_MVP.md`
 - `documentacao/relatorios/PLANO_MIGRACAO_FUNDACAO_MULTIEMPRESA_PARTE_A_MVP.md`
 
+## 11. Aprovação e limites
+
+Em 2026-11-08, o responsável aprovou o modelo físico descrito nesta proposta, incluindo catálogo global versionado, catálogo efetivo materializado por empresa, adoção voluntária, preservação de customizações, histórico/restauração e referências das permissões efetivas por `role_permissions` e `user_permissions`.
+
+A aprovação não resolve as decisões explicitamente listadas na seção 9, não define a matriz completa de permissões nem autoriza implementação física. Permanecem obrigatórios o inventário de dependências, a definição dos códigos estáveis, a validação dos registros existentes, o repositório/baseline de migrations e autorização operacional específica antes de qualquer alteração no Supabase.
+
 ## Histórico de alterações
 
+- 2026-11-08 — v0.2.0: modelo físico aprovado pelo responsável; limites de implementação e decisões ainda pendentes preservados.
 - 2026-11-08 — v0.1.0: proposta inicial do modelo físico do catálogo global versionado e catálogo efetivo customizável por empresa.
