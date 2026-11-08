@@ -125,7 +125,7 @@ Restrições:
 - quando `origin = 'company_custom'`, `source_global_permission_identifier` é nulo;
 - CHECK para coerência entre `origin` e `source_global_permission_identifier`.
 
-Uma permissão copiada do catálogo global mantém o mesmo `permission_code). Uma permissão criada exclusivamente pela empresa usa um código namespaceado, por exemplo `company.<codigo>`, sem colisão com os códigos globais.
+Uma permissão copiada do catálogo global mantém o mesmo `permission_code`. Uma permissão criada exclusivamente pela empresa usa um código namespaceado, por exemplo `company.<codigo>`, sem colisão com os códigos globais.
 
 A cópia local é a definição efetiva. A empresa pode personalizar descrição, ativação e atributos funcionais que forem liberados pela plataforma. A empresa não pode transformar uma definição em capacidade que a plataforma não disponibilizou, nem contornar limites globais de segurança ou de módulos.
 
