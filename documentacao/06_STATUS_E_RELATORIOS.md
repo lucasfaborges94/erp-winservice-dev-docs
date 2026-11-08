@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 1.9.2  
+**Versão:** 1.9.3  
 **Data-base:** 2026-11-08
 
 ## 1. Resumo executivo
@@ -213,8 +213,17 @@ O responsável aprovou o modelo físico descrito em [PROPOSTA_MODELO_FISICO_CATA
 
 **Próxima atividade:** preparar a especificação executável e o pacote de migração do catálogo após inventariar dependências de `permissions`, `role_permissions` e `user_permissions`, validar o registro legado e definir o repositório/baseline de migrations. A execução no Supabase dependerá de autorização específica posterior.
 
+## 18. Auditoria somente leitura das estruturas de permissões — 2026-11-08
+
+Após a aprovação do modelo físico, foi realizada nova inspeção somente leitura de `permissions`, `role_permissions` e `user_permissions` no Supabase PostgreSQL 17.6.
+
+Achados confirmados: 1 registro em `permissions` (`customer/view`, sem código estável); zero registros em `role_permissions` e `user_permissions`; FKs individuais sem garantia composta de tenant; `user_permissions.allow` nullable; RLS habilitado, mas nenhuma policy retornada para as três tabelas; nenhum trigger não interno identificado. O único registro legado pertence à Winservice e não foi alterado. A auditoria completa e suas limitações estão registradas na proposta física v0.3.0.
+
+**Próxima atividade:** transformar o modelo aprovado em especificação executável, resolver os pontos de modelagem ainda abertos e localizar o repositório/baseline oficial de migrations. Nenhuma alteração no Supabase foi executada.
+
 ## Histórico de alterações
 
+- 2026-11-08 — v1.9.3: registra auditoria somente leitura das tabelas atuais de permissões após aprovação do modelo físico.
 - 2026-11-08 — v1.9.2: registra a aprovação do modelo físico do catálogo de permissões; implementação e DDL continuam não autorizados.
 - 2026-11-08 — v1.4.0: registra formalização da memória documental oficial, atualização do protocolo de retomada e preparação para continuar o MVP na próxima sessão.
 - 2026-11-08 — v1.3.0: registra requisitos/pendências, avaliações por tentativa, evidências e uploads idempotentes, coleta de assinatura e aceite digital versionado.
