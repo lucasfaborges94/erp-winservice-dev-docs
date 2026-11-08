@@ -27,6 +27,7 @@ Esta documentação é a referência persistente para planejar, especificar, des
     ├── 07_GOVERNANCA_DOCUMENTAL.md
     ├── 08_CONTINUIDADE_E_TRANSFERENCIA.md
     ├── MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md
+    ├── MODELO_FUNCIONAL_OPERACIONAL_MVP.md
     ├── RASCUNHO.md
     └── decisoes/
         ├── ADR-TEMPLATE.md
@@ -46,7 +47,8 @@ Esta documentação é a referência persistente para planejar, especificar, des
 9. [Governança documental](07_GOVERNANCA_DOCUMENTAL.md) — regras de aprovação, atualização e versionamento.
 10. [Continuidade e transferência](08_CONTINUIDADE_E_TRANSFERENCIA.md) — encerramento e retomada de trabalho entre pessoas e ferramentas.
 11. [Modelo de autorização e isolamento multiempresa](MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md) — proposta técnica para discussão; não aprovada.
-12. [Rascunho](RASCUNHO.md) — ideias e propostas ainda não aprovadas.
+12. [Modelo funcional operacional do MVP](MODELO_FUNCIONAL_OPERACIONAL_MVP.md) — requisitos funcionais de Operação e confronto inicial com o schema Supabase; não substitui ADRs nem comprova implementação.
+13. [Rascunho](RASCUNHO.md) — ideias e propostas ainda não aprovadas.
 
 ## Regras essenciais
 
@@ -68,6 +70,7 @@ Esses arquivos são fotografias técnicas daquela data, não garantia de que o a
 
 ## Histórico deste arquivo
 
+- 2026-11-08 — v0.5.0: inclusão do modelo funcional operacional do MVP no mapa documental.
 - 2026-11-07 — v0.4.0: inclusão da proposta de modelo de autorização e isolamento multiempresa no mapa documental.
 
 - 2026-11-07 — v0.3.0: inclusão do protocolo universal de fonte da verdade e do procedimento de continuidade e transferência entre contas, ferramentas e profissionais.
