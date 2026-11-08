@@ -290,7 +290,23 @@ Esses itens não devem ser presumidos como aprovados.
 - `documentacao/ESPECIFICACAO_FISICA_FUNDACAO_MULTIEMPRESA_MVP.md`
 - `documentacao/relatorios/PLANO_MIGRACAO_FUNDACAO_MULTIEMPRESA_PARTE_A_MVP.md`
 
-## 11. Aprovação e limites
+## 11. Auditoria somente leitura do schema atual — 2026-11-08
+
+A inspeção do projeto Supabase `voaovwphncwbrwtcqnsc` (PostgreSQL 17.6), limitada às tabelas `permissions`, `role_permissions` e `user_permissions`, confirmou:
+
+- Contagens: `permissions` = 1; `role_permissions` = 0; `user_permissions` = 0.
+- O único registro de `permissions` pertence à Winservice e representa `entity=customer`, `field=NULL`, `action=view`, descrição “Permissão para visualizar todos os dados de clientes.”. Ainda não possui `permission_code`; sua classificação/mapeamento para código estável permanece pendente.
+- `role_permissions.permission_identifier` e `user_permissions.permission_identifier` possuem FKs simples para `permissions(identifier)`, sem garantia composta de tenant.
+- `role_permissions.role_identifier` referencia `roles(identifier)` por FK simples; `user_permissions.company_user_identifier` referencia `company_users(identifier)` por FK simples.
+- As três tabelas possuem `company_identifier NOT NULL`, mas suas FKs atuais para `companies(identifier)` são simples. A auditoria não identificou FKs compostas por empresa nesses relacionamentos.
+- `user_permissions.allow` permite NULL, divergindo do modelo aprovado que exige `boolean NOT NULL`.
+- RLS está habilitado nas três tabelas, `FORCE ROW LEVEL SECURITY` está desabilitado e a consulta a `pg_policies` não retornou policies para essas tabelas. Portanto, não há policies próprias identificadas nesta inspeção.
+- Não foram encontrados triggers não internos nas três tabelas. A busca textual em funções `public` não retornou funções que mencionem esses nomes; isso não substitui busca no código da aplicação, workflows ou integrações.
+- Constraints e índices atuais são majoritariamente PK/UNIQUE por `identifier` e FKs individuais. Não há unicidade tenant-scoped de associação documentada no schema consultado.
+
+Esta auditoria é somente leitura. Não foram alterados dados, constraints, policies ou estruturas. Os resultados são um retrato do ambiente consultado em 2026-11-08 e deverão ser revalidados antes de qualquer migration.
+
+## 12. Aprovação e limites
 
 Em 2026-11-08, o responsável aprovou o modelo físico descrito nesta proposta, incluindo catálogo global versionado, catálogo efetivo materializado por empresa, adoção voluntária, preservação de customizações, histórico/restauração e referências das permissões efetivas por `role_permissions` e `user_permissions`.
 
@@ -298,5 +314,6 @@ A aprovação não resolve as decisões explicitamente listadas na seção 9, n�
 
 ## Histórico de alterações
 
+- 2026-11-08 — v0.3.0: inclusão da auditoria somente leitura das tabelas e dependências atuais de permissões; aprovação do modelo preservada.
 - 2026-11-08 — v0.2.0: modelo físico aprovado pelo responsável; limites de implementação e decisões ainda pendentes preservados.
 - 2026-11-08 — v0.1.0: proposta inicial do modelo físico do catálogo global versionado e catálogo efetivo customizável por empresa.
