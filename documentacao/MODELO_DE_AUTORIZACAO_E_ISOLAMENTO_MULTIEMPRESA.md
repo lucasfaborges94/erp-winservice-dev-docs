@@ -1,7 +1,7 @@
 # Modelo de autorização e isolamento multiempresa — ERP Winservice
 
 **Documento:** Modelo de autorização e isolamento multiempresa  
-**Versão:** 0.1.0  
+**Versão:** 0.1.1  
 **Data:** 2026-11-07  
 **Estado:** PROPOSTA PARA DISCUSSÃO — não aprovada como decisão arquitetural  
 **Projeto Supabase consultado:** Winservice (`voaovwphncwbrwtcqnsc`)  
@@ -69,7 +69,10 @@ Esses pontos são observações estruturais. Não se conclui, sem análise adici
 - **Permissão:** autorização granular para executar uma ação sobre uma entidade e, quando aplicável, campo ou recurso.
 - **Recurso tenant-scoped:** dado pertencente a uma empresa e isolado pelo identificador dessa empresa.
 - **Recurso global:** dado mantido pela plataforma e compartilhado entre empresas segundo regras explícitas.
-- **Autoria:** identidade/agente que criou um registro, distinta do usuário que o atualizou posteriormente.
+- **Autoria:** identidade do usuário ou agente autônomo que criou um registro, distinta do ator que o atualizou posteriormente.
+- **Usuário humano:** usuário ERP operado diretamente por uma pessoa.
+- **Usuário autônomo:** usuário ERP cuja execução é realizada por um agente de IA, com identidade, função, configuração e permissões próprias.
+- **Agente autônomo:** configuração operacional e de IA associada a um usuário autônomo; inclui nome de exibição, perfil, função, comportamento, conhecimento autorizado e limites de atuação.
 
 ## 5. Princípios propostos
 
@@ -177,27 +180,67 @@ Quando um registro não possuir `company_identifier` próprio, o caminho de hera
 
 A decisão sobre quais tabelas devem carregar `company_identifier` diretamente não está tomada neste documento.
 
-## 10. Agentes de IA e identidades técnicas
+## 10. Usuários autônomos e agentes de IA
 
-### 10.1 Isa
+### 10.1 Conceito de usuário autônomo
 
-A Isa não deve compartilhar uma identidade humana nem receber privilégios genéricos de serviço. Sua execução deve ter identidade técnica identificável e contexto de atendimento validado.
+A Isa é concebida como um **usuário do ERP operado autonomamente por IA**, e não como um papel fixo do sistema, uma permissão global ou uma integração externa privilegiada.
 
-Os limites da ADR-0012 devem ser aplicados no backend/API e, quando aplicável, no banco:
+O modelo deverá permitir que cada empresa cadastre e configure seus próprios usuários autônomos para funções específicas. A empresa poderá personalizar, no mínimo, o nome de exibição e o perfil operacional de cada agente. A configuração poderá contemplar função, comportamento, tom de comunicação, instruções, documentos/fontes de conhecimento autorizados e permissões compatíveis com a atividade.
 
-- consulta limitada ao cliente identificado no atendimento atual;
-- criação permitida apenas para clientes, equipamentos, ordens de serviço e visitas;
-- exclusão proibida;
-- atualização somente de registros criados pela própria Isa;
-- operações fora do escopo negadas.
+A Isa é a primeira instância desse conceito na Winservice, configurada para atendimento. Outros agentes poderão ser criados para outras funções, sem que a identidade ou as permissões de um agente sejam herdadas automaticamente por outro.
 
-O identificador de cliente ou atendimento fornecido em texto pelo modelo não constitui prova de autorização. O backend deve resolver e validar o contexto.
+**Importante:** “usuário autônomo” descreve o conceito funcional e de autorização. Ainda será necessário decidir se a implementação física reutilizará a tabela `users` com um tipo/modo de execução ou se terá uma entidade complementar ligada ao usuário ERP. Esta proposta não presume alteração de schema.
 
-### 10.2 Workflows e integrações
+### 10.2 Identidade, vínculo e autorização
 
-Cada serviço automatizado deve possuir identidade técnica própria, escopo de atuação mínimo, credenciais gerenciadas fora do código e trilha de auditoria. Não reutilizar indiscriminadamente a identidade de um administrador ou a chave `service_role`.
+Cada usuário autônomo deve possuir identidade própria no contexto da empresa, vínculo explícito com a empresa proprietária e permissões limitadas à sua função. Não deve operar com a identidade pessoal do usuário que o cadastrou, nem herdar automaticamente os privilégios desse usuário.
 
-O uso de `service_role` ou de funções `SECURITY DEFINER` deve ser excepcional, restrito e justificado; essas vias não podem contornar silenciosamente as regras de negócio e de isolamento.
+A autorização de um agente deve considerar:
+
+- empresa à qual pertence;
+- estado ativo/suspenso do agente;
+- função e configuração operacional;
+- módulos contratados e habilitados para a empresa;
+- permissões atribuídas ao próprio usuário autônomo;
+- restrições específicas da atividade, do cliente, do atendimento e da autoria;
+- limites globais de segurança definidos pela plataforma.
+
+A empresa pode personalizar o perfil do agente, mas não pode ampliar permissões além dos módulos contratados, das capacidades disponibilizadas pela plataforma ou dos limites de segurança obrigatórios.
+
+O conceito de `superuser` permanece no âmbito da empresa: não concede acesso a outras empresas nem a módulos não contratados. Quando a empresa adquire/habilita um módulo, o acesso correspondente segue as regras de atribuição aprovadas para aquele módulo. Um agente autônomo também deve respeitar esse limite.
+
+### 10.3 Limites específicos da Isa e da ADR-0012
+
+A ADR-0012 define os limites atuais da Isa na Winservice:
+
+- consulta somente informações do cliente identificado no atendimento atual;
+- pode cadastrar clientes, equipamentos, ordens de serviço e visitas;
+- não pode excluir registros;
+- só pode alterar registros que ela própria criou;
+- não pode executar operações fora do escopo autorizado.
+
+Esses limites devem ser aplicados no backend/API e, quando aplicável, no banco. São limites da configuração/autorização da Isa e não devem ser convertidos automaticamente em regras universais e imutáveis para todos os futuros agentes. Cada agente terá escopo próprio, sempre subordinado aos limites globais da plataforma, aos módulos contratados e às permissões concedidas pela empresa.
+
+O identificador de cliente ou atendimento fornecido em texto pelo modelo não constitui prova de autorização. O backend deve resolver e validar o contexto antes de permitir a consulta ou operação.
+
+### 10.4 Auditoria e rastreabilidade
+
+A trilha de auditoria deve permitir distinguir, no mínimo:
+
+- empresa em cujo contexto a operação ocorreu;
+- usuário humano que cadastrou ou configurou o agente, quando aplicável;
+- usuário autônomo/agente que executou a operação;
+- atendimento ou processo que originou a ação, quando aplicável;
+- ação, recurso, resultado e instante da operação.
+
+O usuário que configura um agente não se torna automaticamente o autor das operações realizadas pelo agente. A autoria operacional deve identificar o próprio usuário autônomo, mantendo separadamente a informação de quem o configurou.
+
+### 10.5 Workflows e integrações técnicas
+
+Workflows e integrações de infraestrutura, como n8n e conectores externos, não devem ser confundidos com usuários autônomos de negócio. Quando precisarem atuar em nome de um agente, devem preservar a identidade e o escopo desse agente; quando executarem tarefas técnicas próprias, devem usar identidade técnica distinta e privilégios mínimos.
+
+Não reutilizar indiscriminadamente a identidade de um administrador ou a chave `service_role`. O uso de `service_role` ou de funções `SECURITY DEFINER` deve ser excepcional, restrito e justificado; essas vias não podem contornar silenciosamente as regras de negócio e de isolamento.
 
 ## 11. Estratégia de tenancy — alternativas em avaliação
 
@@ -245,8 +288,9 @@ Os itens abaixo precisam de resposta do responsável antes de transformar esta p
 5. **Exceções individuais:** `user_permissions.allow` deve representar concessão/negação explícita por vínculo, ou será adotado outro modelo?
 6. **Papéis administrativos:** `company_admin` deve ser um atributo de conveniência ou uma função de autorização formal? Deve existir papel de proprietário/administrador da empresa separado de papéis operacionais?
 7. **Dados globais:** quais catálogos e recursos serão globais da plataforma e quais serão sempre isolados por empresa?
-8. **Identidade técnica:** Isa, n8n e demais integrações terão identidades de serviço distintas, cada uma com escopo próprio?
-9. **Identidade Auth ↔ ERP:** confirmar que `users.auth_user_identifier` é a relação canônica com `auth.users.id` e que `users.identifier` é o ID interno do ERP.
+8. **Implementação dos usuários autônomos:** o conceito será representado por registros na entidade `users` com tipo/modo de execução, por entidade complementar ou por outro arranjo? Como serão vinculados ao usuário/empresa que os cadastra?
+9. **Identidades de infraestrutura:** n8n e demais integrações técnicas terão identidades de serviço distintas, cada uma com escopo próprio?
+10. **Identidade Auth ↔ ERP:** confirmar que `users.auth_user_identifier` é a relação canônica com `auth.users.id` e que `users.identifier` é o ID interno do ERP.
 
 ## 14. Próximas atividades após aprovação
 
@@ -272,4 +316,5 @@ Os itens abaixo precisam de resposta do responsável antes de transformar esta p
 
 ## Histórico de alterações
 
+- 2026-11-07 — v0.1.1: esclarece usuários autônomos como usuários ERP operados por IA, configuráveis por empresa; diferencia agentes de negócio de workflows técnicos; delimita a ADR-0012 à configuração da Isa e registra questões de implementação pendentes.
 - 2026-11-07 — v0.1.0: criação da proposta inicial com base no Project Charter, ADR-0001, ADR-0011, ADR-0012 e inspeção somente leitura do schema e das policies do Supabase.
