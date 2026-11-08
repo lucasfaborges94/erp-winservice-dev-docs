@@ -1070,3 +1070,37 @@ Continuar a preparação do pacote de migrations/DDL. Ainda dependem de definiç
 #### Limites
 
 Esta confirmação não autoriza executar SQL, DDL, migration ou DML no Supabase. Nenhuma alteração de banco foi realizada nesta sessão.
+
+
+### Sessão — 2026-11-08 — preparação do pacote de migração multiempresa (Parte A)
+
+**Etapa:** fundação multiempresa, estrutura e integridade  
+**Estado:** plano técnico v0.1.0 criado para aprovação; nenhuma alteração no Supabase executada.
+
+#### Deliberação recebida
+
+O responsável concordou em separar:
+- **Parte A:** estrutura física, backfill, constraints, FKs compostas, unicidade tenant-scoped, correções de defaults e integridade;
+- **Parte B:** contexto autenticado da empresa, funções de autorização, grants e policies RLS, bloqueada até definição do contrato confiável de contexto transacional no backend.
+
+#### Artefato criado
+
+- `documentacao/relatorios/PLANO_MIGRACAO_FUNDACAO_MULTIEMPRESA_PARTE_A_MVP.md`
+- Versão 0.1.0 — proposta técnica para aprovação.
+- Inclui auditoria somente leitura atual, classificação das tabelas, sequência de migração, mapa de FKs compostas, canonicalização CPF/CNPJ, SQL de referência, gates, bloqueios, testes e rollback.
+
+#### Achados novos que condicionam a migration
+
+- 38 tabelas públicas, RLS habilitado em 38, 23 policies, 103 FKs e nenhuma FK composta por tenant.
+- 15 tabelas já possuem `company_identifier`; 6 dessas colunas ainda aceitam NULL.
+- 25 das 26 visitas têm cliente/endereço coerentes e podem receber tenant por relação verificável; uma visita não possui qualquer evidência de tenant.
+- Todas as 26 visitas estão sem ordem de serviço; `work_orders` está vazia. Nenhuma OS será criada por suposição.
+- As duas associações de `company_user_roles` divergem do campo legado `company_users.role_identifier`; ambas as estruturas serão preservadas até decisão.
+- A constraint global atual de CPF/CNPJ deverá ser substituída por unicidade por empresa com canonicalização, conforme decisão já aprovada.
+- `set_visit_address_snapshot()` referencia colunas inexistentes e depende de revisão do trigger antes da correção.
+
+#### Limites e próxima atividade
+
+A proposta não é migration executável aprovada e não autoriza DDL/DML. A execução depende da aprovação do documento e da resolução dos bloqueios listados nele, além de backup restaurável e definição do repositório oficial de migrations. A Parte B permanece separada.
+
+Nenhuma alteração foi realizada no Supabase nesta sessão.
