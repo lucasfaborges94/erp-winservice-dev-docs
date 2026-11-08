@@ -120,7 +120,7 @@ Campos mínimos:
 Restrições:
 - `UNIQUE(company_identifier, identifier)`;
 - `UNIQUE(company_identifier, permission_code)`;
-- FK composta `(company_identifier)` para a empresa;
+- FK de `company_identifier` para `company_permission_catalogs(company_identifier)`, garantindo que toda permissão efetiva pertença a um catálogo criado para a empresa.
 - quando `origin = 'global_copy'`, `source_global_permission_identifier` é obrigatório e referencia uma definição global;
 - quando `origin = 'company_custom'`, `source_global_permission_identifier` é nulo;
 - CHECK para coerência entre `origin` e `source_global_permission_identifier`.
