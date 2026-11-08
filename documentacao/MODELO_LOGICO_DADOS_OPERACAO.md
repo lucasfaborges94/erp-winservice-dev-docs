@@ -1,6 +1,6 @@
 # Modelo lógico de dados e matriz de conformidade — Operação MVP
 
-**Versão:** 0.6.0  
+**Versão:** 0.7.0  
 **Data:** 2026-11-08  
 **Estado:** proposta técnica parcialmente aprovada como especificação; não aprovada como modelo físico  
 **Projeto Supabase avaliado:** Winservice — `voaovwphncwbrwtcqnsc`  
@@ -628,7 +628,7 @@ A revisão e eventual resolução de eventos antigos ou conflitantes fica restri
 
 ### Idade dos eventos offline — recomendação ainda não aprovada
 
-Recomenda-se que a idade do evento não seja critério isolado de rejeição. A validação deve considerar também sequência, estado atual, identidade/origem e consistência temporal. Como ponto de partida para discussão, recomenda-se janela configurável de até 24 horas para reconciliação automática quando todos os demais critérios forem satisfeitos; eventos mais antigos seriam encaminhados à revisão autorizada. **O limite de 24 horas permanece pendente de aprovação explícita** e não deve ser implementado como regra vigente.
+Recomenda-se que a idade do evento não seja critério isolado de rejeição. A validação deve considerar também sequência, estado atual, identidade/origem e consistência temporal. Como ponto de partida para discussão, recomenda-se janela configurável de até 24 horas para reconciliação automática quando todos os demais critérios forem satisfeitos; eventos mais antigos seriam encaminhados à revisão autorizada. **O limite configurável de 24 horas foi aprovado pelo responsável** como janela inicial para reconciliação automática, desde que todos os demais critérios de consistência sejam satisfeitos. Eventos mais antigos devem ser encaminhados à revisão autorizada.
 
 ### Pré-condições obrigatórias
 
@@ -675,7 +675,9 @@ A implementação de `visit_events` depende da correção e validação de tenan
 
 ## Histórico de alterações
 
-- 2026-11-08 — v0.6.0: especificação técnica aprovada de visit_events, transação atômica estado/evento, exclusividade global do técnico, sincronização offline com occurred_at/recorded_at, comparação do relógio do dispositivo com o horário oficial e trilha separada para comandos rejeitados; tenancy e RLS registrados como pré-condições. Janela de 24 horas permanece apenas recomendação pendente.
+- 2026-11-08 — v0.7.0: aprovação da janela configurável inicial de 24 horas para reconciliação automática de eventos offline; eventos mais antigos encaminhados à revisão autorizada.
+
+- 2026-11-08 — v0.6.0: especificação técnica aprovada de visit_events, transação atômica estado/evento, exclusividade global do técnico, sincronização offline com occurred_at/recorded_at, comparação do relógio do dispositivo com o horário oficial e trilha separada para comandos rejeitados; tenancy e RLS registrados como pré-condições. Aprovação da janela configurável inicial de 24 horas para reconciliação automática; eventos mais antigos seguem para revisão autorizada.
 
 - 2026-11-08 — v0.5.0: remoção da Máquina B e das entidades de sessão; unificação dos eventos operacionais/temporais diretamente em visit_events; inclusão da Máquina A aprovada, transições por revogação e jornada sem encerramento automático; revisão de cardinalidades, integridade e perguntas abertas.
 - 2026-11-08 — v0.4.0: inclusão das avaliações históricas por tentativa, pendências obrigatórias/opcionais, tratamento por gestor/atendente, evidências com uploads idempotentes e confirmação no backend, metadados temporais/GPS e proposta lógica de resumo/aceite digital versionado com coleta remota, presencial e offline.
