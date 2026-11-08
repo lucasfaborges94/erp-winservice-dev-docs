@@ -1,6 +1,6 @@
 # Modelo funcional operacional do MVP — ERP Winservice
 
-**Versão:** 0.7.0  
+**Versão:** 0.8.0  
 **Data da consolidação:** 2026-11-08  
 **Estado:** baseline funcional em consolidação  
 **Escopo:** clientes, equipamentos, ordens de serviço, visitas, tarefas, relatos, requisitos operacionais, evidências e uploads, aceite digital, execução técnica por GPS, orçamentos e aprovações.
@@ -277,6 +277,9 @@ A leitura GPS será aceita inicialmente quando o raio de incerteza reportado pel
 
 Quando o dispositivo receber uma nova visita, deverá comparar seu relógio com o horário oficial do ERP/servidor antes de disponibilizar a visita ao técnico. Se houver divergência, o aplicativo apresentará um aviso; a divergência isolada não bloqueia a disponibilização. O servidor permanece como referência para o horário de registro (`recorded_at`).
 
+
+A janela inicial para reconciliação automática de eventos offline foi aprovada em 24 horas, configurável. Dentro dessa janela, o servidor ainda deverá validar sequência, estado atual da visita, identidade/origem, autorização, idempotência e consistência temporal; a idade, isoladamente, não garante aceitação. Eventos com mais de 24 horas não serão reconciliados automaticamente e deverão ser encaminhados à revisão de gestores ou atendentes/usuários expressamente autorizados.
+
 Na sincronização de eventos offline, devem ser preservados separadamente o instante de ocorrência (`occurred_at`) e o instante de recebimento/registro oficial (`recorded_at`). O servidor valida estado atual, sequência, autorização, empresa e idempotência antes de aceitar o evento.
 
 Comandos rejeitados ou conflitantes não integram o histórico canônico de eventos da visita; devem ser auditados separadamente. A revisão desses casos é restrita a gestores e atendentes/usuários expressamente autorizados. O técnico não pode aprovar nem dispensar conflitos.
@@ -543,6 +546,8 @@ A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de con
 - Requisitos funcionais confirmados não equivalem a implementação comprovada nem a uma ADR formal.
 
 ## Histórico de alterações
+
+- 2026-11-08 — v0.8.0: aprovação da janela configurável inicial de 24 horas para reconciliação automática de eventos offline e revisão autorizada dos eventos mais antigos.
 
 - 2026-11-08 — v0.7.0: inclusão da conferência do relógio do dispositivo ao receber nova visita, distinção temporal na sincronização offline e restrição de revisão de conflitos a gestores/atendentes/usuários autorizados.
 
