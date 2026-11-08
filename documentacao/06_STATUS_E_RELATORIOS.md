@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 1.9.0  
+**Versão:** 1.9.1  
 **Data-base:** 2026-11-08
 
 ## 1. Resumo executivo
@@ -304,7 +304,7 @@ Nenhum DDL, DML, migration, policy ou grant foi executado nesta etapa.
 O plano da Parte A foi revisado para incorporar as deliberações do responsável:
 - todas as 26 visitas existentes pertencem à Winservice; o backfill deverá preencher o tenant em todas;
 - visita pode existir sem OS; `work_order_identifier` permanece nullable e a FK composta será aplicada quando houver referência;
-- a ADR-0017 não foi considerada suficiente para declarar formalmente `company_user_roles` como fonte única e remover `company_users.role_identifier`; o campo permanece sem alteração até deliberação e reconciliação dos dados divergentes.
+- a decisão sobre a fonte única de papéis foi posteriormente formalizada e aprovada na ADR-0018; o registro anterior desta seção está superado. `company_user_roles` é a fonte única e `company_users.role_identifier` será descartado sem reconciliação.
 
 Foi criada a proposta [PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md](relatorios/PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md), v0.1.0, com catálogo global versionado, cópia efetiva tenant-scoped, preservação de customizações, adoção voluntária, histórico e restauração. A proposta aguarda aprovação e não autoriza DDL.
 
