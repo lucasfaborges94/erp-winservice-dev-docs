@@ -1,6 +1,6 @@
 # Modelo funcional operacional do MVP — ERP Winservice
 
-**Versão:** 0.6.0  
+**Versão:** 0.7.0  
 **Data da consolidação:** 2026-11-08  
 **Estado:** baseline funcional em consolidação  
 **Escopo:** clientes, equipamentos, ordens de serviço, visitas, tarefas, relatos, requisitos operacionais, evidências e uploads, aceite digital, execução técnica por GPS, orçamentos e aprovações.
@@ -272,6 +272,17 @@ A revogação deve gerar evento histórico com visita, técnico, instante, orige
 
 A leitura GPS será aceita inicialmente quando o raio de incerteza reportado pelo dispositivo for de até 50 metros; esse limite é configurável. Valores menores representam leituras mais precisas. Em perda de sinal, o sistema conserva como referência a posição mais recente recebida, registrando sua data/hora e idade. Uma posição antiga não será tratada como nova leitura nem, isoladamente, provocará pausa ou retomada automática.
 
+
+### 4.10 Sincronização offline e conferência do relógio
+
+Quando o dispositivo receber uma nova visita, deverá comparar seu relógio com o horário oficial do ERP/servidor antes de disponibilizar a visita ao técnico. Se houver divergência, o aplicativo apresentará um aviso; a divergência isolada não bloqueia a disponibilização. O servidor permanece como referência para o horário de registro (`recorded_at`).
+
+Na sincronização de eventos offline, devem ser preservados separadamente o instante de ocorrência (`occurred_at`) e o instante de recebimento/registro oficial (`recorded_at`). O servidor valida estado atual, sequência, autorização, empresa e idempotência antes de aceitar o evento.
+
+Comandos rejeitados ou conflitantes não integram o histórico canônico de eventos da visita; devem ser auditados separadamente. A revisão desses casos é restrita a gestores e atendentes/usuários expressamente autorizados. O técnico não pode aprovar nem dispensar conflitos.
+
+A política de idade máxima para reconciliação automática permanece pendente de aprovação; não presumir um prazo vigente.
+
 ## 5. Reabertura e edição de visitas finalizadas
 
 ### 5.1 Reabertura
@@ -532,6 +543,8 @@ A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de con
 - Requisitos funcionais confirmados não equivalem a implementação comprovada nem a uma ADR formal.
 
 ## Histórico de alterações
+
+- 2026-11-08 — v0.7.0: inclusão da conferência do relógio do dispositivo ao receber nova visita, distinção temporal na sincronização offline e restrição de revisão de conflitos a gestores/atendentes/usuários autorizados.
 
 - 2026-11-08 — v0.6.0: aprovação da visita como única máquina de estados operacional; remoção da Máquina B e das sessões independentes no MVP; consolidação dos oito estados, transições, revogação de autenticação, regra de jornada sem encerramento automático e histórico append-only unificado de eventos da visita.
 - 2026-11-08 — v0.5.0: consolidação de requisitos obrigatórios/opcionais e pendências, avaliações históricas por tentativa, evidências com upload assíncrono/idempotente, coordenadas e timestamps, encerramento excepcional com requisitos obrigatórios pendentes e fluxo de aceite digital versionado com resumo, anexos e assinatura remota/presencial/offline.
