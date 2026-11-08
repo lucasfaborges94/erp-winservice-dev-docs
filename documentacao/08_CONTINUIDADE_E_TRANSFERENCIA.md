@@ -162,6 +162,69 @@ Fazer uma auditoria de consistência documental do repositório: validar links r
 
 ## 8. Histórico de sessões
 
+### 2026-11-08 — Formalização do repositório como memória documental oficial
+
+#### 1. Objetivo
+
+Formalizar o uso do repositório `erp-winservice-dev-docs` como memória documental persistente do ERP Winservice e definir o procedimento de recuperação e manutenção desse conhecimento entre conversas, contas, ferramentas e profissionais.
+
+#### 2. Contexto consultado
+
+- `00_FONTE_DA_VERDADE.md`
+- `documentacao/PROTOCOLO_DE_ATUACAO_IA_GITHUB.md`
+- `documentacao/00_LEIA-ME.md`
+- `documentacao/07_GOVERNANCA_DOCUMENTAL.md`
+- `documentacao/08_CONTINUIDADE_E_TRANSFERENCIA.md`
+- Árvore completa da branch `main` e metadados do repositório.
+
+#### 3. Trabalho realizado
+
+- Confirmada a existência de fonte da verdade, governança documental, ADRs, status e histórico de continuidade.
+- Formalizado o repositório como memória documental oficial e persistente.
+- Definida a sequência mínima de recuperação de contexto no início de novas sessões.
+- Definida a classificação do conhecimento e o local adequado para registrar decisões, requisitos, propostas, implementação, auditorias e continuidade.
+- Reforçada a distinção entre documentação aprovada, implementação verificada e contexto auxiliar de ferramentas de IA.
+
+#### 4. Decisões
+
+- O repositório GitHub é a memória documental oficial do projeto.
+- Memórias internas de IA, conversas, anexos e resumos são auxiliares e não substituem os documentos versionados.
+- Não será criado um arquivo monolítico de memória; o conhecimento continuará organizado por assunto e tipo de artefato.
+- Toda sessão que produza avanço relevante deverá registrar o resultado no documento especializado e atualizar a continuidade.
+
+#### 5. Artefatos alterados
+
+- `00_FONTE_DA_VERDADE.md`: inclusão da definição de memória documental oficial e atualização de versão.
+- `documentacao/PROTOCOLO_DE_ATUACAO_IA_GITHUB.md`: inclusão do procedimento de inicialização de contexto e manutenção da memória.
+- `documentacao/00_LEIA-ME.md`: explicitação do papel do repositório como memória oficial.
+
+#### 6. Verificações e testes
+
+- Leitura dos arquivos e metadados diretamente no GitHub, branch `main`.
+- Verificação da estrutura documental e das referências existentes.
+- Não foram executados testes de aplicação, alterações de banco ou operações de infraestrutura.
+
+#### 7. Estado ao encerrar
+
+A estrutura documental existente foi mantida e complementada. A memória oficial está formalmente definida; sua eficácia depende de cumprir o procedimento de consulta e atualização em cada sessão relevante.
+
+#### 8. Pendências e bloqueios
+
+- Verificar futuramente se o fluxo de retomada e a atualização dos registros estão sendo cumpridos de forma consistente.
+- A proteção da branch `main` e o estado de Secret Scanning continuam sem alteração nesta sessão.
+
+#### 9. Riscos e observações
+
+O repositório não carrega automaticamente todo o seu conteúdo para cada conversa. O agente precisa consultar os arquivos pela integração disponível. Se o acesso falhar, deve declarar a limitação em vez de presumir que possui o contexto completo.
+
+#### 10. Próxima atividade recomendada
+
+Retomar a próxima atividade técnica registrada na sessão anterior, seguindo o procedimento de retomada e verificando o estado remoto atual antes de qualquer alteração.
+
+#### 11. Instruções para quem assumir
+
+Começar por `00_FONTE_DA_VERDADE.md`, seguir o protocolo de atuação com GitHub, ler este registro e comparar o commit de referência com o HEAD atual. Consultar os documentos específicos da próxima tarefa e não inferir aprovação ou implementação a partir de propostas documentais.
+
 ### 2026-11-07 — Governança dos controles e condição de execução do Módulo de IA
 
 **Estado:** CONCLUÍDA para registro das regras conceituais; especificação técnica e implementação pendentes.
