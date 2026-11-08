@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 1.9.1  
+**Versão:** 1.9.2  
 **Data-base:** 2026-11-08
 
 ## 1. Resumo executivo
@@ -205,8 +205,17 @@ O status e a continuidade foram atualizados nesta publicação para refletir o f
 
 **Limites desta sessão:** trabalho exclusivamente documental no repositório GitHub. Nenhum código da aplicação, SQL, DDL, DML, migration, policy, função, trigger, configuração, dado do Supabase ou infraestrutura foi alterado. A proteção da branch `main` e o estado de Secret Scanning permanecem sem alteração.
 
+## 17. Aprovação do modelo físico do catálogo de permissões — 2026-11-08
+
+O responsável aprovou o modelo físico descrito em [PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md](relatorios/PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md), agora v0.2.0. A aprovação valida o desenho de catálogo global versionado, cópia efetiva por empresa, adoção voluntária, preservação de customizações, histórico/restauração e associação de permissões efetivas a papéis e usuários.
+
+**Estado:** modelo físico aprovado; implementação não iniciada/não comprovada. A aprovação não autoriza DDL, DML, migrations, RLS, grants ou alterações no Supabase. Permanecem pendentes a matriz completa de permissões, códigos estáveis, atributos customizáveis, política detalhada para permissões removidas, fluxo de adoção/restauração, implementação no backend/API e contrato confiável de contexto transacional.
+
+**Próxima atividade:** preparar a especificação executável e o pacote de migração do catálogo após inventariar dependências de `permissions`, `role_permissions` e `user_permissions`, validar o registro legado e definir o repositório/baseline de migrations. A execução no Supabase dependerá de autorização específica posterior.
+
 ## Histórico de alterações
 
+- 2026-11-08 — v1.9.2: registra a aprovação do modelo físico do catálogo de permissões; implementação e DDL continuam não autorizados.
 - 2026-11-08 — v1.4.0: registra formalização da memória documental oficial, atualização do protocolo de retomada e preparação para continuar o MVP na próxima sessão.
 - 2026-11-08 — v1.3.0: registra requisitos/pendências, avaliações por tentativa, evidências e uploads idempotentes, coleta de assinatura e aceite digital versionado.
 - 2026-11-08 — v1.2.0: registra GPS/histórico de posições, transições de visita, aprovação do histórico append-only (ADR-0016) e proposta de catálogos globais versionados.
