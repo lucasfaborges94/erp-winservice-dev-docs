@@ -275,13 +275,10 @@ A leitura GPS será aceita inicialmente quando o raio de incerteza reportado pel
 ## 5. Reabertura e edição de visitas finalizadas
 
 ### 5.1 Reabertura
-- Somente o técnico poderá reabrir uma visita finalizada.
-- A reabertura exige que o técnico esteja dentro de **200 metros** do endereço da visita.
-- A validação deve ocorrer no backend com base na localização capturada no momento da solicitação.
-- A reabertura deve ser registrada como evento auditável, incluindo técnico, data/hora, coordenadas, precisão GPS e visita.
-- O gestor não pode reabrir uma visita.
-- O atendente não pode reabrir uma visita.
-- A reabertura deve respeitar a regra de uma visita por técnico.
+- Visitas em estado terminal (completed, interrupted, prevented ou canceled) não podem ser reabertas nem retornar ao fluxo operacional.
+- A continuidade do atendimento exige a criação de uma nova visita, que poderá permanecer vinculada à mesma OS e referenciar a visita/tarefa anterior conforme o contexto.
+- A nova visita deve respeitar a exclusividade de uma visita por técnico.
+- A regra anterior de reabertura por técnico dentro de 200 metros fica substituída pela máquina de estados aprovada, que define os estados terminais sem transições de saída.
 
 ### 5.2 Edição depois da finalização
 - O gestor pode editar visitas finalizadas, mas não reabri-las.
@@ -483,7 +480,7 @@ Uma cópia deve ser enviada ao cliente após confirmação do aceite; se a colet
 
 ### 12.2 Estruturas não encontradas na listagem atual
 
-Não foram encontradas tabelas dedicadas com nomes `tasks`, `visit_tasks`, `task_reports`, `visit_reports`, `execution_sessions`, `visit_events` ou `audit_events`.
+Não foram encontradas tabelas dedicadas com nomes `tasks`, `visit_tasks`, `task_reports`, `visit_reports`, `visit_events` ou `audit_events`.
 
 Essa constatação significa apenas que não há tabelas com esses nomes na listagem consultada. Não exclui que algum comportamento esteja parcialmente representado por outra estrutura, JSON, serviço externo ou código não inspecionado.
 
