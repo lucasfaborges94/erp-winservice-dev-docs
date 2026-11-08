@@ -4,6 +4,25 @@
 **Escopo:** tarefas relacionadas ao repositório do ERP Winservice  
 **Repositório principal:** `lucasfaborges94/erp-winservice-dev-docs`  
 **Branch padrão:** `main`
+**Papel do repositório:** memória documental oficial e fonte persistente do projeto.
+
+## 0. Inicialização de contexto: recuperar a memória do projeto
+
+No início de toda nova conversa ou sessão de trabalho sobre o ERP Winservice, reconstruir o contexto a partir do repositório, e não presumir que o histórico da conversa ou a memória interna da IA esteja completo.
+
+Sequência mínima obrigatória:
+
+1. Confirmar acesso ao repositório e identificar branch padrão, HEAD/commit atual e árvore de arquivos.
+2. Ler `00_FONTE_DA_VERDADE.md` na raiz.
+3. Ler este protocolo e `documentacao/00_LEIA-ME.md`.
+4. Ler `documentacao/08_CONTINUIDADE_E_TRANSFERENCIA.md`, localizar a sessão mais recente e seguir seu procedimento de retomada.
+5. Comparar o commit citado no registro de continuidade com o HEAD atual; não presumir que o registro representa o estado remoto mais recente.
+6. Ler `documentacao/06_STATUS_E_RELATORIOS.md` e `documentacao/03_ROADMAP_ETAPAS.md` para identificar situação, etapa e prioridades.
+7. Consultar Project Charter, escopo, ADRs, regras, modelos e relatórios específicos da tarefa.
+8. Separar fatos documentados, implementação verificada, decisões aprovadas, propostas, pendências e inferências não verificadas.
+9. Se o repositório estiver inacessível, desatualizado ou incompleto, declarar a limitação. Não preencher lacunas com suposições nem afirmar que recuperou a memória integral.
+
+A leitura deve ser proporcional: os documentos de entrada e a sessão mais recente são obrigatórios; os demais documentos devem ser selecionados conforme as dependências da tarefa. Não é necessário carregar todos os arquivos indiscriminadamente.
 
 ## 1. Regra obrigatória: verificar o GitHub antes de pedir ações locais
 
@@ -72,7 +91,20 @@ A integração do GitHub permite consultar e modificar recursos remotos autoriza
 
 Nesses casos, explicar o que não está acessível e solicitar somente a evidência mínima necessária.
 
-## 7. Regra de continuidade
+## 7. Regra de manutenção da memória documental
+
+Ao longo do trabalho, identificar o tipo de conhecimento produzido e registrá-lo no local correto:
+
+- decisão arquitetural ou de governança aprovada: ADR individual e índice correspondente;
+- requisito ou regra de negócio: especificação funcional/processual pertinente;
+- proposta ainda não aprovada: documento de proposta ou rascunho, com estado explícito;
+- mudança de implementação: código/migração e evidências de teste, sem confundir documentação com implementação;
+- descoberta de auditoria: relatório datado, com escopo, evidências, limitações e ambiente;
+- mudança de andamento, pendência ou próximo passo: status e registro de continuidade.
+
+Não duplicar o mesmo conteúdo em vários documentos sem necessidade. Usar referências cruzadas e manter índices atualizados. Ao encerrar uma sessão relevante, verificar se outro profissional ou agente consegue retomar o trabalho sem consultar a conversa original.
+
+## 8. Regra de continuidade
 
 Este protocolo deve ser consultado no início de toda nova sessão de trabalho que envolva o repositório. Em caso de dúvida, a regra é verificar primeiro o GitHub e só depois solicitar intervenção local.
 
