@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 1.3.0  
+**Versão:** 1.4.0  
 **Data-base:** 2026-11-08
 
 ## 1. Resumo executivo
@@ -9,7 +9,7 @@ O projeto está em fase de definição arquitetural, organização de governanç
 
 A prioridade da primeira versão é Operação, com substituição gradual por módulos.
 
-A documentação passou a incluir um protocolo de fonte da verdade e um procedimento de continuidade independente de conta, fornecedor de IA ou profissional. O repositório é a referência documental versionada; o estado efetivamente implementado deve ser verificado no código, nas migrações e nos ambientes correspondentes.
+A documentação passou a definir explicitamente o repositório GitHub como memória documental oficial e persistente, com procedimento obrigatório de recuperação e manutenção do contexto entre sessões. Históricos de conversa e memórias internas de IA são auxiliares. O estado efetivamente implementado deve ser verificado no código, nas migrações e nos ambientes correspondentes.
 
 ## 2. Estado conhecido
 
@@ -187,8 +187,25 @@ Usar apenas estes estados:
 
 Não marcar DONE sem critérios de aceite e evidências.
 
+## 13. Fechamento de sessão — memória documental e preparação da retomada do MVP (2026-11-08)
+
+Nesta sessão foi formalizado o repositório `erp-winservice-dev-docs` como memória documental oficial do ERP Winservice. O protocolo passou a exigir a recuperação do contexto no início de cada nova sessão, incluindo leitura da fonte da verdade, do protocolo, do mapa documental, do registro de continuidade e do status, com consulta proporcional dos documentos específicos da tarefa.
+
+Foram atualizados:
+- `00_FONTE_DA_VERDADE.md`: papel do repositório como memória oficial;
+- `documentacao/PROTOCOLO_DE_ATUACAO_IA_GITHUB.md`: inicialização de contexto e manutenção da memória;
+- `documentacao/00_LEIA-ME.md`: orientação sobre memória oficial e fontes auxiliares;
+- `documentacao/08_CONTINUIDADE_E_TRANSFERENCIA.md`: registro detalhado desta sessão.
+
+O status e a continuidade foram atualizados nesta publicação para refletir o fechamento.
+
+**Próxima atividade indicada pelo responsável:** retomar o desenvolvimento do MVP na próxima sessão, a partir do último estado documentado da frente Operação e das pendências registradas nos modelos funcional e lógico. Antes de executar, verificar o HEAD remoto e reler os documentos pertinentes. Não presumir que a especificação lógica está aprovada como modelo físico nem que existe autorização para DDL, alterações no Supabase ou mudanças de infraestrutura.
+
+**Limites desta sessão:** trabalho exclusivamente documental no repositório GitHub. Nenhum código da aplicação, SQL, DDL, DML, migration, policy, função, trigger, configuração, dado do Supabase ou infraestrutura foi alterado. A proteção da branch `main` e o estado de Secret Scanning permanecem sem alteração.
+
 ## Histórico de alterações
 
+- 2026-11-08 — v1.4.0: registra formalização da memória documental oficial, atualização do protocolo de retomada e preparação para continuar o MVP na próxima sessão.
 - 2026-11-08 — v1.3.0: registra requisitos/pendências, avaliações por tentativa, evidências e uploads idempotentes, coleta de assinatura e aceite digital versionado.
 - 2026-11-08 — v1.2.0: registra GPS/histórico de posições, transições de visita, aprovação do histórico append-only (ADR-0016) e proposta de catálogos globais versionados.
 - 2026-11-08 — v1.1.0: registra a revisão do modelo lógico v0.2.0 e as definições funcionais de execução por visita, GPS, catálogo global editável por empresa e vínculo de orçamento.
