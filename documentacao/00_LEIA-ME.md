@@ -1,6 +1,6 @@
 # ERP Winservice — Base oficial de documentação
 
-**Versão do pacote:** 1.0.0  
+**Versão do pacote:** 1.1.0  
 **Data de consolidação:** 2026-11-08  
 **Estado:** baseline documental em evolução  
 **Projeto:** ERP Winservice
@@ -76,6 +76,7 @@ Esses arquivos são fotografias técnicas daquela data, não garantia de que o a
 
 ## Histórico deste arquivo
 
+- 2026-11-08 — v1.1.0: inclui a arquitetura da Base de Conhecimento do ERP e atualiza o mapa dos artefatos de Operação.
 - 2026-11-08 — atualização do mapa documental para incluir a arquitetura da Base de Conhecimento do ERP e a consolidação do ciclo operacional único da visita.
 - 2026-11-08 — v1.0.0: explicita o repositório como memória documental oficial do projeto e os históricos de conversa como contexto auxiliar.
 - 2026-11-08 — v0.9.0: atualização do mapa documental para incluir o escopo consolidado de requisitos, evidências e aceite digital nos modelos funcional e lógico.
