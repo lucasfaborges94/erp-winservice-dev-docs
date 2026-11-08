@@ -1,7 +1,7 @@
 # ERP Winservice — Base oficial de documentação
 
 **Versão do pacote:** 0.5.0  
-**Data de consolidação:** 2026-11-07  
+**Data de consolidação:** 2026-11-08  
 **Estado:** baseline documental em evolução  
 **Projeto:** ERP Winservice
 
