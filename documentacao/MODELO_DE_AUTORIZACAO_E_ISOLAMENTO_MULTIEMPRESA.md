@@ -431,8 +431,14 @@ Nas sete tabelas de autorização examinadas, RLS está habilitado; policies for
 
 A auditoria de privilégios encontrou grants amplos para `anon`, `authenticated` e `service_role` nas sete tabelas de autorização examinadas. RLS é camada adicional, mas a combinação de grants amplos, ausência de policies em cinco tabelas e funções `SECURITY DEFINER` acessíveis exige revisão coordenada. Os Security Advisors retornaram 26 tabelas com RLS sem policies, 7 funções com `search_path` mutável, 2 funções `SECURITY DEFINER` executáveis por `anon`, 2 por `authenticated` e proteção contra senhas vazadas desabilitada. Views públicas examinadas não mostraram referências aos campos legados; a função `can_view_expense` permanece dependência confirmada de `company_users.role_identifier`. Nenhuma correção ou alteração de privilégios foi executada. Detalhes em `documentacao/auditorias/AUDITORIA_DADOS_AUTORIZACAO_2026-11-08.md`.
 
+
+## 19. Linha de base e backend — complemento da auditoria — 2026-11-08
+
+A listagem do projeto Supabase retornou zero migrations registradas e nenhuma Edge Function. A ausência de histórico nativo de migrations dificulta reconstruir a evolução do schema; será necessário criar e reconciliar uma linha de base documental antes de futuras mudanças. Não foram identificados Edge Functions neste projeto, sem excluir serviços externos ou outras APIs. Nenhuma alteração foi executada.
+
 ## Histórico de alterações
 
+- 2026-11-08 — v0.3.4: registra ausência de migrations e Edge Functions no projeto Supabase auditado.
 - 2026-11-08 — v0.3.3: registra grants SQL e achados dos Security Advisors identificados na auditoria.
 - 2026-11-08 — v0.3.2: registra achados técnicos complementares da auditoria RLS e dependência da função can_view_expense no campo legado.
 - 2026-11-08 — v0.3.1: registra referência à auditoria somente leitura dos papéis, vínculos, administradores e permissões atuais. Nenhuma migração autorizada.
