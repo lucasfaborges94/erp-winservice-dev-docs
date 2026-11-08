@@ -257,7 +257,15 @@ A desativação de um módulo deverá bloquear novas operações daquele módulo
 
 Esta regra é transversal e deverá ser aplicada de forma consistente a todos os módulos, APIs, workflows, aplicações e canais de acesso. Um módulo não poderá contornar o controle por meio de chamadas diretas, funções privilegiadas ou automações técnicas.
 
-### 10.7 Regras específicas do Módulo de Inteligência Artificial
+### 10.7 Ciclo de vida do superadmin
+
+Cada empresa deverá manter pelo menos um **superadmin humano ativo**. Agentes de IA nunca poderão receber, ocupar ou exercer esse papel, independentemente de sua função, perfil ou configuração.
+
+**Provisionamento inicial:** o primeiro usuário criado para uma empresa deverá ser obrigatoriamente um usuário humano e receberá o papel de superadmin. Essa atribuição deverá ocorrer no fluxo confiável de criação/provisionamento da empresa, sem depender de seleção livre pelo cliente ou de ação de um agente de IA.
+
+O sistema deverá impedir a remoção, suspensão ou rebaixamento do último superadmin humano ativo, bem como qualquer outra operação que deixe a empresa sem esse responsável administrativo. O procedimento de recuperação de acesso administrativo ainda deverá ser especificado.
+
+### 10.8 Regras específicas do Módulo de Inteligência Artificial
 
 O ERP deverá possuir um **Módulo de Inteligência Artificial (IA)** próprio. Sua utilização estará subordinada à regra geral de ativação dos módulos descrita na seção 10.6.
 
