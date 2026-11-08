@@ -1,7 +1,7 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 0.8.0  
-**Data-base:** 2026-11-07
+**Versão:** 0.9.0  
+**Data-base:** 2026-11-08
 
 ## 1. Resumo executivo
 
