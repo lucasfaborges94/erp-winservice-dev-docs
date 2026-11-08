@@ -1,7 +1,7 @@
 # Modelo de autorização e isolamento multiempresa — ERP Winservice
 
 **Documento:** Modelo de autorização e isolamento multiempresa  
-**Versão:** 0.1.2  
+**Versão:** 0.1.3  
 **Data:** 2026-11-07  
 **Estado:** PROPOSTA PARA DISCUSSÃO — não aprovada como decisão arquitetural  
 **Projeto Supabase consultado:** Winservice (`voaovwphncwbrwtcqnsc`)  
@@ -246,18 +246,22 @@ Não reutilizar indiscriminadamente a identidade de um administrador ou a chave 
 
 O ERP deverá possuir um **Módulo de Inteligência Artificial (IA)** próprio, cuja disponibilidade e ativação serão controladas em dois níveis independentes:
 
-1. **Disponibilidade global pela plataforma:** a administração da plataforma controla se o módulo de IA está disponibilizado para uso no produto.
-2. **Ativação individual por empresa:** cada empresa controla se habilita ou desabilita o módulo em seu próprio ambiente, respeitando a disponibilidade global e as condições de contratação.
+1. **Disponibilidade global pela plataforma:** somente os desenvolvedores responsáveis pelo ERP — inicialmente o próprio responsável pelo projeto e, futuramente, membros de sua equipe — poderão ativar ou desativar globalmente a disponibilidade do módulo.
+2. **Ativação individual por empresa:** o superadmin da própria empresa poderá ativar ou desativar o módulo para aquela empresa. Cada empresa deverá manter no mínimo um superadmin.
 
-A condição efetiva de utilização será a conjunção dos dois controles: o módulo somente estará disponível para uma empresa quando estiver disponibilizado globalmente pela plataforma **e** habilitado para aquela empresa. A habilitação individual não poderá sobrepor uma indisponibilidade global.
+A condição efetiva de utilização será a conjunção dos dois controles: o módulo somente estará disponível para uma empresa quando estiver disponibilizado globalmente pela plataforma **e** habilitado para aquela empresa. A ativação individual não poderá sobrepor uma indisponibilidade global.
 
-A ativação do módulo não ativa automaticamente os agentes. Cada usuário autônomo/agente deverá possuir estado próprio e somente poderá executar operações quando, cumulativamente, o módulo estiver efetivamente disponível para a empresa, o módulo estiver habilitado para ela, o agente estiver ativo e as permissões e demais condições de autorização forem satisfeitas.
+A ativação do módulo não ativa automaticamente os agentes. Cada usuário autônomo/agente deverá possuir estado próprio e somente poderá executar operações quando, cumulativamente, o módulo estiver disponibilizado globalmente, estiver habilitado para a empresa, o agente estiver ativo e as permissões e demais condições de autorização forem satisfeitas.
 
-A desativação do módulo por uma empresa deverá bloquear novas execuções de seus agentes, sem apagar identidades, configurações, históricos ou registros anteriormente produzidos. A indisponibilidade global também deverá impedir novas execuções em todas as empresas afetadas, preservando os dados e permitindo retomada conforme as regras da plataforma.
+**Toda execução de IA deverá ocorrer somente enquanto o módulo estiver efetivamente ativo para a empresa.** A verificação desse estado deverá ser aplicada no backend/orquestrador, não apenas na interface. O controle deverá impedir o início de novas execuções quando qualquer um dos dois níveis estiver desativado. Se o módulo for desativado durante uma execução, o sistema deverá impedir que a execução continue realizando novas ações; o mecanismo seguro de interrupção, cancelamento ou encerramento de etapa deverá ser especificado tecnicamente.
+
+A desativação do módulo por uma empresa deverá bloquear as execuções de seus agentes, sem apagar identidades, configurações, históricos ou registros anteriormente produzidos. A indisponibilidade global também deverá impedir execuções em todas as empresas afetadas, preservando os dados e permitindo retomada conforme as regras da plataforma.
 
 O módulo de IA deverá ser tratado como módulo funcional/comercial do ERP. Provedores de modelos, workflows de execução, n8n e demais componentes de infraestrutura são serviços de suporte e não se confundem com o módulo nem com a identidade dos agentes.
 
-**Escopo desta definição:** está acordada a existência dos dois níveis de controle e a regra lógica de disponibilidade efetiva. Permanecem para especificação a identidade do papel autorizado a alterar cada controle, o comportamento de execuções já iniciadas no momento da desativação, a política de contratação/limites e os requisitos operacionais de retomada.
+A exigência de no mínimo um superadmin por empresa implica que o sistema deverá impedir operações administrativas que deixem uma empresa sem superadmin ativo, inclusive a remoção, suspensão ou rebaixamento do último superadmin. O procedimento de criação inicial da empresa e de recuperação de acesso administrativo ainda deverá ser especificado.
+
+**Escopo desta definição:** estão definidos os responsáveis por cada nível de controle, a exigência de pelo menos um superadmin por empresa e a condição de que nenhuma execução de IA ocorra com o módulo inativo. Permanecem para especificação o tratamento técnico de execuções em andamento, o procedimento de provisionamento/recuperação do superadmin, a política de contratação/limites e os requisitos operacionais de retomada.
 
 ## 11. Estratégia de tenancy — alternativas em avaliação
 
@@ -333,6 +337,7 @@ Os itens abaixo precisam de resposta do responsável antes de transformar esta p
 
 ## Histórico de alterações
 
+- 2026-11-07 — v0.1.3: define que desenvolvedores do ERP controlam a disponibilidade global, superadmin controla a ativação por empresa, cada empresa mantém ao menos um superadmin e toda execução de IA depende do módulo efetivamente ativo.
 - 2026-11-07 — v0.1.2: registra o Módulo de Inteligência Artificial com disponibilidade global pela plataforma e ativação individual por empresa; define a conjunção dos controles e a independência do estado de cada agente.
 - 2026-11-07 — v0.1.1: esclarece usuários autônomos como usuários ERP operados por IA, configuráveis por empresa; diferencia agentes de negócio de workflows técnicos; delimita a ADR-0012 à configuração da Isa e registra questões de implementação pendentes.
 - 2026-11-07 — v0.1.0: criação da proposta inicial com base no Project Charter, ADR-0001, ADR-0011, ADR-0012 e inspeção somente leitura do schema e das policies do Supabase.
