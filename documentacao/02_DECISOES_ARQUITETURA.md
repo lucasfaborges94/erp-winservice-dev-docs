@@ -1,6 +1,6 @@
 # Índice de decisões arquiteturais — ERP Winservice
 
-**Versão:** 0.3.0
+**Versão:** 0.4.0
 **Data de atualização:** 2026-11-07
 
 Este documento é o índice consolidado das decisões arquiteturais e de produto aprovadas. Cada decisão deverá possuir uma ficha individual em `documentacao/decisoes/`, identificada por um código sequencial `ADR-NNNN`.
@@ -45,6 +45,7 @@ As decisões abaixo constavam como aprovadas na versão anterior deste documento
 | ADR-0012 | Autonomia da Isa | Consulta limitada ao cliente do atendimento; criação de clientes, equipamentos, OS e visitas; sem exclusão; alteração apenas de registros criados pela própria Isa; controles no backend/API e permissões. | Aprovada — [ficha individual](decisoes/ADR-0012-autonomia-isa-operacoes-permitidas.md) |
 | ADR-0013 | Módulo Jurídico | Módulo Jurídico amplo; Gestão de Documentos e Instrumentos Jurídicos como funcionalidade inicial. | Aprovada — [ficha individual](decisoes/ADR-0013-modulo-juridico-amplo.md) |
 | ADR-0014 | Documentos legais | Documentos e versões armazenados no banco; páginas públicas consultam a versão vigente; contratação registra a versão apresentada/aceita. | Aprovada — [ficha individual](decisoes/ADR-0014-documentos-legais-versoes-e-aceite.md) |
+| ADR-0015 | Drenagem e falhas de execuções | Bloqueio de novas admissões durante desativação; retry limitado para falhas temporárias e estados terminais para falhas permanentes/timeouts. | Aprovada — [ficha individual](decisoes/ADR-0015-drenagem-e-falhas-de-execucoes.md) |
 
 **Nota de rastreabilidade:** os IDs antigos `ADR-001` a `ADR-014` foram renumerados neste índice para `ADR-0001` a `ADR-0014`. A numeração nova é a referência canônica daqui em diante. O histórico Git preserva a versão anterior do índice.
 
@@ -97,6 +98,7 @@ Consultar a ficha [ADR-0011](decisoes/ADR-0011-catalogo-permissoes-global-versio
 
 ## 7. Registro de alteração
 
+- **2026-11-07 — v0.4.0:** inclusão da ADR-0015, aprovada, sobre drenagem de execuções e tratamento de falhas durante a drenagem.
 - **2026-11-07 — v0.3.0:** ADR-0003 a ADR-0014 individualizados em fichas próprias; estados aprovados preservados do baseline legado. Lacunas históricas mantidas como não documentadas.
 
 - **2026-11-07 — v0.2.0:** índice preparado para fichas ADR individuais; identificadores legados normalizados para quatro dígitos; template e governança documental associados. Nenhuma nova decisão de produto ou arquitetura foi criada nesta atualização.
