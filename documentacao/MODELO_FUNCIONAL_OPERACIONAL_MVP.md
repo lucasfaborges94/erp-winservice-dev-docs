@@ -152,7 +152,7 @@ A execução da visita atual será finalizada quando ocorrer qualquer um destes 
 
 Quando a finalização ocorrer por transição para outra tarefa ou deslocamento, o técnico deverá registrar texto com suas próprias palavras, a mudança de status da visita e o motivo do abandono/interrupção. O código/valor exato do novo status e a taxonomia de motivos ainda serão especificados. O relato deve ser preservado como evento histórico, sem substituição posterior.
 
-No encerramento por fim de jornada, somente uma execução pausada pode ser fechada automaticamente; uma execução ativa não será encerrada automaticamente sem o fluxo operacional correspondente.
+O fim da jornada é gatilho para finalizar a visita. O procedimento exato para encerrar uma sessão que ainda esteja ativa nesse instante permanece pendente de definição; não presumir encerramento automático silencioso da sessão.
 
 ### 4.7 Checkout manual e limite da jornada
 
@@ -223,7 +223,7 @@ A migração do schema atual deverá tratar registros que hoje tenham simultanea
 
 A máquina de estados reutilizável definida para o projeto pertence ao módulo Chat. Ela não deve ser confundida com o ciclo operacional das visitas nem usada como substituta dos eventos de execução da visita.
 
-Como recomendação técnica ainda sujeita à validação do responsável, o histórico imutável pode ser implementado com eventos append-only e snapshots/revisões versionadas. Correções devem gerar novos registros de correção/revisão, sem sobrescrever o conteúdo histórico original. A política definitiva de retenção, integridade e proteção contra alteração ainda não foi aprovada.
+A diretriz append-only está aprovada pela ADR-0016. Como proposta de implementação, o histórico imutável poderá usar eventos append-only e snapshots/revisões versionadas. Correções devem gerar novos registros de correção/revisão, sem sobrescrever o conteúdo histórico original. Retenção, integridade, proteção contra alteração e granularidade dos snapshots ainda precisam de desenho técnico.
 
 ## 9. Histórico de posições GPS
 
@@ -300,11 +300,11 @@ A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de con
 
 1. Definir campos, relatos e evidências obrigatórios para cada tipo de tarefa.
 2. Definir o esquema de tarefa e a distinção persistente entre equipamento não identificado e tarefa sem equipamento.
-3. Definir se uma visita pode ter várias sessões de tarefas simultâneas ou apenas uma sessão ativa por técnico.
+3. Definir cardinalidade das sessões de execução da visita e como tratar sessão ativa durante transição/fim da jornada; tarefas não possuem sessões.
 4. Definir raio, precisão mínima e tempo de confirmação para pausa automática.
 5. Definir condições de permanência para retomada automática.
 6. Definir horário de corte da jornada e fuso horário por empresa.
-7. Definir exatamente quando a visita será finalizada automaticamente e como tratar visita com sessão ainda em execução.
+7. Confirmar quando o início de outra tarefa exige transição para fora da visita atual e como tratar sessão ativa no fim da jornada.
 8. Definir o critério de relato adequado exigido após finalização automática.
 9. Definir se e como a reabertura GPS poderá ser tentada quando o técnico já tiver outra visita ativa.
 10. Definir estrutura de auditoria, versionamento e snapshots históricos.
@@ -326,6 +326,6 @@ A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de con
 ## Histórico de alterações
 
 - 2026-11-08 — v0.4.0: confirmação do check-in inicial de 5 minutos/50 m, precisão GPS configurável até 50 m, histórico de posições, gatilhos de finalização por nova tarefa/deslocamento/fim de jornada, relato de transição e aprovação do histórico append-only; incluída proposta de repositório de catálogos globais versionados.
-- 2026-11-08 — v0.3.0: inclusão do vínculo opcional e exclusivo de orçamento e separação entre máquina de estados do módulo Chat e ciclo operacional da visita; histórico append-only registrado como recomendação pendente de validação.
+- 2026-11-08 — v0.3.0: inclusão do vínculo opcional e exclusivo de orçamento e separação entre máquina de estados do módulo Chat e ciclo operacional da visita.
 - 2026-11-08 — v0.2.0: atualização para execução/sessões no nível da visita, finalização da visita anterior mediante relato, limiares GPS de 200 m/50 m e catálogo global de tipos editável independentemente por empresa.
 - 2026-11-08 — v0.1.0: criação do baseline funcional de Operação e confronto inicial com o schema Supabase consultado em tempo real, somente leitura.
