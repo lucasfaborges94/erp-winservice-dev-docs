@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 1.5.0  
+**Versão:** 1.6.0  
 **Data-base:** 2026-11-08
 
 ## 1. Resumo executivo
@@ -20,7 +20,7 @@ A documentação passou a definir explicitamente o repositório GitHub como mem�
 | Supabase | Auditoria técnica somente leitura realizada em 2026-11-07; relatório versionado | Priorizar revisão de RLS, grants, função de ingestão, integridade multiempresa e trigger de visitas |
 | Permissões | Catálogo global versionado e personalizações por empresa definidos | Auditar implementação e políticas |
 | Isa | Limites de autonomia definidos | Testar autorização no backend/API |
-| Operação | Modelo funcional v0.6.0 e modelo lógico v0.5.0; Máquina A única aprovada; Máquina B eliminada; histórico unificado em visit_events; tarefas sem estados; Base de Conhecimento conceitualmente aprovada; implementação parcial no Supabase ainda não reavaliada | Especificar modelo físico de visit_events, idempotência/concorrência, jornada, GPS e validar tenancy antes de qualquer DDL |
+| Operação | Modelo funcional v0.6.0 e modelo lógico v0.5.0; Máquina A única aprovada; Máquina B eliminada; histórico unificado em visit_events; tarefas sem estados; Base de Conhecimento conceitualmente aprovada; implementação parcial no Supabase ainda não reavaliada | Implementar especificação aprovada de visit_events somente após corrigir tenancy/RLS; definir janela de idade offline e validar jornada/GPS |
 | Atendimento | Chatwoot transitório | Mapear dependências e plano de substituição |
 | WeWeb | Direção aprovada | Definir ambiente, autenticação e contratos de API |
 | FlutterFlow | Direção aprovada | Especificar sync offline-first e GPS background |
@@ -257,3 +257,17 @@ Esta atualização é documental. Não foram alterados código da aplicação, b
 6. Definir frequência, idade máxima, retenção e controles do histórico GPS.
 7. Continuar especificação da Base de Conhecimento: glossário, entidades, processos, contratos e guias derivados.
 8. Validar o modelo lógico e confrontá-lo novamente com o estado real do Supabase antes de qualquer DDL.
+
+
+## 14. Atualização — especificação técnica de eventos e sincronização offline (2026-11-08)
+
+O responsável aprovou a especificação técnica de `visit_events`, incluindo:
+- exclusividade do técnico nos estados `in_displacement`, `in_progress` e `paused`, com enforcement transacional e restrição de integridade;
+- sincronização offline validada pelo servidor, preservando `occurred_at` e `recorded_at`;
+- conferência do relógio do dispositivo contra o horário oficial do ERP antes de disponibilizar uma nova visita, com aviso em caso de divergência;
+- separação entre eventos canônicos aceitos e comandos rejeitados/conflitantes;
+- revisão de conflitos restrita a gestores e atendentes/usuários autorizados.
+
+A correção de tenancy, integridade multiempresa e RLS é pré-condição para implementar `visit_events`. A especificação aprovada não autoriza DDL nem alterações no banco. A janela de 24 horas para reconciliação automática foi recomendada para avaliação, mas permanece sem aprovação.
+
+Nenhuma alteração foi realizada no Supabase nesta etapa.
