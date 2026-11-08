@@ -1,7 +1,7 @@
 # Modelo de autorização e isolamento multiempresa — ERP Winservice
 
 **Documento:** Modelo de autorização e isolamento multiempresa  
-**Versão:** 0.1.4  
+**Versão:** 0.1.5  
 **Data:** 2026-11-07  
 **Estado:** PROPOSTA PARA DISCUSSÃO — não aprovada como decisão arquitetural  
 **Projeto Supabase consultado:** Winservice (`voaovwphncwbrwtcqnsc`)  
@@ -251,9 +251,13 @@ A regra de ativação em dois níveis aplica-se **a todos os módulos do ERP**, 
 
 Um módulo somente estará efetivamente disponível para uma empresa quando estiver disponibilizado globalmente pela plataforma **e** habilitado para aquela empresa. A ativação individual não poderá sobrepor uma indisponibilidade global.
 
-A verificação da condição efetiva deverá ocorrer no backend/API ou no orquestrador responsável pela operação, e não apenas na interface. Nenhuma operação ou execução pertencente a um módulo poderá começar ou continuar produzindo novas ações quando qualquer um dos dois níveis estiver desativado. O mecanismo técnico de interrupção, cancelamento ou encerramento seguro de operações em andamento deverá ser especificado.
+A verificação da condição efetiva deverá ocorrer no backend/API ou no orquestrador responsável pela operação, e não apenas na interface.
 
-A desativação de um módulo deverá bloquear novas operações daquele módulo no escopo afetado, sem apagar automaticamente dados, configurações, históricos ou registros anteriormente produzidos. A retomada dependerá de o módulo voltar a estar disponível globalmente e habilitado para a empresa, além das demais condições de autorização.
+**Desativação com drenagem (graceful drain):** quando qualquer um dos dois níveis for desativado, o sistema deverá fechar imediatamente a entrada de novas execuções para o módulo no escopo afetado. Nenhuma nova execução poderá ser aceita nem adicionada à fila enquanto o módulo permanecer inativo. As execuções que já tiverem sido aceitas — tanto as que estiverem em andamento quanto as que já estiverem aguardando processamento na fila — deverão continuar sendo processadas e terminar normalmente. A fila existente deverá ser drenada até que todas essas execuções sejam concluídas; a desativação, por si só, não deverá cancelar nem interromper abruptamente essas execuções.
+
+Durante a drenagem, etapas internas necessárias para concluir uma execução já aceita poderão prosseguir, mas não poderão originar a admissão ou o enfileiramento de uma nova execução independente. O controle de entrada deverá ser aplicado atomicamente no backend/orquestrador para evitar que uma execução seja aceita em uma corrida com a desativação. O módulo permanecerá fechado para novas entradas mesmo depois de a fila esvaziar, até que esteja novamente ativo nos dois níveis.
+
+A desativação não deverá apagar automaticamente dados, configurações, históricos ou registros anteriormente produzidos. A retomada da admissão dependerá de o módulo voltar a estar disponível globalmente e habilitado para a empresa, além das demais condições de autorização.
 
 Esta regra é transversal e deverá ser aplicada de forma consistente a todos os módulos, APIs, workflows, aplicações e canais de acesso. Um módulo não poderá contornar o controle por meio de chamadas diretas, funções privilegiadas ou automações técnicas.
 
@@ -271,7 +275,7 @@ O ERP deverá possuir um **Módulo de Inteligência Artificial (IA)** próprio. 
 
 A ativação do Módulo de IA não ativa automaticamente os agentes. Cada usuário autônomo/agente deverá possuir estado próprio e somente poderá executar operações quando, cumulativamente, o módulo estiver efetivamente ativo para a empresa, o agente estiver ativo e as permissões e demais condições de autorização forem satisfeitas.
 
-Toda execução de IA deverá ser bloqueada quando o módulo estiver indisponível globalmente ou desabilitado para a empresa. Se o módulo for desativado durante uma execução, a execução não poderá continuar realizando novas ações. O mecanismo seguro de interrupção, cancelamento ou encerramento de etapa deverá ser especificado tecnicamente.
+A admissão de novas execuções de IA deverá ser bloqueada quando o módulo estiver indisponível globalmente ou desabilitado para a empresa. As execuções de IA já aceitas, inclusive as que estiverem aguardando na fila, deverão ser concluídas normalmente conforme a regra de drenagem da seção 10.6; nenhuma nova execução poderá ser admitida até a reativação do módulo nos dois níveis.
 
 Provedores de modelos, workflows de execução, n8n e demais componentes de infraestrutura são serviços de suporte e não se confundem com o Módulo de IA nem com a identidade dos agentes.
 
@@ -349,6 +353,7 @@ Os itens abaixo precisam de resposta do responsável antes de transformar esta p
 
 ## Histórico de alterações
 
+- 2026-11-07 — v0.1.5: define desativação com drenagem: bloquear novas admissões e enfileiramentos, concluir normalmente todas as execuções já aceitas e reabrir a entrada somente após reativação nos dois níveis.
 - 2026-11-07 — v0.1.4: generaliza a ativação em dois níveis para todos os módulos; define que o primeiro usuário da empresa será humano e superadmin; proíbe agentes de IA como superadmin; exige a manutenção de ao menos um superadmin humano ativo.
 - 2026-11-07 — v0.1.3: define que desenvolvedores do ERP controlam a disponibilidade global, superadmin controla a ativação por empresa, cada empresa mantém ao menos um superadmin e toda execução de IA depende do módulo efetivamente ativo.
 - 2026-11-07 — v0.1.2: registra o Módulo de Inteligência Artificial com disponibilidade global pela plataforma e ativação individual por empresa; define a conjunção dos controles e a independência do estado de cada agente.
