@@ -144,3 +144,26 @@ Os cinco registros de `users` têm `identifier = auth_user_identifier`, alinhame
 ### 12.4 Limitações
 
 A busca de dependências por catálogo não identificou dependência relacional registrada para a função SQL; a dependência foi confirmada pela leitura do corpo da função. Ainda falta examinar grants de tabela, demais funções e views, código das aplicações e workflows.
+
+## 13. Privilégios SQL e advisors de segurança — complemento
+
+### 13.1 Privilégios de tabela
+
+A consulta a `information_schema.role_table_grants` encontrou concessões de privilégios amplas para `anon`, `authenticated` e `service_role` nas sete tabelas examinadas (`users`, `company_users`, `company_user_roles`, `roles`, `permissions`, `role_permissions`, `user_permissions`), incluindo operações de leitura e escrita e privilégios estruturais.
+
+Essas concessões não significam, isoladamente, que todas as operações estejam acessíveis: RLS continua sendo uma camada de filtragem para papéis sujeitos a RLS. Contudo, a combinação de grants amplos, ausência de policies em cinco tabelas e funções `SECURITY DEFINER` executáveis por `anon`/ `authenticated` exige revisão coordenada. Nenhum grant foi alterado.
+
+### 13.2 Views e rotinas
+
+A busca em views públicas não encontrou definições que mencionem diretamente `company_users`, `company_user_roles`, `company_admin` ou `role_identifier`. A busca de rotinas confirmou `public.can_view_expense(uuid)` como a função diretamente dependente de `company_users.role_identifier` entre as funções examinadas.
+
+### 13.3 Supabase Security Advisors
+
+A consulta aos Security Advisors em 2026-11-08 retornou:
+- 26 tabelas com RLS habilitado e sem policies;
+- 7 funções com `search_path` mutável;
+- 2 funções `SECURITY DEFINER` executáveis por `anon`;
+- 2 funções `SECURITY DEFINER` executáveis por `authenticated`;
+- proteção contra senhas vazadas desabilitada.
+
+Entre as funções destacadas estão `public.can_view_expense` e `public.authorize_integration_sync_event`. A lista completa de tabelas sem policies e as referências de remediação estão no resultado dos advisors da execução desta auditoria. Estes achados são para avaliação e não foram corrigidos nesta etapa.
