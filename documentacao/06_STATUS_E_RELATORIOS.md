@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 1.6.0  
+**Versão:** 1.7.0  
 **Data-base:** 2026-11-08
 
 ## 1. Resumo executivo
@@ -268,6 +268,11 @@ O responsável aprovou a especificação técnica de `visit_events`, incluindo:
 - separação entre eventos canônicos aceitos e comandos rejeitados/conflitantes;
 - revisão de conflitos restrita a gestores e atendentes/usuários autorizados.
 
-A correção de tenancy, integridade multiempresa e RLS é pré-condição para implementar `visit_events`. A especificação aprovada não autoriza DDL nem alterações no banco. A janela de 24 horas para reconciliação automática foi recomendada para avaliação, mas permanece sem aprovação.
+A correção de tenancy, integridade multiempresa e RLS é pré-condição para implementar `visit_events`. A especificação aprovada não autoriza DDL nem alterações no banco. A janela configurável inicial de 24 horas para reconciliação automática foi aprovada; eventos mais antigos devem ser encaminhados à revisão autorizada.
 
 Nenhuma alteração foi realizada no Supabase nesta etapa.
+
+
+### Aprovação complementar — idade de eventos offline (2026-11-08)
+
+O responsável aprovou a janela configurável inicial de 24 horas para reconciliação automática. A idade não é critério isolado: o servidor deve validar sequência, estado atual, identidade/origem, autorização, idempotência e consistência temporal. Eventos com mais de 24 horas seguem para revisão por gestor ou atendente/usuário expressamente autorizado. Esta definição não autoriza alterações no Supabase.
