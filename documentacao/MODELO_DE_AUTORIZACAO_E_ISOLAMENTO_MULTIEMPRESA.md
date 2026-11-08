@@ -1,7 +1,7 @@
 # Modelo de autorização e isolamento multiempresa — ERP Winservice
 
 **Documento:** Modelo de autorização e isolamento multiempresa  
-**Versão:** 0.3.1  
+**Versão:** 0.3.2  
 **Data:** 2026-11-08  
 **Estado:** PROPOSTA PARA DISCUSSÃO — inclui diretrizes e sugestões recentes ainda em avaliação; não substitui ADRs aprovadas nem autoriza implementação  
 **Projeto Supabase consultado:** Winservice (`voaovwphncwbrwtcqnsc`)  
@@ -37,8 +37,8 @@ Foram identificadas, entre outras, as seguintes tabelas e campos:
 |---|---|---|
 | `companies` | `identifier`, `name`, `is_active` | Cadastro de empresas |
 | `users` | `identifier`, `auth_user_identifier`, `role`, `status` | Há uma distinção estrutural entre identificador interno e identificador de Auth |
-| `company_users` | `company_identifier`, `user_identifier`, `role_identifier`, `company_admin` | Associação usuário–empresa |
-| `company_user_roles` | `company_user_identifier`, `role_identifier` | Associação de múltiplos papéis ao vínculo |
+| `company_users` | `company_identifier`, `user_identifier`, `company_admin` | Associação usuário–empresa; `role_identifier` é campo legado fora do modelo ERP conforme ADR-0018 |
+| `company_user_roles` | `company_identifier`, `company_user_identifier`, `role_identifier` | Fonte única de atribuição de múltiplos papéis ao vínculo, conforme ADR-0018 |
 | `roles` | `identifier`, `company_identifier` | Papel pode estar associado a uma empresa |
 | `permissions` | `company_identifier`, `entity`, `field`, `action` | Permissões atuais são associadas a uma empresa |
 | `role_permissions` | `company_identifier`, `role_identifier`, `permission_identifier` | Associação entre papel e permissão |
@@ -55,7 +55,7 @@ Também foram observadas policies RLS permissivas em tabelas como `companies`, `
 - A tabela `users` tem FK de `auth_user_identifier` para uma entidade externa ao schema `public`; a relação exata com `auth.users` e o fluxo de provisionamento precisam ser confirmados.
 - `permissions.company_identifier` é obrigatório no esquema observado, o que não demonstra, por si só, um catálogo global independente como exige a ADR-0011.
 - As FKs individuais não comprovam que todos os relacionamentos entre entidades pertencem à mesma empresa.
-- O campo `company_admin` e os campos de papel em `company_users` coexistem com a tabela `company_user_roles`; precedência e semântica não estão documentadas.
+- O campo `company_admin` é uma designação administrativa/comercial distinta de papel de autorização. O campo legado `company_users.role_identifier` foi descartado do modelo pela ADR-0018; `company_user_roles` é a fonte única de papéis.
 
 Esses pontos são observações estruturais. Não se conclui, sem análise adicional, que sejam exploráveis ou que o fluxo de autenticação esteja necessariamente quebrado.
 
@@ -124,6 +124,19 @@ O modelo deve permitir que uma identidade tenha vínculos independentes com uma 
 
 A autorização em uma empresa não deve se propagar automaticamente a outra. Suspender ou remover um vínculo deve impedir novas operações nesse tenant sem exigir a exclusão do perfil global do usuário.
 
+### 7.2.1 Fonte única de atribuição de papéis
+
+Conforme ADR-0018, `company_user_roles` é a única fonte oficial de atribuição de papéis aos vínculos usuário–empresa.
+
+- A resolução de papéis deverá consultar exclusivamente `company_user_roles`, considerando o vínculo e o tenant validados.
+- Um vínculo pode ter zero, um ou vários papéis.
+- A integridade deverá ser garantida por `company_identifier` e FKs compostas entre `company_user_roles`, `company_users` e `roles`.
+- `company_users.role_identifier` e seu valor legado não integram o modelo de autorização, não serão migrados nem reconciliados e não poderão ser utilizados como fallback.
+- A coluna física deverá ser removida após tratamento de suas dependências técnicas. A auditoria de 2026-11-08 identificou a FK `company_users_role_identifier_fkey` e referência no corpo de `public.can_view_expense(uuid)`; essa função, classificada como obsoleta e fora do escopo atual, deverá ser retirada ou adaptada antes da remoção da coluna.
+- A designação `company_admin` não substitui nem representa um papel de autorização.
+
+A aprovação arquitetural não comprova que a remoção física foi executada.
+
 ### 7.3 Empresa de contexto
 
 A seleção da empresa ativa pode ocorrer na aplicação, mas sua validade deve ser confirmada em cada operação sensível no backend/banco. Não utilizar uma variável de sessão mutável pelo cliente como única prova de vínculo ou autorização.
@@ -156,7 +169,7 @@ A estrutura atual de `permissions` com `company_identifier` obrigatório não co
 
 ### 8.2 Semântica de múltiplos papéis e exceções
 
-A regra para usuários comuns é a agregação por união: uma permissão é concedida quando qualquer um dos papéis atribuídos ao vínculo a concede. A avaliação não depende da ordem de consulta dos papéis.
+A regra para usuários comuns é a agregação por união dos papéis atribuídos exclusivamente em `company_user_roles`: uma permissão é concedida quando qualquer um dos papéis atribuídos ao vínculo a concede. A avaliação não depende da ordem de consulta dos papéis.
 
 As exceções individuais são avaliadas por vínculo usuário–empresa e seguem estas regras:
 
@@ -169,7 +182,7 @@ Para usuários com papel `superuser`, a negação explícita individual (`allow 
 
 A regra de `superuser` não concede acesso a controles exclusivos da plataforma SaaS nem a outra empresa. Agentes autônomos não podem receber ou exercer esse papel.
 
-A forma física de armazenamento e a implementação da avaliação permanecem pendentes de especificação técnica.
+A forma física do catálogo e a implementação da avaliação permanecem pendentes de especificação técnica, conforme ADR-0011 e proposta física específica. A fonte única de atribuição de papéis está definida pela ADR-0018.
 
 ### 8.3. Função legada de despesas fora do escopo atual
 
@@ -457,3 +470,8 @@ A listagem do projeto Supabase retornou zero migrations registradas e nenhuma Ed
 - 2026-11-07 — v0.1.2: registra o Módulo de Inteligência Artificial com disponibilidade global pela plataforma e ativação individual por empresa; define a conjunção dos controles e a independência do estado de cada agente.
 - 2026-11-07 — v0.1.1: esclarece usuários autônomos como usuários ERP operados por IA, configuráveis por empresa; diferencia agentes de negócio de workflows técnicos; delimita a ADR-0012 à configuração da Isa e registra questões de implementação pendentes.
 - 2026-11-07 — v0.1.0: criação da proposta inicial com base no Project Charter, ADR-0001, ADR-0011, ADR-0012 e inspeção somente leitura do schema e das policies do Supabase.
+
+
+## 12. Complemento — fonte única de atribuição de papéis (ADR-0018)
+
+O responsável aprovou a ADR-0018, que define `company_user_roles` como fonte única de papéis por vínculo usuário–empresa. O campo `company_users.role_identifier` e seu valor legado foram explicitamente desconsiderados; não haverá reconciliação nem migração desse valor. A coluna deverá ser removida do schema físico após tratamento das dependências técnicas identificadas. A decisão não altera `company_admin` nem concede papéis automaticamente.
