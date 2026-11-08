@@ -566,3 +566,53 @@ A especificação registra requisitos funcionais confirmados pelo responsável, 
 3. Produzir matriz de conformidade requisito × objeto atual × lacuna × ação proposta.
 4. Revisar RLS e integridade multiempresa antes de liberar operações.
 5. Somente após aprovação do modelo lógico, elaborar migrações revisáveis e testes.
+
+
+### Sessão — 2026-11-08 — Modelo lógico e matriz de conformidade da Operação
+
+**Responsável/agente:** ChatGPT, sob orientação do responsável pelo projeto  
+**Repositório:** `lucasfaborges94/erp-winservice-dev-docs`, branch `main`  
+**Supabase:** projeto Winservice `voaovwphncwbrwtcqnsc`, schema `public`  
+**Estado:** proposta de modelo lógico v0.1.0 criada; não aprovada como modelo físico
+
+#### 1. Objetivo
+
+Traduzir o modelo funcional operacional aprovado conceitualmente em entidades, cardinalidades, regras de integridade e matriz de conformidade com o schema atual.
+
+#### 2. Trabalho realizado
+
+- Releitura do modelo funcional operacional e dos documentos de status/decisões.
+- Nova inspeção somente leitura de tabelas, colunas, PKs e FKs relevantes no Supabase.
+- Modelagem conceitual de cliente, equipamento, OS, visita, tarefa, tipos de tarefa, relatos, sessões de execução, eventos GPS, orçamento e auditoria.
+- Definição de distinção entre tarefa sem equipamento, equipamento ainda não identificado e equipamento identificado.
+- Definição de proposta de eventos append-only para execução/GPS e histórico de visita.
+- Matriz de conformidade com classificação aproveitar, ajustar, criar e revisar.
+- Registro de pré-condições de tenancy, RLS, integridade, autoria e concorrência.
+
+#### 3. Principais conclusões
+
+- Estruturas atuais de clientes, endereços, equipamentos, OS e visitas podem ser aproveitadas, mas exigem ajustes e garantias multiempresa.
+- `task_types` é catálogo, não instância de tarefa; `work_order_equipment` não substitui tarefa por visita.
+- Não foram encontradas estruturas dedicadas para tarefas por visita, relatos, sessões de execução, eventos GPS históricos e auditoria append-only.
+- Orçamentos e documentos precisam de relação explícita com tarefa/visita conforme as regras finais.
+- A exclusividade de uma visita por técnico exige controle transacional e constraint/índice adequado.
+- O modelo proposto ainda possui decisões abertas sobre catálogo de tipos, requisitos dinâmicos, cardinalidade de orçamentos, simultaneidade de sessões, GPS, jornada e auditoria.
+
+#### 4. Artefatos publicados
+
+- Criado `documentacao/MODELO_LOGICO_DADOS_OPERACAO.md`, versão 0.1.0.
+- Atualizado `documentacao/00_LEIA-ME.md`, versão 0.6.0.
+- Atualizado `documentacao/06_STATUS_E_RELATORIOS.md`, versão 1.0.0.
+- Modelo funcional relacionado: `documentacao/MODELO_FUNCIONAL_OPERACIONAL_MVP.md`, versão 0.1.0.
+
+#### 5. Estado, limites e segurança
+
+A proposta não é ADR nem modelo físico aprovado. Não foi gerado SQL de migração e nenhuma alteração foi realizada no banco. A inspeção foi de metadados, sem leitura de dados pessoais. Não foram executados testes de RLS, concorrência, GPS, workflows, API ou aplicativo. A matriz representa conformidade estrutural observada em 2026-11-08.
+
+#### 6. Próximas atividades
+
+1. Validar o modelo lógico e responder às decisões abertas da seção 9.
+2. Definir a máquina de estados da visita e o ciclo completo de sessão.
+3. Decidir catálogo de tipos, requisitos por tipo e cardinalidade de orçamento ↔ tarefa.
+4. Fechar arquitetura de auditoria e integridade multiempresa.
+5. Após aprovação, elaborar modelo físico, plano de migração e testes — ainda sem aplicar ao Supabase até autorização explícita.
