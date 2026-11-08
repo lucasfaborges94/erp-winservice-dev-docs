@@ -1,6 +1,6 @@
 # Modelo lógico de dados e matriz de conformidade — Operação MVP
 
-**Versão:** 0.3.0  
+**Versão:** 0.4.0  
 **Data:** 2026-11-08  
 **Estado:** proposta técnica para validação; não aprovada como modelo físico  
 **Projeto Supabase avaliado:** Winservice — `voaovwphncwbrwtcqnsc`  
@@ -168,6 +168,112 @@ Define campos, relatos e evidências obrigatórios para cada tipo de tarefa. Cam
 A configuração JSONB deve descrever validação e apresentação, mas não substituir colunas relacionais para dados críticos de negócio. Deve existir versionamento ou snapshot dos requisitos aplicados à tarefa, para que uma alteração futura no tipo não modifique retroativamente o que era obrigatório no momento do atendimento.
 
 O requisito funcional está definido: haverá um catálogo global inicial e cada empresa poderá editar sua própria versão, sem afetar o catálogo global nem outras empresas. A estratégia física ainda deve escolher entre cópia sob demanda (copy-on-write), registros de personalização vinculados ao tipo global ou outra estrutura equivalente. Deve preservar a origem global, a versão herdada e o histórico de alterações. Uma edição local não pode alterar o tipo global nem propagar-se silenciosamente às empresas que já personalizaram o tipo.
+
+#### `requirement_evaluations` — avaliações completas de requisitos
+
+Uma avaliação é criada para cada tentativa de finalização normal da visita, inclusive quando a tentativa é bloqueada. A avaliação agrega os requisitos aplicáveis à visita e a todas as tarefas vinculadas, com instante, ator, contexto e resultado global. Não atualizar uma avaliação anterior quando houver nova tentativa.
+
+Campos conceituais:
+- `identifier`, `company_identifier`, `visit_identifier`;
+- `attempt_number` ou sequência equivalente, com unicidade por visita;
+- `requested_at`, `evaluated_at`, `recorded_at` (`timestamptz`);
+- `requested_by`, `actor_kind`, origem/canal;
+- `outcome`: por exemplo, `blocked_mandatory` ou `eligible_for_normal_completion`;
+- referência ao snapshot/versão do conjunto de requisitos aplicáveis;
+- correlation/idempotency identifier para impedir avaliações duplicadas por repetição da mesma solicitação.
+
+#### `requirement_evaluation_items` — resultado por requisito
+
+Um item por requisito avaliado em cada avaliação, com snapshot suficiente para reconstruir a regra aplicada.
+
+Campos conceituais:
+- `identifier`, `company_identifier`, `evaluation_identifier`;
+- referência de origem ao requisito de visita ou de tipo de tarefa, mais tipo/identificador da entidade de contexto;
+- código, descrição, tipo, obrigatoriedade e configuração em snapshot;
+- `result`: `fulfilled`, `not_fulfilled` ou `not_applicable` quando permitido;
+- referências às evidências/relatos que fundamentam o resultado;
+- justificativa quando houver não aplicabilidade;
+- timestamps e autoria do registro.
+
+A avaliação deve cobrir requisitos da visita e de todas as tarefas, mesmo que a conclusão seja bloqueada por um único requisito obrigatório.
+
+#### `requirement_pending_reviews` — tratamento de pendências
+
+Registra o tratamento posterior sem alterar o resultado original da avaliação.
+
+Estados conceituais: `pending_review`, `assigned_to_technician`, `fulfilled` e `accepted_with_justification`. O desenho pode evoluir, mas cada transição deve ser registrada append-only ou por eventos de revisão.
+
+Campos conceituais:
+- `identifier`, `company_identifier`, referência ao item de avaliação e à visita/tarefa;
+- estado atual como projeção, origem e motivo da pendência;
+- ator, data/hora, justificativa e decisão;
+- referência a eventual evidência posterior e à avaliação subsequente.
+
+Gestor e atendente autorizado podem aceitar a ausência de requisito opcional com justificativa. Técnico pode cumprir ou solicitar revisão, mas não dispensar. Requisito obrigatório pendente em encerramento excepcional deve ser encaminhado para revisão; a dispensa, se autorizada, não equivale a cumprimento. O histórico da avaliação original permanece intacto.
+
+Os indicadores `has_pending_mandatory_requirements` e `has_pending_optional_requirements` na visita e na tarefa são projeções derivadas, não campos de entrada editáveis. Podem ser materializados para consulta, desde que sua origem e atualização sejam confiáveis e reconstruíveis.
+
+#### `evidence_records` — evidências de visita e tarefa
+
+Armazena a identidade e os metadados de fotografias, documentos e evidências de assinatura/aceite, vinculando cada item à visita ou tarefa e, quando aplicável, ao requisito que pretende satisfazer.
+
+Campos conceituais:
+- `identifier`, `company_identifier`, `visit_identifier` e/ou `task_identifier` com regra de exclusividade de contexto;
+- `requirement_evaluation_item_identifier` ou referência ao requisito aplicável;
+- `evidence_type`, nome original, MIME type, tamanho, hash/checksum e referência de armazenamento;
+- `created_at` (`timestamptz`), `captured_at`, `received_at`, `upload_confirmed_at`;
+- `latitude`, `longitude`, precisão, quando disponíveis e autorizadas;
+- autor, dispositivo/origem, estado de validação e metadados técnicos.
+
+`created_at` registra a criação/registro da evidência; `captured_at` registra o momento da captura no dispositivo; `received_at` e `upload_confirmed_at` distinguem recebimento e confirmação no backend. Latitude/longitude devem representar o local da captura/coleta, não o local da sincronização posterior. Todos os instantes devem usar tipo temporal com fuso, conceitualmente `timestamptz`.
+
+#### `evidence_uploads` e `evidence_upload_attempts` — controle de envio
+
+Separar o estado lógico da evidência do processo de transferência. Uma evidência pode estar localmente preparada, aguardando envio, enviando, aguardando retry, confirmada ou em falha/timeout.
+
+Campos conceituais:
+- identificador, empresa, evidência, chave idempotente;
+- estado, número de tentativas, início, última tentativa, prazo/timeout e conclusão;
+- erro classificado, resposta/recibo de armazenamento e checksum confirmado;
+- tabela append-only de tentativas, quando necessária para preservar cada execução.
+
+Timeout, quantidade máxima de retries, backoff, limites de tamanho e formatos ainda serão parametrizados. Repetições devem ser idempotentes. A evidência obrigatória só satisfaz requisito após confirmação de armazenamento/validação pelo backend. Upload obrigatório pendente ou não confirmado bloqueia conclusão normal; pode permanecer em andamento ou ser tratado por encerramento excepcional da visita. Em offline, o arquivo permanece em armazenamento local protegido até sincronização.
+
+#### `acceptance_document_versions` — versões do resumo de visita
+
+Representa cada versão imutável do resumo e seus anexos apresentados ao cliente.
+
+Campos conceituais:
+- `identifier`, `company_identifier`, `visit_identifier`;
+- número/identificador de versão e estado;
+- snapshot do conteúdo estruturado e renderizado, ou referência a artefato imutável;
+- hash do resumo e referências/versões/hash dos anexos;
+- `generated_at`, `presented_at`, autoria e origem;
+- classificação de alterações relevantes/administrativas e referência à versão anterior.
+
+O resumo principal inclui data/hora, cliente, equipamentos, técnico, solicitação original, relato geral e relatos das tarefas, fotografias incorporadas e valores discriminados da visita/tarefas. Documentos são anexos identificados, não incorporados como imagens no corpo do resumo. O cliente deve consultar resumo e anexos antes de assinar.
+
+#### `digital_acceptances` — assinaturas e manifestações do cliente
+
+Vincula a manifestação de vontade a uma versão exata de `acceptance_document_versions`.
+
+Campos conceituais:
+- `identifier`, `company_identifier`, `visit_identifier`, `acceptance_document_version_identifier`;
+- signatário, método de identificação, dados estritamente necessários;
+- modalidade `remote_customer_device` ou `in_person_technician_device`;
+- referência/hash da assinatura e conteúdo aceito;
+- `presented_at`, `signed_at`, `received_at`, `confirmed_at`;
+- técnico responsável pela coleta presencial, canal/dispositivo e origem;
+- latitude/longitude quando disponíveis e autorizadas;
+- estado de sincronização/validação e cópia enviada ao cliente.
+
+O link individual no dispositivo pessoal do cliente é a modalidade padrão. A assinatura no dispositivo do técnico é alternativa presencial. Offline, a coleta presencial pode ser armazenada localmente de forma protegida, mas só é confirmada pelo backend após sincronização e validação. Não coletar nem armazenar impressão digital. Data de nascimento é método de identificação considerado, mas o método inicial e os critérios de validação ainda não estão definidos; CPF não será exigido indiscriminadamente.
+
+Alterações relevantes após assinatura exigem nova versão e novo aceite. Alterações administrativas sem impacto no conteúdo aceito não exigem nova assinatura. Versões, anexos, hashes e assinaturas anteriores permanecem preservados.
+
+#### `acceptance_delivery_events` — envio de links e cópias
+
+Opcionalmente, separar os eventos de emissão, envio, entrega, abertura e reenvio de links e de cópias ao cliente. Preservar canal, destinatário de forma minimizada, instante, resultado e identificador do provedor. Falha no envio da cópia não deve reescrever nem invalidar a assinatura já confirmada.
 
 #### `visit_reports` — relatos gerais da visita
 
@@ -355,6 +461,20 @@ Não definir a lista de estados ativos até fechar a máquina de estados da visi
 
 ### 5.6 Execução da visita e GPS
 
+### 5.7 Avaliações, evidências e conclusão da visita
+
+- Cada tentativa de finalização normal deve criar uma avaliação completa e imutável, com um item por requisito aplicável da visita e de todas as tarefas.
+- A conclusão normal é bloqueada se houver requisito obrigatório não cumprido ou evidência obrigatória sem upload confirmado pelo backend.
+- Requisitos opcionais não cumpridos geram pendência e não bloqueiam conclusão normal.
+- Encerramento excepcional por interrupção/abandono pode ocorrer com requisitos obrigatórios pendentes; não deve ser classificado como conclusão normal. A pendência permanece para revisão autorizada.
+- Dispensa justificada não muda o resultado original para `fulfilled`; registra decisão separada, ator, instante e justificativa.
+- Indicadores de requisitos obrigatórios/opcionais pendentes na visita e na tarefa são projeções derivadas das avaliações e dos tratamentos.
+- Evidência deve ter vínculo íntegro e exclusivo ao contexto (visita ou tarefa) e, quando aplicável, ao requisito.
+- Uma evidência só satisfaz requisito após confirmação de armazenamento e validação pelo backend. O estado local ou a mera captura não basta.
+- Uploads devem ser idempotentes; tentativas e retries precisam ser registráveis sem duplicar evidência.
+- Assinatura digital deve apontar para uma versão imutável do resumo e anexos, identificada por hash. Alteração relevante exige nova versão e novo aceite.
+- A coleta offline permanece provisória até sincronização e confirmação pelo backend.
+
 - Sessões de execução pertencem à visita; não existe sessão de execução de tarefa.
 - A exclusividade é de uma visita em execução por técnico.
 - Eventos de sessão e GPS são append-only e ordenados por `occurred_at` e `recorded_at`.
@@ -378,6 +498,22 @@ Não definir a lista de estados ativos até fechar a máquina de estados da visi
 - No fim da jornada, somente execução pausada pode ser fechada automaticamente; execução ativa não deve ser encerrada automaticamente.
 
 ## 6. Diagrama de fluxo do histórico
+
+```mermaid
+flowchart TD
+  A[Visita e tarefas com requisitos versionados] --> B[Tentativa de finalização]
+  B --> C[Avaliação completa e imutável]
+  C --> D{Há requisito obrigatório não cumprido?}
+  D -->|Sim| E[Conclusão normal bloqueada]
+  E --> F[Corrigir evidência ou encerrar excepcionalmente]
+  D -->|Não| G{Há requisito opcional não cumprido?}
+  G -->|Sim| H[Concluir visita e abrir pendência para revisão]
+  G -->|Não| I[Concluir visita sem pendências]
+  H --> J[Gestor/atendente revisa]
+  J --> K[Cumprir ou aceitar ausência com justificativa]
+  K --> L[Nova avaliação/revisão; histórico anterior preservado]
+```
+
 
 ```mermaid
 flowchart TD
@@ -422,6 +558,10 @@ Legenda:
 | Continuidade entre tarefas de visitas distintas | Nenhuma relação encontrada | Sem entidade tarefa | Criar FK opcional `previous_task_identifier` em `visit_tasks` | P1 |
 | Relatos gerais da visita | Nenhuma tabela dedicada encontrada | `visits` não tem relato estruturado observado | Criar `visit_reports` | P0 |
 | Relatos por tarefa | Nenhuma tabela dedicada encontrada | Não há instância de tarefa nem relatório | Criar `task_reports` | P0 |
+| Avaliações de requisitos | Nenhuma estrutura dedicada encontrada | Não há histórico de tentativas/resultados por requisito | Criar `requirement_evaluations` e `requirement_evaluation_items` append-only | P0 |
+| Pendências e revisão | Nenhuma estrutura dedicada encontrada | Não há tratamento auditável de requisito não cumprido | Criar `requirement_pending_reviews` ou eventos equivalentes | P0 |
+| Evidências e uploads | `documents` genérico; sem fluxo dedicado comprovado | Não há vínculo estruturado a requisito, tentativa, upload, retry e confirmação | Criar/ajustar `evidence_records`, `evidence_uploads` e tentativas | P0 |
+| Aceite digital | `approval_events` e `documents` existem, mas não comprovam o fluxo especificado | Não há versão imutável do resumo nem assinatura vinculada à versão comprovada | Criar `acceptance_document_versions`, `digital_acceptances` e eventos de entrega | P1 |
 | Sessões de execução da visita | Nenhuma tabela dedicada encontrada | `visits` possui um único conjunto de check-in/checkout | Criar `visit_execution_sessions` | P0 |
 | Eventos GPS/execução da visita | Nenhuma tabela dedicada encontrada | Sem histórico de múltiplas pausas/retomadas | Criar `visit_execution_events` | P0 |
 | Histórico de posições GPS | Nenhuma tabela dedicada encontrada | `visits` mantém apenas coordenadas pontuais | Criar `technician_gps_positions` append-only, com captura/recebimento/precisão | P0 |
@@ -470,6 +610,11 @@ Não executar essa sequência sem aprovação do modelo físico, plano de migra�
 9. **Documentos:** definir relação e armazenamento de fotos/documentos por tarefa e visita.
 10. **Identidade:** normalizar referências de autoria para usuário humano, agente autônomo e sistema.
 11. **Catálogos globais:** aprovar ou ajustar o repositório versionado e a política de atualização/merge das personalizações.
+12. **Uploads:** definir timeout, retries máximos, backoff, tamanho/formato de arquivos, retenção, política de limpeza local e confirmação de integridade no storage.
+13. **Identificação do signatário:** escolher método inicial, critérios de validação, contingência para cadastro incompleto e proteção/expiração dos links.
+14. **Aceite digital:** definir eventos de apresentação/ciência/aceite/consentimento, validade do link, reenvio, revogação e classificação completa de alterações relevantes.
+15. **Pendências obrigatórias:** definir matriz de autorização para dispensa justificada após encerramento excepcional, sem confundir dispensa com cumprimento.
+16. **Resumo de visita:** definir layout final, regra para valores/tributos/descontos, campos opcionais e tratamento de visitas sem equipamento.
 
 ## 10. Riscos e pré-condições antes de DDL
 
@@ -493,6 +638,7 @@ Não executar essa sequência sem aprovação do modelo físico, plano de migra�
 
 ## Histórico de alterações
 
+- 2026-11-08 — v0.4.0: inclusão das avaliações históricas por tentativa, pendências obrigatórias/opcionais, tratamento por gestor/atendente, evidências com uploads idempotentes e confirmação no backend, metadados temporais/GPS e proposta lógica de resumo/aceite digital versionado com coleta remota, presencial e offline.
 - 2026-11-08 — v0.3.0: inclusão do histórico GPS de técnicos, precisão configurável de até 50 m, posição mais recente sem inferência a partir de amostra obsoleta, gatilhos de finalização por nova tarefa/deslocamento/fim de jornada, confirmação do check-in inicial e aprovação da diretriz append-only; detalhada proposta de repositório global de catálogos versionados.
 - 2026-11-08 — v0.2.0: revisão após decisões funcionais sobre catálogo global editável por empresa, vínculo exclusivo opcional de orçamento, execução/sessões no nível da visita, limiares GPS de pausa/retomada e transição entre visitas. Removidas sessões de tarefa; máquina de estados do módulo Chat mantida separada.
 - 2026-11-08 — v0.1.0: criação do modelo lógico proposto e matriz de conformidade inicial com o schema Supabase.
