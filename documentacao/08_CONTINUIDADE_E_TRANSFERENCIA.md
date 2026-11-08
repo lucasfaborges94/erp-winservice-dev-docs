@@ -509,3 +509,60 @@ Nenhuma implementação foi realizada em código, banco, filas, workflows ou inf
 - Definir timeouts e tratamento de execução presa ou sem confirmação de resultado.
 - Definir persistência do estado e da identidade da execução entre retries.
 - Criar testes de falha temporária, falha permanente, timeout, retry e concorrência com desativação.
+
+
+### Sessão — 2026-11-08 — Modelo funcional operacional do MVP e confronto com Supabase
+
+**Responsável/agente:** ChatGPT, sob orientação do responsável pelo projeto  
+**Ferramentas/ambiente:** GitHub — repositório documental, branch main; Supabase — projeto Winservice, inspeção somente leitura  
+**Etapa do roadmap:** auditoria/fundação de dados e especificação da Operação V1  
+**Módulo/processo:** clientes, equipamentos, OS, visitas, tarefas, relatos e execução técnica  
+**Estado:** baseline funcional inicial documentado; implementação não iniciada nesta sessão
+
+#### 1. Objetivo
+
+Consolidar os requisitos funcionais confirmados para o núcleo operacional do MVP e confrontá-los com o schema Supabase vigente, sem executar alterações no banco.
+
+#### 2. Requisitos consolidados
+
+- A OS preserva o histórico completo do atendimento e pode conter várias visitas.
+- Uma nova data de atendimento gera nova visita; a visita normalmente permanece na mesma OS. Na criação, o técnico poderá optar por abrir uma nova OS.
+- Cada visita contém tarefas próprias. Tarefa representa atividade técnica naquela visita, não checklist nem unidade de execução transferível.
+- Se o atendimento continuar em outra data, cria-se nova visita e nova tarefa, normalmente relacionada ao mesmo equipamento e podendo referenciar a tarefa anterior.
+- Tarefas não possuem status de execução/conclusão; relatos e sessões de execução preservam sua história.
+- Equipamento associado à tarefa é opcional e distingue equipamento identificado, equipamento ainda não identificado e tarefa sem equipamento.
+- Visita pode ter relato geral e cada tarefa pode ter relatos próprios. Cada tipo de tarefa poderá definir campos, relatos e evidências obrigatórios. Uma visita exige pelo menos um relato para encerramento.
+- Um técnico só pode executar uma visita por vez.
+- Check-in automático configurável: visita em `in_displacement`, técnico dentro de 50 metros por 5 minutos (valores configuráveis); inicia a primeira tarefa sem sessão iniciada.
+- Afastamento das coordenadas de check-in pausa a sessão; retorno permite retomada automática. Limiares e tolerâncias de saída/retomada ainda precisam ser especificados.
+- Sessão em execução não será finalizada automaticamente. Somente sessões pausadas poderão ser finalizadas pelo limite da jornada; o horário efetivo será o da pausa e as coordenadas serão as registradas na pausa. Checkout manual usa horário e coordenadas do próprio checkout.
+- Se a visita for finalizada automaticamente, o técnico deverá preencher posteriormente o relato pendente antes de prosseguir com a abertura do aplicativo ou iniciar outro deslocamento/visita.
+- Somente o técnico poderá reabrir visita finalizada, dentro de 200 metros do endereço. Gestor e atendente não podem reabrir.
+- Gestor pode editar visita finalizada. Edição por técnico e atendente será configurável pelo gestor, separadamente por perfil.
+- Alterações devem preservar os dados anteriores e registrar autoria, data/hora, origem e histórico.
+- Autoria deve identificar corretamente usuário humano ou agente autônomo.
+
+#### 3. Confronto com o schema
+
+A inspeção atual de tabelas, colunas e foreign keys encontrou estruturas cadastrais e operacionais iniciais: `customers`, `customer_contacts`, `phonenumbers`, `addresses`, `equipments`, `work_orders`, `visits`, `work_order_equipment`, `task_types`, `visit_types`, `visit_requirements`, `visit_type_requirement`, `quotations`, `approval_events` e `documents`.
+
+Não foram encontradas tabelas dedicadas a tarefas por visita, relatos, sessões de execução, eventos GPS históricos ou auditoria append-only. `task_types` é um catálogo básico sem configuração observada de campos/obrigatoriedades. `work_order_equipment` associa OS e equipamento, mas não substitui a tarefa. Há lacunas de autoria em algumas entidades e riscos de autorização/integridade multiempresa já descritos na auditoria técnica de 2026-11-07.
+
+#### 4. Artefatos publicados
+
+- Criado `documentacao/MODELO_FUNCIONAL_OPERACIONAL_MVP.md`, versão 0.1.0.
+- Atualizado `documentacao/00_LEIA-ME.md`, versão 0.5.0, com o novo documento no mapa documental.
+- Atualizado `documentacao/06_STATUS_E_RELATORIOS.md`, versão 0.9.0, com o baseline funcional e a situação do schema.
+- Este registro de continuidade.
+
+#### 5. Estado e limites
+
+A especificação registra requisitos funcionais confirmados pelo responsável, mas não constitui ADR nem modelo lógico final. Questões técnicas ainda pendentes estão enumeradas no documento funcional. O schema foi inspecionado por ferramentas de leitura; nenhuma tabela, coluna, policy, função, trigger, dado ou configuração foi alterada. Não foram consultados registros pessoais de clientes nem realizados testes funcionais, de GPS, concorrência ou segurança.
+
+#### 6. Próximas atividades
+
+1. Revisar o modelo funcional e resolver as pendências da seção 8 do documento.
+2. Produzir modelo lógico das entidades e relacionamentos, incluindo tarefas, relatos, sessões e eventos de auditoria.
+3. Produzir matriz de conformidade requisito × objeto atual × lacuna × ação proposta.
+4. Revisar RLS e integridade multiempresa antes de liberar operações.
+5. Somente após aprovação do modelo lógico, elaborar migrações revisáveis e testes.
