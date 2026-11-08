@@ -927,6 +927,7 @@ A visita é a única entidade com ciclo de vida operacional:
 - paused → in_progress, interrupted.
 
 Estados terminais: completed, interrupted, prevented, canceled.
+Estados terminais não podem ser reabertos. A regra anterior de reabertura por técnico dentro de 200 metros foi substituída; continuidade exige uma nova visita.
 
 Revogação de autenticação:
 - pending: permanece;
