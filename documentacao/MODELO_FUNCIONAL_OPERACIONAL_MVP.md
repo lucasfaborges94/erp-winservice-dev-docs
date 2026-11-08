@@ -1,6 +1,6 @@
 # Modelo funcional operacional do MVP — ERP Winservice
 
-**Versão:** 0.5.0  
+**Versão:** 0.6.0  
 **Data da consolidação:** 2026-11-08  
 **Estado:** baseline funcional em consolidação  
 **Escopo:** clientes, equipamentos, ordens de serviço, visitas, tarefas, relatos, requisitos operacionais, evidências e uploads, aceite digital, execução técnica por GPS, orçamentos e aprovações.
@@ -15,7 +15,7 @@ Princípios:
 - A Ordem de Serviço (OS) é o contêiner histórico do atendimento.
 - Cada visita representa um comparecimento/atendimento em uma data e possui seu próprio conjunto de tarefas e relatos.
 - Uma tarefa representa uma atividade técnica registrada em uma visita; não é checklist de etapas nem uma entidade de execução que migra entre visitas.
-- A execução temporal do trabalho é registrada em sessões vinculadas à visita; tarefas não possuem sessões nem estados próprios de execução.
+- A visita é a única entidade com ciclo de vida operacional. O tempo de execução é reconstruído a partir de eventos históricos append-only da própria visita; não existe máquina ou entidade independente de sessão no MVP.
 - Relatos e evidências preservam o que aconteceu; não se deve inferir conclusão técnica apenas pelo encerramento de uma sessão.
 - Alterações não apagam silenciosamente o passado: versões e eventos anteriores devem permanecer consultáveis.
 - O modelo deve permitir navegação tanto do cliente para seus equipamentos e OS quanto do equipamento para suas tarefas, visitas e OS.
@@ -36,7 +36,7 @@ A visão conceitual é:
 
 `Evidências → Uploads → Resumos versionados e aceites digitais`
 
-`Visita → Sessões de execução (zero ou mais)`
+`Visita → Eventos operacionais append-only (um ou mais, conforme os acontecimentos)`
 
 ### 2.1 Cliente
 - Reúne os dados cadastrais, contatos e endereços.
@@ -179,74 +179,98 @@ O tratamento da pendência é distinto do resultado original da avaliação:
 
 O conjunto de estados é conceitual e poderá ser refinado, mas não deve apagar o resultado original da avaliação. O técnico pode cumprir ou solicitar revisão; não pode dispensar requisito. A decisão de dispensa deve registrar autor autorizado, data/hora, justificativa e referência à avaliação/requisito.
 
-## 4. Execução técnica da visita e GPS
+## 4. Ciclo operacional da visita, execução técnica e GPS
 
-### 4.1 Separação entre tarefa e execução
+### 4.1 Princípio: uma única máquina de estados
 
-A tarefa não possui estado nem sessão de execução. O trabalho temporal do técnico será representado por sessões vinculadas à visita. Enquanto a visita estiver em execução, o técnico registra as atividades realizadas por meio das tarefas e dos respectivos relatos.
+A visita é a única entidade que controla o ciclo operacional do atendimento. Não haverá uma Máquina B, estados independentes de sessão (active, paused, closed) nem entidade de sessão de execução no MVP.
+
+A execução técnica acompanha o estado da visita:
+- pending: execução ainda não iniciada;
+- in_displacement: técnico em deslocamento;
+- in_progress: atendimento em execução;
+- paused: execução temporariamente pausada;
+- completed: execução encerrada normalmente;
+- interrupted: execução iniciada e encerrada excepcionalmente;
+- prevented: execução não iniciada por impedimento operacional;
+- canceled: agendamento cancelado antes do início da execução.
+
+Não existe estado de execução separado que possa divergir do estado da visita. Tarefas não possuem estado nem sessão de execução.
 
 ### 4.2 Exclusividade do técnico e transição entre visitas
 
 - Um técnico só pode executar uma visita por vez.
 - O backend deve impedir que o mesmo técnico inicie ou mantenha duas visitas simultaneamente em execução, inclusive diante de requisições concorrentes ou dispositivos diferentes.
-- Ao iniciar nova visita, a visita anterior deve ser finalizada mediante relato do técnico.
+- Uma visita em paused continua ocupando a disponibilidade operacional do técnico.
+- Antes de iniciar outra visita, a anterior precisa alcançar estado terminal e ter o relato exigido registrado.
 - A nova visita não pode iniciar enquanto a finalização anterior e o relato exigido não forem confirmados.
-- Uma reabertura também deve respeitar a exclusividade.
+- Uma reabertura, quando permitida pela regra vigente, também deve respeitar a exclusividade.
 
-### 4.3 Check-in automático
+### 4.3 Check-in e início da execução
 
-A funcionalidade de check-in automático por GPS poderá ser habilitada ou desabilitada pela empresa.
+O início manual pode ocorrer diretamente de pending para in_progress ou após deslocamento, de in_displacement para in_progress. O check-in manual não exige permanência mínima.
 
-Parâmetros anteriormente definidos:
-- Raio de chegada: **50 metros**, configurável.
-- Permanência mínima dentro do raio: **5 minutos**, configurável.
-- Pré-condição: a visita deve estar em deslocamento (in_displacement).
+O check-in automático por GPS é funcionalidade futura, fora do MVP. Quando implementado, poderá ser habilitado/desabilitado pela empresa e terá como parâmetros iniciais configuráveis:
+- raio de chegada: 50 metros;
+- permanência mínima: 5 minutos;
+- pré-condição: visita em in_displacement.
 
-Confirmado: o primeiro check-in automático exige permanência de 5 minutos dentro do raio configurável de 50 metros. Essa regra é distinta da retomada automática da execução pausada.
+O evento automático deverá preservar horário, coordenadas, precisão GPS, parâmetros aplicados e identificação do processo. Eventos repetidos não poderão gerar transições duplicadas.
 
-Quando as condições de check-in forem satisfeitas, registrar a chegada/início da execução da visita. Não iniciar uma tarefa individual: as tarefas são atividades registradas dentro da visita.
+### 4.4 Pausa e retomada por GPS
 
-O evento automático deve preservar horário, coordenadas, precisão GPS, parâmetros aplicados e identificação do processo que o produziu. Eventos repetidos de localização não podem gerar check-ins duplicados.
+As regras funcionais de pausa e retomada automática permanecem:
+- o ponto de referência é o endereço/coordenada da visita, não a coordenada de início de uma tarefa;
+- afastamento de 200 metros ou mais pausa a visita (in_progress → paused); o limiar é configurável;
+- retorno a 50 metros ou menos pode retomar a visita (paused → in_progress); o limiar é configurável;
+- a pausa e a retomada geram eventos próprios, preservando horário, coordenadas, precisão e distância quando confiável;
+- a retomada exige que a visita continue operacional e respeita a exclusividade do técnico;
+- visita terminal não pode ser reativada por mera chegada GPS.
+
+Os limiares assimétricos formam uma faixa de histerese. Posição obsoleta não provoca transição automática.
+
+### 4.5 Jornada de trabalho
+
+O fim da jornada não encerra automaticamente a visita nem a execução técnica. Uma visita em in_progress ou paused poderá permanecer nesse estado depois do horário previsto de encerramento da jornada, até que o técnico a finalize normalmente ou excepcionalmente.
+
+Ao tentar iniciar uma visita ou fazer check-in fora da jornada, o aplicativo deverá solicitar confirmação explícita ao técnico antes de permitir a operação.
+
+Não haverá fechamento automático de sessão pausada ou ativa no fim da jornada, pois não existe entidade sessão independente e a jornada não é gatilho de encerramento da visita.
+
+### 4.6 Checkout e registro temporal
+
+O técnico poderá encerrar manualmente a visita, registrando horário e coordenadas GPS do checkout, quando disponíveis. O sistema não deve finalizar automaticamente uma execução ativa por perda de sinal/GPS.
+
+O tempo de execução será reconstruído a partir da sequência de eventos da visita:
+- início (in_progress);
+- pausas (paused);
+- retomadas (in_progress);
+- encerramento terminal (completed ou interrupted).
+
+Os intervalos e durações serão projeções calculadas; não exigem sessão ou estado temporal independente. Eventos devem distinguir o instante efetivo do acontecimento (occurred_at) e o instante de registro no backend (recorded_at).
+
+### 4.7 Impedimento, cancelamento e interrupção
+
+- prevented representa impedimento operacional externo que impediu o início da execução; exige motivo estruturado, relato do técnico, data/hora, autoria e evento histórico.
+- canceled representa cancelamento do agendamento antes do início da execução.
+- interrupted representa encerramento excepcional de visita cuja execução já começou. Pode ocorrer com requisitos obrigatórios pendentes, que permanecem sujeitos a revisão.
+- in_displacement pode retornar a pending quando o deslocamento for cancelado sem cancelar o agendamento.
+- Estados terminais não possuem transições de saída. Continuidade exige nova visita, que poderá permanecer vinculada à mesma OS.
+
+### 4.8 Revogação de autenticação
+
+Quando a autenticação do técnico for revogada:
+- em pending, a visita permanece pending;
+- em in_displacement, retorna para pending;
+- em in_progress, transiciona para interrupted;
+- em paused, transiciona para interrupted;
+- em estado terminal, permanece inalterada.
+
+A revogação deve gerar evento histórico com visita, técnico, instante, origem/motivo e estados anterior/posterior. Não apaga dados nem histórico. Ainda não está definido se logout voluntário, expiração de token e revogação administrativa terão tratamento idêntico; não presumir equivalência.
+
+### 4.9 GPS e perda de sinal
 
 A leitura GPS será aceita inicialmente quando o raio de incerteza reportado pelo dispositivo for de até 50 metros; esse limite é configurável. Valores menores representam leituras mais precisas. Em perda de sinal, o sistema conserva como referência a posição mais recente recebida, registrando sua data/hora e idade. Uma posição antiga não será tratada como nova leitura nem, isoladamente, provocará pausa ou retomada automática.
-
-### 4.4 Pausa automática por afastamento
-
-- O ponto de referência é o endereço/coordenada da visita, não a coordenada de início de uma tarefa.
-- Ao atingir ou ultrapassar **200 metros** do endereço da visita, a execução da visita será pausada automaticamente.
-- O limiar de 200 metros é configurável.
-- A pausa deve guardar horário, coordenadas, precisão GPS e distância calculada.
-- O afastamento não significa que o serviço foi concluído nem finaliza a visita por si só.
-
-### 4.5 Retomada automática
-
-- Quando o técnico retornar para uma distância de **50 metros ou menos** do endereço da visita, a execução pausada poderá ser retomada automaticamente.
-- O limiar de 50 metros é configurável.
-- A retomada deve gerar evento próprio e preservar a pausa anterior.
-- A retomada exige que a visita ainda esteja operacional e deve respeitar a exclusividade de uma visita por técnico.
-- Visita finalizada não pode ser reativada silenciosamente por mera chegada GPS.
-
-Os limiares assimétricos de 200 m para pausa e 50 m para retomada estabelecem uma faixa de histerese para reduzir oscilações repetidas próximas a um único limite.
-
-### 4.6 Finalização por deslocamento ou jornada
-
-A execução da visita atual será finalizada quando ocorrer qualquer um destes eventos:
-- início de um novo deslocamento;
-- término da jornada de trabalho do técnico responsável.
-
-Tarefas não são iniciadas individualmente. Não existe evento de início de tarefa nem transição de visita motivada apenas pela inclusão/registro de outra tarefa. Todas as tarefas vinculadas permanecem no contexto da visita e são avaliadas em conjunto quando a visita é encerrada.
-
-Quando a visita for encerrada por deslocamento ou interrupção, o técnico deverá registrar texto com suas próprias palavras, a mudança de status da visita e o motivo do abandono/interrupção. O código/valor exato do novo status e a taxonomia de motivos ainda serão especificados. O relato deve ser preservado como evento histórico, sem substituição posterior.
-
-O fim da jornada é gatilho para finalizar a visita. O procedimento exato para encerrar uma sessão que ainda esteja ativa nesse instante permanece pendente de definição; não presumir encerramento automático silencioso da sessão.
-
-### 4.7 Checkout manual e limite da jornada
-
-- O técnico poderá finalizar manualmente a execução da visita, registrando horário e coordenadas GPS do checkout.
-- O sistema não deve finalizar automaticamente uma execução que ainda esteja ativa.
-- O fim da jornada é gatilho para finalizar a visita. Se a execução estiver pausada, poderá ser fechada automaticamente usando o instante e as coordenadas da pausa, registrando separadamente o instante do processamento.
-- Se a execução ainda estiver ativa no fim da jornada, o procedimento para encerrar a sessão permanece pendente; não assumir encerramento automático sem definir como registrar o evento e o relato do técnico.
-- Não fabricar coordenadas no momento posterior do processamento.
 
 ## 5. Reabertura e edição de visitas finalizadas
 
@@ -305,11 +329,49 @@ O vínculo é opcional e exclusivo: um orçamento não poderá estar simultaneam
 
 A migração do schema atual deverá tratar registros que hoje tenham simultaneamente vínculo de OS e visita, sem escolher automaticamente qual deles deve prevalecer.
 
-## 8. Máquina de estados e histórico
+## 8. Máquina de estados da visita e histórico
 
-A máquina de estados reutilizável definida para o projeto pertence ao módulo Chat. Ela não deve ser confundida com o ciclo operacional das visitas nem usada como substituta dos eventos de execução da visita.
+A visita possui a única máquina de estados do ciclo operacional de atendimento. Ela é distinta de qualquer máquina reutilizável do módulo Chat.
 
-A diretriz append-only está aprovada pela ADR-0016. Como proposta de implementação, o histórico imutável poderá usar eventos append-only e snapshots/revisões versionadas. Correções devem gerar novos registros de correção/revisão, sem sobrescrever o conteúdo histórico original. Retenção, integridade, proteção contra alteração e granularidade dos snapshots ainda precisam de desenho técnico.
+### 8.1 Estados
+
+| Estado | Significado |
+|---|---|
+| pending | Visita agendada; deslocamento ainda não iniciado |
+| in_displacement | Técnico iniciou o deslocamento |
+| in_progress | Atendimento técnico iniciado |
+| paused | Atendimento temporariamente suspenso |
+| completed | Conclusão normal |
+| interrupted | Atendimento iniciado e encerrado antes da conclusão normal |
+| prevented | Técnico impedido de iniciar por impedimento operacional externo |
+| canceled | Agendamento cancelado antes do início da execução |
+
+### 8.2 Transições permitidas
+
+| Origem | Destinos permitidos |
+|---|---|
+| pending | in_displacement, in_progress, prevented, canceled |
+| in_displacement | pending, in_progress, prevented, canceled |
+| in_progress | paused, completed, interrupted |
+| paused | in_progress, interrupted |
+
+completed, interrupted, prevented e canceled são terminais e não possuem transições de saída.
+
+### 8.3 Regras de transição
+
+- O início pode ocorrer diretamente de pending para in_progress, sem deslocamento.
+- in_displacement → pending cancela somente o deslocamento, não o agendamento.
+- prevented só se aplica antes do início do atendimento e exige motivo/relato.
+- interrupted só se aplica depois do início do atendimento e exige motivo/relato; não equivale a conclusão normal.
+- Estados terminais não são reabertos. A continuidade exige nova visita.
+- Revogação de autenticação: in_displacement → pending; in_progress ou paused → interrupted; pending permanece; estados terminais permanecem inalterados.
+- A jornada não finaliza automaticamente a visita. A tentativa de início/check-in fora da jornada exige confirmação do técnico no aplicativo.
+
+### 8.4 Eventos e imutabilidade
+
+A sequência operacional será registrada em eventos append-only da visita, sem Máquina B e sem entidade de sessão no MVP. O evento deverá preservar, conforme aplicável, visita/empresa, tipo, estado anterior/posterior, instante efetivo, instante de registro, ator, origem, motivo, coordenadas, precisão e metadados.
+
+A diretriz append-only está aprovada pela ADR-0016. Correções devem gerar novos eventos/revisões, sem sobrescrever o conteúdo histórico original. A estrutura física, retenção, integridade, proteção contra alteração e granularidade dos snapshots ainda precisam de desenho técnico.
 
 ## 9. Histórico de posições GPS
 
@@ -450,18 +512,17 @@ A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de con
 
 1. Definir campos, relatos e evidências obrigatórios para cada tipo de tarefa.
 2. Definir o esquema de tarefa e a distinção persistente entre equipamento não identificado e tarefa sem equipamento.
-3. Definir cardinalidade das sessões de execução da visita e como tratar sessão ativa durante transição/fim da jornada; tarefas não possuem sessões.
-4. Definir raio, precisão mínima e tempo de confirmação para pausa automática.
-5. Definir condições de permanência para retomada automática.
-6. Definir horário de corte da jornada e fuso horário por empresa.
-7. Tratar sessão ativa no fim da jornada; tarefas não são iniciadas individualmente e não constituem gatilho de finalização da visita.
-8. Definir o critério de relato adequado exigido após finalização automática.
-9. Definir se e como a reabertura GPS poderá ser tentada quando o técnico já tiver outra visita ativa.
-10. Definir estrutura de auditoria, versionamento e snapshots históricos.
-11. Definir relação entre tarefas, orçamentos, documentos, fotos e demais evidências.
-12. Definir estados e transições da visita, sem reutilizar status de visita como status da tarefa.
-13. Definir como a seleção da OS existente ou criação de nova OS será apresentada no fluxo do técnico.
-14. Definir tratamento de falha/indisponibilidade do GPS e ações manuais excepcionais, sem permitir fraude ou perda de rastreabilidade.
+3. Definir frequência de amostragem, idade máxima operacional, retenção e controles de acesso ao histórico GPS.
+4. Definir critérios de localização simulada/antifraude e tratamento de leituras inconsistentes.
+5. Definir horário de jornada, fuso por empresa, dias úteis e exceções para confirmação de início fora da jornada; o fim da jornada não encerra a visita.
+6. Definir taxonomia detalhada de motivos para prevented, interrupted e cancelamentos, além do tratamento quando o técnico não consegue registrar relato imediatamente.
+7. Definir se logout voluntário, expiração de token e revogação administrativa terão o mesmo tratamento da revogação de autenticação.
+8. Definir estrutura física de visit_events, índices, idempotência, ordenação, transação com a mudança de estado e projeções de duração.
+9. Definir estrutura de auditoria geral, versionamento e snapshots históricos.
+10. Definir relação entre tarefas, orçamentos, documentos, fotos e demais evidências.
+11. Definir como a seleção da OS existente ou criação de nova OS será apresentada no fluxo do técnico.
+12. Definir tratamento de falha/indisponibilidade do GPS e ações manuais excepcionais, sem permitir fraude ou perda de rastreabilidade.
+13. Definir os parâmetros técnicos das automações GPS antes de sua implementação. O check-in automático inicial permanece fora do MVP.
 
 ## 14. Segurança e limites desta análise
 
@@ -475,6 +536,7 @@ A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de con
 
 ## Histórico de alterações
 
+- 2026-11-08 — v0.6.0: aprovação da visita como única máquina de estados operacional; remoção da Máquina B e das sessões independentes no MVP; consolidação dos oito estados, transições, revogação de autenticação, regra de jornada sem encerramento automático e histórico append-only unificado de eventos da visita.
 - 2026-11-08 — v0.5.0: consolidação de requisitos obrigatórios/opcionais e pendências, avaliações históricas por tentativa, evidências com upload assíncrono/idempotente, coordenadas e timestamps, encerramento excepcional com requisitos obrigatórios pendentes e fluxo de aceite digital versionado com resumo, anexos e assinatura remota/presencial/offline.
 - 2026-11-08 — v0.4.0: confirmação do check-in inicial de 5 minutos/50 m, precisão GPS configurável até 50 m, histórico de posições, gatilhos de finalização por nova tarefa/deslocamento/fim de jornada, relato de transição e aprovação do histórico append-only; incluída proposta de repositório de catálogos globais versionados.
 - 2026-11-08 — v0.3.0: inclusão do vínculo opcional e exclusivo de orçamento e separação entre máquina de estados do módulo Chat e ciclo operacional da visita.
