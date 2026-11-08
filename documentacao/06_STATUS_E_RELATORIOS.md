@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 1.2.0  
+**Versão:** 1.3.0  
 **Data-base:** 2026-11-08
 
 ## 1. Resumo executivo
@@ -20,7 +20,7 @@ A documentação passou a incluir um protocolo de fonte da verdade e um procedim
 | Supabase | Auditoria técnica somente leitura realizada em 2026-11-07; relatório versionado | Priorizar revisão de RLS, grants, função de ingestão, integridade multiempresa e trigger de visitas |
 | Permissões | Catálogo global versionado e personalizações por empresa definidos | Auditar implementação e políticas |
 | Isa | Limites de autonomia definidos | Testar autorização no backend/API |
-| Operação | Baseline funcional 0.1.0 e modelo lógico proposto 0.1.0; matriz de conformidade inicial concluída; implementação parcial no Supabase | Validar pendências do modelo lógico, tenancy e requisitos de sessão/GPS antes de aprovar modelo físico |
+| Operação | Modelos funcional v0.5.0 e lógico v0.4.0; requisitos de pendências, avaliações históricas, evidências e aceite digital consolidados; implementação parcial no Supabase ainda não reavaliada | Fechar parâmetros de upload/identificação/aceite, validar modelo lógico, tenancy e requisitos de jornada antes de aprovar modelo físico |
 | Atendimento | Chatwoot transitório | Mapear dependências e plano de substituição |
 | WeWeb | Direção aprovada | Definir ambiente, autenticação e contratos de API |
 | FlutterFlow | Direção aprovada | Especificar sync offline-first e GPS background |
@@ -130,7 +130,34 @@ Definições incorporadas: check-in inicial de 5 minutos/50 m; precisão GPS ini
 
 Modelo funcional v0.4.0 e modelo lógico v0.3.0. Nenhuma alteração foi realizada no Supabase.
 
-## 10. Modelo para relatórios futuros
+
+
+## 10. Atualização operacional — requisitos, evidências e aceite digital (2026-11-08)
+
+Foram consolidadas as seguintes definições funcionais:
+- Tarefas permanecem como registros vinculados à visita, sem início/status de execução/conclusão individual.
+- Indicadores derivados de requisitos obrigatórios e opcionais pendentes na visita e em cada tarefa.
+- Cada tentativa de finalização normal gera avaliação histórica completa dos requisitos, inclusive quando bloqueada.
+- Requisitos obrigatórios não cumpridos bloqueiam conclusão normal; requisitos opcionais pendentes permitem conclusão e seguem para revisão.
+- Encerramento excepcional por interrupção/abandono pode ocorrer com requisitos obrigatórios pendentes, sem equivaler à conclusão normal.
+- Gestor/atendente autorizado pode aceitar ausência de requisito opcional mediante justificativa; técnico pode cumprir ou solicitar revisão.
+- Evidências de foto/documento/assinatura com captura, revisão, upload em segundo plano, timeout/retries e confirmação pelo backend; idempotência obrigatória.
+- Metadados de evidência incluem `created_at` (`timestamptz`) e latitude/longitude da captura quando disponíveis e autorizadas.
+- Aceite digital com link para dispositivo pessoal como padrão, assinatura presencial no dispositivo do técnico como alternativa, coleta offline protegida e sincronização posterior.
+- Resumo versionado: identificação do atendimento, cliente, equipamento, técnico, solicitação original, relatos, fotos incorporadas, valores discriminados e documentos como anexos. Alterações relevantes exigem novo aceite.
+
+**Estado:** modelos funcional v0.5.0 e lógico v0.4.0 publicados como especificações em evolução. O modelo lógico continua proposta técnica, não modelo físico aprovado. Nenhuma alteração foi feita no Supabase.
+
+### Pendências
+- Timeout, retries, backoff, limites e retenção de uploads.
+- Método inicial de identificação do signatário e ciclo de vida dos links.
+- Matriz de autorização para dispensa justificada de requisito obrigatório em encerramento excepcional.
+- Classificação detalhada de alterações relevantes para novo aceite.
+- Armazenamento local protegido e limpeza após sincronização.
+- Jornada, sessão ativa no fim da jornada e estados/motivos de visita.
+
+
+## 11. Modelo para relatórios futuros
 
 Cada relatório deverá conter:
 - Período e data.
@@ -146,7 +173,7 @@ Cada relatório deverá conter:
 - Documentos oficiais atualizados.
 - Commits, PRs e evidências.
 
-## 11. Status por módulo
+## 12. Status por módulo
 
 Usar apenas estes estados:
 - NOT_STARTED
@@ -162,6 +189,7 @@ Não marcar DONE sem critérios de aceite e evidências.
 
 ## Histórico de alterações
 
+- 2026-11-08 — v1.3.0: registra requisitos/pendências, avaliações por tentativa, evidências e uploads idempotentes, coleta de assinatura e aceite digital versionado.
 - 2026-11-08 — v1.2.0: registra GPS/histórico de posições, transições de visita, aprovação do histórico append-only (ADR-0016) e proposta de catálogos globais versionados.
 - 2026-11-08 — v1.1.0: registra a revisão do modelo lógico v0.2.0 e as definições funcionais de execução por visita, GPS, catálogo global editável por empresa e vínculo de orçamento.
 - 2026-11-08 — v1.0.0: registra o modelo lógico proposto e a matriz de conformidade da Operação.\n- 2026-11-08 — v0.9.0: registra o modelo funcional operacional do MVP e o confronto somente leitura com o schema Supabase atual.
