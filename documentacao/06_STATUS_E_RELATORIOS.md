@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 0.7.0  
+**Versão:** 0.8.0  
 **Data-base:** 2026-11-07
 
 ## 1. Resumo executivo
@@ -25,7 +25,7 @@ A documentação passou a incluir um protocolo de fonte da verdade e um procedim
 | WeWeb | Direção aprovada | Definir ambiente, autenticação e contratos de API |
 | FlutterFlow | Direção aprovada | Especificar sync offline-first e GPS background |
 | Jurídico | Módulo amplo aprovado; primeira funcionalidade documental | Elaborar arquitetura funcional e requisitos |
-| Módulos do ERP | Regra geral de ativação em dois níveis e drenagem de execuções já aceitas definidas na proposta documental v0.1.5; primeiro usuário humano como superadmin; agentes de IA proibidos de ocupar superadmin | Especificar enforcement transversal da admissão, drenagem das filas existentes e recuperação do superadmin |
+| Módulos do ERP | Regra geral de ativação em dois níveis e drenagem de execuções já aceitas e tratamento de falhas durante a drenagem definidos na proposta v0.1.6; primeiro usuário humano como superadmin; agentes de IA proibidos de ocupar superadmin | Especificar enforcement transversal da admissão, drenagem das filas existentes e recuperação do superadmin |
 | ADRs | Índice e fichas individuais em consolidação documental | Verificar integridade de todas as fichas e referências |
 | Continuidade | Protocolo universal e modelo de transferência registrados | Aplicar ao final de cada sessão relevante |
 
@@ -103,6 +103,7 @@ Não marcar DONE sem critérios de aceite e evidências.
 
 ## Histórico de alterações
 
+- 2026-11-07 — v0.8.0: registra retries limitados para falhas temporárias, estados terminais para falhas permanentes/timeouts e conclusão da drenagem por estados terminais.
 - 2026-11-07 — v0.7.0: registra desativação com drenagem das execuções já aceitas e bloqueio de novas entradas até reativação nos dois níveis.
 - 2026-11-07 — v0.6.0: generaliza o controle de ativação em dois níveis para todos os módulos; registra primeiro usuário humano como superadmin e proíbe agentes de IA como superadmin.
 - 2026-11-07 — v0.5.0: registra responsáveis pelos controles do Módulo de IA, mínimo de um superadmin por empresa e bloqueio de execuções quando o módulo não estiver ativo.
