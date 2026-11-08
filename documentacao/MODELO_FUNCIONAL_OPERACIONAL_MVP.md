@@ -1,9 +1,9 @@
 # Modelo funcional operacional do MVP — ERP Winservice
 
-**Versão:** 0.4.0  
+**Versão:** 0.5.0  
 **Data da consolidação:** 2026-11-08  
 **Estado:** baseline funcional em consolidação  
-**Escopo:** clientes, equipamentos, ordens de serviço, visitas, tarefas, relatos, execução técnica por GPS, orçamentos e aprovações.
+**Escopo:** clientes, equipamentos, ordens de serviço, visitas, tarefas, relatos, requisitos operacionais, evidências e uploads, aceite digital, execução técnica por GPS, orçamentos e aprovações.
 
 > Este documento consolida requisitos funcionais confirmados pelo responsável do projeto durante a modelagem. Não é uma ADR, não substitui decisões arquiteturais formais e não declara que os requisitos estejam implementados. A avaliação do Supabase é uma fotografia do schema consultado em 2026-11-08; qualquer mudança posterior exige nova inspeção.
 
@@ -30,7 +30,11 @@ A visão conceitual é:
 
 `Visita → Relatos da visita`
 
-`Tarefa → Relatos da tarefa, evidências e registros relacionados`
+`Tarefa → Relatos da tarefa, requisitos, evidências e registros relacionados`
+
+`Visita/Tarefa → Requisitos aplicáveis → Avaliações → Pendências e tratamentos`
+
+`Evidências → Uploads → Resumos versionados e aceites digitais`
 
 `Visita → Sessões de execução (zero ou mais)`
 
@@ -81,18 +85,99 @@ São três situações funcionais distintas:
 
 A estrutura física que representará essas três situações ainda precisa ser definida. Não criar equipamentos fictícios apenas para satisfazer uma referência obrigatória.
 
-## 3. Relatos, evidências e obrigatoriedades
+## 3. Relatos, requisitos, pendências e evidências
+
+### 3.1 Relatos
 
 - A visita pode possuir um relato geral.
 - Cada tarefa pode possuir um ou mais relatos próprios.
-- Cada tipo de tarefa poderá exigir relatos, campos, fotos, documentos ou outras evidências específicas.
-- As regras de obrigatoriedade serão configuráveis por tipo de tarefa.
-- Para encerrar uma visita, deve existir pelo menos um relato válido no nível da visita ou de alguma tarefa daquela visita.
-- Relatos devem manter autoria e horário de registro.
-- Se um relato for corrigido, o conteúdo anterior deverá continuar visível no histórico.
-- Fotos, documentos e demais evidências devem manter vínculo inequívoco com a visita ou tarefa correspondente e preservar sua autoria e temporalidade.
+- Toda visita precisa ter pelo menos um relato geral ou de uma tarefa antes de ser encerrada.
+- O relato deve preservar autoria e horário de registro.
+- Correções geram novos registros/revisões; o conteúdo anterior permanece consultável.
+- O relato da solicitação original do cliente deve permanecer distinto do relato técnico, para não confundir o pedido com a conclusão profissional.
 
-A definição de campos obrigatórios por tipo, estrutura de formulários e critérios para considerar um relato válido ainda requer detalhamento.
+### 3.2 Requisitos da visita e das tarefas
+
+- Os requisitos da visita são definidos por `visit_requirements` e pelo tipo de visita aplicável.
+- Os requisitos de cada tarefa são definidos por `task_type_requirements`.
+- Cada requisito deve indicar se é obrigatório ou opcional.
+- Os requisitos aplicáveis devem ser versionados ou congelados em snapshot quando vinculados à visita/tarefa. Alterações futuras em catálogos não podem modificar retroativamente os requisitos de atendimentos anteriores.
+- A tarefa não possui status de execução ou conclusão. O resultado da atividade é documentado pelos relatos, evidências e avaliação dos requisitos no contexto da visita.
+- As tarefas vinculadas à visita permanecem como registros históricos daquela visita; não são transferidas nem recebem ciclo individual de início/conclusão.
+
+### 3.3 Avaliação dos requisitos e indicadores de pendência
+
+Toda tentativa de finalização normal da visita deve gerar uma avaliação histórica completa, mesmo quando a conclusão for bloqueada. A avaliação inclui os requisitos da visita e de todas as tarefas vinculadas, com snapshot da definição aplicável e resultado individual.
+
+Resultados conceituais por requisito:
+- `fulfilled`: requisito cumprido com os dados/evidência exigidos;
+- `not_fulfilled`: requisito não cumprido;
+- `not_applicable`: requisito não aplicável, somente quando a definição permitir e a justificativa/regra correspondente for preservada.
+
+Regras:
+- Requisito obrigatório não cumprido bloqueia a conclusão normal.
+- Requisito opcional não cumprido não bloqueia a conclusão normal; gera pendência para revisão.
+- A visita poderá ser concluída normalmente quando todos os requisitos obrigatórios estiverem cumpridos, mesmo que existam requisitos opcionais pendentes.
+- A visita também poderá ser encerrada excepcionalmente por interrupção/abandono com requisitos obrigatórios pendentes. Esse encerramento não equivale a conclusão normal; os requisitos permanecem pendentes e sujeitos à análise do gestor/atendente autorizado e a eventual reavaliação.
+- Uma dispensa justificada não altera o resultado original: o requisito continua historicamente não cumprido, embora seu tratamento possa ser encerrado por decisão autorizada.
+- Gestor e atendente autorizado podem aceitar a ausência de requisito opcional mediante justificativa. O técnico pode cumprir o requisito ou solicitar revisão, mas não dispensá-lo.
+- Para requisitos obrigatórios pendentes em encerramento excepcional, a justificativa e a revisão do gestor devem ser registradas. A dispensa, quando autorizada, não deve ser confundida com cumprimento.
+- Cada nova tentativa de finalização gera uma nova avaliação; avaliações anteriores nunca são sobrescritas.
+- As avaliações e decisões devem respeitar o histórico append-only aprovado na ADR-0016.
+
+Indicadores derivados, não editáveis manualmente:
+- `has_pending_mandatory_requirements`;
+- `has_pending_optional_requirements`.
+
+Os dois indicadores devem existir conceitualmente no contexto da visita e de cada tarefa. São projeções do conjunto de avaliações e tratamentos, não fonte primária da verdade. A apresentação deve distinguir pendências abertas, cumpridas posteriormente e dispensadas com justificativa.
+
+### 3.4 Evidências e uploads
+
+Evidências podem ser exigidas no nível da visita ou da tarefa. Tipos previstos incluem fotografia, documento e assinatura/aceite digital.
+
+**Fotografias**
+1. O técnico aciona a captura pela câmera.
+2. Visualiza a imagem e confirma sua legibilidade.
+3. Confirma o envio.
+4. O upload pode continuar em segundo plano.
+5. A evidência só satisfaz o requisito após confirmação do backend de que o arquivo foi recebido, armazenado e validado.
+
+**Documentos**
+- O técnico pode fotografar o documento ou selecionar um arquivo do dispositivo.
+- Deve poder conferir o conteúdo antes de confirmar o envio.
+- O requisito só é satisfeito após confirmação do armazenamento pelo backend.
+
+**Upload**
+- O envio deve ter identidade idempotente, estado, tentativas, horários, erros e confirmação de armazenamento.
+- São necessários timeout e retries limitados, com política de backoff a definir.
+- Uma repetição não pode criar evidências duplicadas nem satisfazer indevidamente um requisito.
+- Upload obrigatório pendente, em andamento, com falha ou timeout impede a conclusão normal da visita.
+- Upload opcional não confirmado gera pendência opcional e não bloqueia a conclusão normal.
+- Em modo offline, o arquivo deve permanecer em armazenamento local protegido até sincronização confirmada; a evidência ainda não pode ser considerada confirmada pelo backend.
+- O comportamento após esgotar retries deve permitir manter a visita em andamento ou encerrá-la excepcionalmente por interrupção, sem autorizar conclusão normal com evidência obrigatória não confirmada.
+
+Metadados conceituais de cada evidência:
+- identificador e empresa;
+- vínculo com visita ou tarefa e com o requisito que pretende satisfazer;
+- tipo, nome, tipo MIME, tamanho e referência de armazenamento;
+- `created_at` (`timestamptz`) como instante de criação/registro da evidência;
+- `captured_at` quando houver instante de captura no dispositivo;
+- `received_at`/confirmação de upload no backend;
+- latitude e longitude do local de captura, quando disponíveis e autorizadas;
+- precisão da localização, quando disponível;
+- autor, dispositivo/origem, checksum/hash e estado de validação.
+
+As coordenadas representam o local da captura/coleta, não o local posterior de sincronização. Horário de captura, criação local, recebimento e confirmação no servidor devem ser distinguíveis. Para aceite remoto, a localização só será coletada quando disponível e autorizada.
+
+### 3.5 Tratamento das pendências
+
+O tratamento da pendência é distinto do resultado original da avaliação:
+- `pending_review`: aguardando análise;
+- `assigned_to_technician`: devolvida ao técnico para providências;
+- `fulfilled`: requisito posteriormente cumprido com evidência/registro válido;
+- `accepted_with_justification`: ausência aceita por gestor/atendente autorizado, com justificativa.
+
+O conjunto de estados é conceitual e poderá ser refinado, mas não deve apagar o resultado original da avaliação. O técnico pode cumprir ou solicitar revisão; não pode dispensar requisito. A decisão de dispensa deve registrar autor autorizado, data/hora, justificativa e referência à avaliação/requisito.
 
 ## 4. Execução técnica da visita e GPS
 
@@ -146,11 +231,12 @@ Os limiares assimétricos de 200 m para pausa e 50 m para retomada estabelecem u
 ### 4.6 Finalização por nova atividade, deslocamento ou jornada
 
 A execução da visita atual será finalizada quando ocorrer qualquer um destes eventos:
-- início de outra tarefa que provoque a transição para fora da visita atual;
 - início de um novo deslocamento;
 - término da jornada de trabalho do técnico responsável.
 
-Quando a finalização ocorrer por transição para outra tarefa ou deslocamento, o técnico deverá registrar texto com suas próprias palavras, a mudança de status da visita e o motivo do abandono/interrupção. O código/valor exato do novo status e a taxonomia de motivos ainda serão especificados. O relato deve ser preservado como evento histórico, sem substituição posterior.
+Tarefas não são iniciadas individualmente. Não existe evento de início de tarefa nem transição de visita motivada apenas pela inclusão/registro de outra tarefa. Todas as tarefas vinculadas permanecem no contexto da visita e são avaliadas em conjunto quando a visita é encerrada.
+
+Quando a visita for encerrada por deslocamento ou interrupção, o técnico deverá registrar texto com suas próprias palavras, a mudança de status da visita e o motivo do abandono/interrupção. O código/valor exato do novo status e a taxonomia de motivos ainda serão especificados. O relato deve ser preservado como evento histórico, sem substituição posterior.
 
 O fim da jornada é gatilho para finalizar a visita. O procedimento exato para encerrar uma sessão que ainda esteja ativa nesse instante permanece pendente de definição; não presumir encerramento automático silencioso da sessão.
 
@@ -244,13 +330,77 @@ Estrutura conceitual sugerida:
 
 A empresa não altera registros globais. Aderir a uma nova versão global deve ser ação explícita e controlada, apresentar diferenças e preservar customizações locais. A estrutura exata e a política de merge permanecem como proposta técnica, ainda não aprovada como ADR.
 
-## 11. Confronto com o schema Supabase consultado em 2026-11-08
+## 11. Aceite digital e resumo da visita
+
+### 11.1 Finalidade e modalidades
+
+O aceite digital registra a manifestação do cliente sobre uma versão específica do resumo da visita e seus anexos. A assinatura não deve ser tratada como simples imagem isolada: precisa estar vinculada ao conteúdo efetivamente apresentado, à identificação do signatário e aos eventos de apresentação e decisão.
+
+Modalidades aprovadas:
+1. **Padrão — dispositivo pessoal do cliente:** envio de link individual por canal disponível (por exemplo, WhatsApp ou e-mail); o cliente abre o link no próprio celular, consulta o conteúdo e assina.
+2. **Alternativa presencial — dispositivo do técnico:** utilizada quando o fluxo padrão não for viável. O técnico entrega o dispositivo ao cliente, que deve visualizar o mesmo conteúdo e realizar pessoalmente a assinatura. O técnico não pode assinar em nome do cliente.
+3. **Presencial offline:** quando não houver conectividade, o aplicativo pode coletar a assinatura no dispositivo do técnico, desde que o resumo tenha sido preparado e armazenado localmente. A coleta fica protegida e aguardando sincronização; o aceite só é confirmado pelo backend após sincronização e validação.
+
+A modalidade deve ser registrada. Nenhuma modalidade será considerada juridicamente superior apenas pelo dispositivo utilizado; a confiabilidade depende do conjunto de evidências e controles.
+
+### 11.2 Identificação do signatário
+
+- O signatário deve ser identificado antes da assinatura.
+- A identificação deve ser proporcional à finalidade e evitar coleta indiscriminada de CPF.
+- Data de nascimento foi considerada como alternativa de menor exposição em relação ao CPF, mas o método inicial e os critérios de validação ainda precisam ser especificados.
+- CPF poderá ser utilizado quando necessário, mas não deve ser exigido indiscriminadamente.
+- Não haverá coleta nem armazenamento da impressão digital do cliente.
+- A assinatura desenhada na tela é evidência gráfica da manifestação, não biometria de impressão digital.
+- Na coleta presencial, o cliente deve preencher/confirmar pessoalmente os dados de identificação e assinar; o técnico não deve preencher ou assinar em seu nome.
+
+### 11.3 Conteúdo do resumo apresentado
+
+O resumo principal deverá conter, inicialmente:
+- data e hora relacionadas à visita e ao atendimento;
+- identificação do cliente;
+- equipamento(s) envolvidos;
+- identificação do técnico responsável;
+- motivo da visita, refletindo a solicitação original do cliente;
+- relato geral do técnico e relatos das tarefas;
+- fotografias incorporadas diretamente no resumo;
+- valores monetários discriminados, relacionados à visita e às tarefas.
+
+Documentos não serão incorporados visualmente ao resumo principal: serão apresentados como anexos identificados. O cliente deve poder consultar o resumo e os anexos antes de assinar.
+
+A apresentação deverá distinguir a solicitação original do cliente dos relatos e conclusões do técnico. Os valores devem ser discriminados e relacionados à visita ou à tarefa correspondente, evitando apenas um total sem composição.
+
+### 11.4 Versionamento, integridade e novo aceite
+
+- Cada resumo apresentado deve gerar uma versão identificável e imutável, com hash do conteúdo e referências/versões dos anexos.
+- A assinatura fica vinculada à versão exata apresentada.
+- Alterações relevantes após a assinatura — por exemplo, serviços, valores ou relatos técnicos — exigem nova versão e novo aceite.
+- Alterações administrativas sem impacto no conteúdo aceito não exigem nova assinatura.
+- Versões anteriores, anexos, hashes, assinaturas e eventos de apresentação/aceite permanecem preservados conforme a ADR-0016.
+- O sistema deve registrar separadamente apresentação, ciência, aceite e consentimento, pois são eventos juridicamente distintos. Não presumir que todo aceite equivale a consentimento LGPD.
+
+### 11.5 Registro do aceite, cópia e sincronização
+
+Registrar, quando aplicável:
+- cliente e signatário;
+- visita e versão do resumo;
+- método de identificação;
+- modalidade remota/presencial e dispositivo/canal;
+- instante de emissão/apresentação e instante da assinatura;
+- evidência da assinatura e hash do conteúdo aceito;
+- técnico responsável pela coleta presencial;
+- latitude e longitude quando disponíveis e autorizadas;
+- estado de sincronização e validação do backend;
+- envio da cópia ao cliente e respectivo resultado.
+
+Uma cópia deve ser enviada ao cliente após confirmação do aceite; se a coleta ocorrer offline, o envio fica aguardando sincronização/conectividade. O backend confirma o aceite somente depois de validar a integridade e registrar a evidência sincronizada.
+
+## 12. Confronto com o schema Supabase consultado em 2026-11-08
 
 **Projeto:** Winservice — `voaovwphncwbrwtcqnsc`  
 **Schema:** `public`  
 **Método:** inspeção somente leitura de tabelas, colunas e foreign keys. Nenhuma alteração foi executada.
 
-### 7.1 Estruturas existentes relevantes
+### 12.1 Estruturas existentes relevantes
 
 | Tabela | Evidência observada | Avaliação frente ao modelo |
 |---|---|---|
@@ -269,13 +419,13 @@ A empresa não altera registros globais. Aderir a uma nova versão global deve s
 | `approval_events` | Eventos de aprovação com versão, hash, decisão, origem e autoria | Estrutura útil; referencia orçamento, OS e cliente, não tarefa |
 | `documents` | Metadados genéricos de arquivo e uploader | Não há vínculo direto com visita/tarefa observado na tabela |
 
-### 7.2 Estruturas não encontradas na listagem atual
+### 12.2 Estruturas não encontradas na listagem atual
 
 Não foram encontradas tabelas dedicadas com nomes `tasks`, `visit_tasks`, `task_reports`, `visit_reports`, `execution_sessions`, `visit_events` ou `audit_events`.
 
 Essa constatação significa apenas que não há tabelas com esses nomes na listagem consultada. Não exclui que algum comportamento esteja parcialmente representado por outra estrutura, JSON, serviço externo ou código não inspecionado.
 
-### 7.3 Lacunas e inconsistências relevantes
+### 12.3 Lacunas e inconsistências relevantes
 
 1. **Entidade tarefa:** existe `task_types`, mas não foi encontrada uma entidade de tarefa vinculada à visita. O catálogo de tipos não registra atividades individuais.
 2. **Requisitos por tipo de tarefa:** `task_types` possui somente nome e código além dos metadados; não foi observada estrutura de campos/obrigatoriedades por tipo.
@@ -290,13 +440,13 @@ Essa constatação significa apenas que não há tabelas com esses nomes na list
 11. **Integridade multiempresa:** a auditoria técnica de 07/11/2026 identificou ausência de garantias compostas em relações relevantes e policies RLS permissivas. O modelo operacional não deve ser implementado antes de alinhar autorização e integridade multiempresa.
 12. **Trigger de endereço:** a auditoria de 07/11/2026 identificou incompatibilidade entre a função `set_visit_address_snapshot` e as colunas existentes em `addresses`; requer correção e teste antes de depender do fluxo de criação de visitas.
 
-### 7.4 Conclusão técnica
+### 12.4 Conclusão técnica
 
 O Supabase possui uma fundação cadastral e relacionamentos iniciais para clientes, equipamentos, OS, visitas, tipos de tarefa, orçamentos e aprovações. Entretanto, o modelo consultado não demonstra a implementação do núcleo funcional agora definido para tarefas por visita, relatos, sessões de execução, múltiplos eventos GPS e histórico imutável de alterações.
 
 A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de conformidade detalhada antes de qualquer DDL ou migração. Não adicionar tabelas/colunas por inferência nem adaptar `work_order_equipment` para representar tarefas.
 
-## 12. Pendências de especificação
+## 13. Pendências de especificação
 
 1. Definir campos, relatos e evidências obrigatórios para cada tipo de tarefa.
 2. Definir o esquema de tarefa e a distinção persistente entre equipamento não identificado e tarefa sem equipamento.
@@ -313,7 +463,7 @@ A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de con
 13. Definir como a seleção da OS existente ou criação de nova OS será apresentada no fluxo do técnico.
 14. Definir tratamento de falha/indisponibilidade do GPS e ações manuais excepcionais, sem permitir fraude ou perda de rastreabilidade.
 
-## 13. Segurança e limites desta análise
+## 14. Segurança e limites desta análise
 
 - A inspeção do Supabase foi somente leitura.
 - Nenhuma tabela, coluna, policy, função, trigger, dado ou configuração foi alterada.
@@ -325,6 +475,7 @@ A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de con
 
 ## Histórico de alterações
 
+- 2026-11-08 — v0.5.0: consolidação de requisitos obrigatórios/opcionais e pendências, avaliações históricas por tentativa, evidências com upload assíncrono/idempotente, coordenadas e timestamps, encerramento excepcional com requisitos obrigatórios pendentes e fluxo de aceite digital versionado com resumo, anexos e assinatura remota/presencial/offline.
 - 2026-11-08 — v0.4.0: confirmação do check-in inicial de 5 minutos/50 m, precisão GPS configurável até 50 m, histórico de posições, gatilhos de finalização por nova tarefa/deslocamento/fim de jornada, relato de transição e aprovação do histórico append-only; incluída proposta de repositório de catálogos globais versionados.
 - 2026-11-08 — v0.3.0: inclusão do vínculo opcional e exclusivo de orçamento e separação entre máquina de estados do módulo Chat e ciclo operacional da visita.
 - 2026-11-08 — v0.2.0: atualização para execução/sessões no nível da visita, finalização da visita anterior mediante relato, limiares GPS de 200 m/50 m e catálogo global de tipos editável independentemente por empresa.
