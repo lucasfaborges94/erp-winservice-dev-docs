@@ -235,7 +235,7 @@ O fim da jornada não encerra automaticamente a visita nem a execução técnica
 
 Ao tentar iniciar uma visita ou fazer check-in fora da jornada, o aplicativo deverá solicitar confirmação explícita ao técnico antes de permitir a operação.
 
-Não haverá fechamento automático de sessão pausada ou ativa no fim da jornada, pois não existe entidade sessão independente e a jornada não é gatilho de encerramento da visita.
+Não haverá encerramento automático da visita no fim da jornada; a jornada não é gatilho de transição de estado.
 
 ### 4.6 Checkout e registro temporal
 
