@@ -533,7 +533,7 @@ Consolidar os requisitos funcionais confirmados para o núcleo operacional do MV
 - Equipamento associado à tarefa é opcional e distingue equipamento identificado, equipamento ainda não identificado e tarefa sem equipamento.
 - Visita pode ter relato geral e cada tarefa pode ter relatos próprios. Cada tipo de tarefa poderá definir campos, relatos e evidências obrigatórios. Uma visita exige pelo menos um relato para encerramento.
 - Um técnico só pode executar uma visita por vez.
-- Check-in automático configurável: visita em `in_displacement`, técnico dentro de 50 metros por 5 minutos (valores configuráveis); inicia a primeira tarefa sem sessão iniciada.
+- Check-in automático configurável: visita em `in_displacement`, técnico dentro de 50 metros por 5 minutos (valores configuráveis); inicia a execução da visita; tarefas são registradas dentro da visita e não possuem início individual.
 - Afastamento das coordenadas de check-in pausa a sessão; retorno permite retomada automática. Limiares e tolerâncias de saída/retomada ainda precisam ser especificados.
 - Sessão em execução não será finalizada automaticamente. Somente sessões pausadas poderão ser finalizadas pelo limite da jornada; o horário efetivo será o da pausa e as coordenadas serão as registradas na pausa. Checkout manual usa horário e coordenadas do próprio checkout.
 - Se a visita for finalizada automaticamente, o técnico deverá preencher posteriormente o relato pendente antes de prosseguir com a abertura do aplicativo ou iniciar outro deslocamento/visita.
@@ -679,7 +679,7 @@ A atualização é documental. Não houve geração ou execução de SQL, migrat
 - Precisão GPS inicial: aceitar amostras com incerteza reportada de até 50 metros, configurável. Valores menores indicam maior precisão.
 - Manter histórico de posições GPS dos técnicos em entidade própria.
 - Em perda de sinal, usar a posição mais recente recebida como última referência conhecida, mantendo sua idade; não simular atualização nem executar transição automática baseada em posição obsoleta.
-- Finalizar a visita quando outra tarefa que exija transição para fora da visita atual iniciar, quando iniciar novo deslocamento ou quando terminar a jornada do técnico responsável.
+- Finalizar a visita quando iniciar novo deslocamento ou quando terminar a jornada do técnico responsável. Tarefas não são iniciadas individualmente e não constituem gatilho de finalização.
 - Na transição por tarefa/deslocamento, exigir relato textual com as palavras do técnico, atualização do status e motivo de abandono/interrupção. Valores exatos de status e motivos permanecem pendentes.
 - Aprovação do histórico append-only, formalizada na ADR-0016. Correções devem gerar novos eventos/revisões sem sobrescrever ou excluir o registro original.
 
