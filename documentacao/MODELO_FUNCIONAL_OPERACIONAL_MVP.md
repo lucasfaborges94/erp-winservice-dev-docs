@@ -1,6 +1,6 @@
 # Modelo funcional operacional do MVP — ERP Winservice
 
-**Versão:** 0.1.0  
+**Versão:** 0.2.0  
 **Data da consolidação:** 2026-11-08  
 **Estado:** baseline funcional em consolidação  
 **Escopo:** clientes, equipamentos, ordens de serviço, visitas, tarefas, relatos, execução técnica por GPS, orçamentos e aprovações.
@@ -15,7 +15,7 @@ Princípios:
 - A Ordem de Serviço (OS) é o contêiner histórico do atendimento.
 - Cada visita representa um comparecimento/atendimento em uma data e possui seu próprio conjunto de tarefas e relatos.
 - Uma tarefa representa uma atividade técnica registrada em uma visita; não é checklist de etapas nem uma entidade de execução que migra entre visitas.
-- A execução temporal do trabalho é registrada em sessões independentes das tarefas.
+- A execução temporal do trabalho é registrada em sessões vinculadas à visita; tarefas não possuem sessões nem estados próprios de execução.
 - Relatos e evidências preservam o que aconteceu; não se deve inferir conclusão técnica apenas pelo encerramento de uma sessão.
 - Alterações não apagam silenciosamente o passado: versões e eventos anteriores devem permanecer consultáveis.
 - O modelo deve permitir navegação tanto do cliente para seus equipamentos e OS quanto do equipamento para suas tarefas, visitas e OS.
@@ -32,7 +32,7 @@ A visão conceitual é:
 
 `Tarefa → Relatos da tarefa, evidências e registros relacionados`
 
-`Tarefa → Sessões de execução (zero ou mais)`
+`Visita → Sessões de execução (zero ou mais)`
 
 ### 2.1 Cliente
 - Reúne os dados cadastrais, contatos e endereços.
@@ -58,6 +58,7 @@ A visão conceitual é:
 - Pertence a uma OS e mantém referência ao cliente, endereço, técnico responsável, agendamento e eventos de chegada/saída.
 - Cada visita possui suas próprias tarefas e pode possuir relato geral.
 - Uma visita precisa ter pelo menos um relato registrado nela própria ou em uma de suas tarefas para poder ser encerrada.
+- Ao iniciar uma nova visita para o mesmo técnico, a visita anterior deve ser finalizada mediante registro do relato exigido; a nova execução não deve começar antes dessa condição.
 - O encerramento da visita não significa que todas as atividades técnicas tenham sido concluídas; os relatos devem descrever o resultado real.
 
 ### 2.5 Tarefa
@@ -65,8 +66,9 @@ A visão conceitual é:
 - Cada tarefa pertence a uma visita específica.
 - Exemplos de tipos (lista não exaustiva): orçamento, coleta de equipamento, cobrança, retorno/garantia e vistoria.
 - Cada tipo de tarefa poderá definir campos, relatos, evidências e obrigatoriedades próprias.
+- Os tipos partem de um catálogo global inicial, mas cada empresa poderá editar sua própria versão sem alterar o catálogo global nem as versões de outras empresas.
 - A tarefa não terá status de execução ou de conclusão. Não usar estados como `pending`, `in_progress`, `paused` ou `completed` na entidade tarefa.
-- A história da tarefa é composta por seus dados, relatos, evidências e sessões de execução relacionadas.
+- A história da tarefa é composta por seus dados, relatos e evidências; a execução temporal é registrada no nível da visita.
 - Uma tarefa registrada em uma visita não é transferida para outra visita. Se o atendimento continuar em outra data, cria-se outra visita e uma nova tarefa, vinculada ao mesmo equipamento quando aplicável e podendo referenciar a tarefa anterior.
 - A tarefa poderá existir sem equipamento previamente identificado.
 
@@ -92,79 +94,60 @@ A estrutura física que representará essas três situações ainda precisa ser 
 
 A definição de campos obrigatórios por tipo, estrutura de formulários e critérios para considerar um relato válido ainda requer detalhamento.
 
-## 4. Execução técnica por sessões e GPS
+## 4. Execução técnica da visita e GPS
 
 ### 4.1 Separação entre tarefa e execução
 
-A tarefa não possui estado de execução. O trabalho temporal do técnico será representado por sessões de execução associadas à tarefa e à visita.
+A tarefa não possui estado nem sessão de execução. O trabalho temporal do técnico será representado por sessões vinculadas à visita. Enquanto a visita estiver em execução, o técnico registra as atividades realizadas por meio das tarefas e dos respectivos relatos.
 
-Uma tarefa pode ter várias sessões ao longo do tempo. Cada sessão registra os períodos de atividade e seus eventos, sem alterar a identidade da tarefa.
-
-### 4.2 Exclusividade do técnico
+### 4.2 Exclusividade do técnico e transição entre visitas
 
 - Um técnico só pode executar uma visita por vez.
 - O backend deve impedir que o mesmo técnico inicie ou mantenha duas visitas simultaneamente em execução, inclusive diante de requisições concorrentes ou dispositivos diferentes.
-- Uma reabertura também deve respeitar essa exclusividade.
-- A exclusividade de múltiplas sessões de tarefa simultâneas dentro da mesma visita ainda precisa ser especificada; não deve ser presumida a partir da regra de uma visita por técnico.
+- Ao iniciar nova visita, a visita anterior deve ser finalizada mediante relato do técnico.
+- A nova visita não pode iniciar enquanto a finalização anterior e o relato exigido não forem confirmados.
+- Uma reabertura também deve respeitar a exclusividade.
 
 ### 4.3 Check-in automático
 
 A funcionalidade de check-in automático por GPS poderá ser habilitada ou desabilitada pela empresa.
 
-Parâmetros iniciais:
+Parâmetros anteriormente definidos:
 - Raio de chegada: **50 metros**, configurável.
 - Permanência mínima dentro do raio: **5 minutos**, configurável.
-- Pré-condição: a visita deve estar com status `in_displacement`.
+- Pré-condição: a visita deve estar em deslocamento (in_displacement).
 
-Quando todas as condições forem satisfeitas:
-- Registrar a chegada/check-in da visita.
-- Iniciar a primeira tarefa da visita que ainda não possua sessão de execução iniciada.
-- Não iniciar automaticamente as demais tarefas; elas serão iniciadas pelo técnico conforme a execução real.
+A permanência de 5 minutos para o primeiro check-in precisa ser confirmada em conjunto com os novos limiares de pausa e retomada; não deve ser confundida com a regra de retomada.
 
-Como as tarefas não possuem status, o critério técnico para identificar a “primeira tarefa pendente” será a ausência de sessão de execução iniciada, sujeito à validação na especificação detalhada.
+Quando as condições de check-in forem satisfeitas, registrar a chegada/início da execução da visita. Não iniciar uma tarefa individual: as tarefas são atividades registradas dentro da visita.
 
 O evento automático deve preservar horário, coordenadas, precisão GPS, parâmetros aplicados e identificação do processo que o produziu. Eventos repetidos de localização não podem gerar check-ins duplicados.
 
 ### 4.4 Pausa automática por afastamento
 
-- O ponto de referência é a coordenada registrada no check-in da tarefa/sessão, conforme definição técnica final.
-- Quando o técnico se afastar desse ponto além da condição de distância configurada, a sessão ativa será pausada automaticamente.
-- A tarefa permanece como registro histórico sem mudança de status.
-- A visita registra a saída temporária, sem ser encerrada apenas por esse afastamento.
-- A pausa deve guardar horário, coordenadas e precisão GPS.
-- O afastamento não significa que o serviço foi concluído.
-
-O raio de afastamento, a tolerância de precisão, a janela de confirmação e a estratégia contra oscilações do GPS ainda precisam ser definidos.
+- O ponto de referência é o endereço/coordenada da visita, não a coordenada de início de uma tarefa.
+- Ao atingir ou ultrapassar **200 metros** do endereço da visita, a execução da visita será pausada automaticamente.
+- O limiar de 200 metros é configurável.
+- A pausa deve guardar horário, coordenadas, precisão GPS e distância calculada.
+- O afastamento não significa que o serviço foi concluído nem finaliza a visita por si só.
 
 ### 4.5 Retomada automática
 
-- O sistema deve permitir retomada automática de uma sessão pausada quando o técnico retornar ao endereço e as condições GPS forem satisfeitas.
-- A retomada deve criar um novo período/evento de execução, preservando a pausa anterior.
-- Deve respeitar a exclusividade de uma visita por técnico.
-- O raio e o tempo de permanência para retomada ainda precisam ser definidos; não assumir automaticamente que serão idênticos aos parâmetros de check-in inicial.
+- Quando o técnico retornar para uma distância de **50 metros ou menos** do endereço da visita, a execução pausada poderá ser retomada automaticamente.
+- O limiar de 50 metros é configurável.
+- A retomada deve gerar evento próprio e preservar a pausa anterior.
+- A retomada exige que a visita ainda esteja operacional e deve respeitar a exclusividade de uma visita por técnico.
+- Visita finalizada não pode ser reativada silenciosamente por mera chegada GPS.
+
+Os limiares assimétricos de 200 m para pausa e 50 m para retomada estabelecem uma faixa de histerese para reduzir oscilações repetidas próximas a um único limite.
 
 ### 4.6 Checkout manual e limite da jornada
 
-- O técnico poderá finalizar manualmente uma sessão, registrando horário e coordenadas GPS do checkout.
-- O sistema não deve finalizar automaticamente uma sessão que ainda esteja em execução.
-- Somente sessões que estejam pausadas poderão ser finalizadas pelo processo automático de limite da jornada.
-- Na finalização automática de uma sessão pausada, o horário efetivo de encerramento será o horário em que ocorreu a pausa, e as coordenadas serão as registradas naquele momento.
-- O sistema também deve guardar separadamente o instante em que o processo automático realizou a finalização, para não confundir horário efetivo do evento com horário de processamento.
-- No checkout manual, o horário efetivo e as coordenadas serão os capturados no momento da ação manual.
-- Encerrar uma sessão não significa declarar a tarefa tecnicamente concluída.
-
-O horário de corte da jornada, fuso horário, tratamento de sessões sem GPS válido e política de exceções ainda precisam ser definidos.
-
-### 4.7 Visita finalizada automaticamente e relato obrigatório posterior
-
-Quando uma visita for finalizada automaticamente pelo processo de limite da jornada:
-- O sistema deve identificar a tarefa cuja execução foi interrompida e que ficou sem relato adequado de encerramento/continuidade.
-- Na próxima abertura do aplicativo, ou antes de o técnico iniciar outro deslocamento ou outra visita, deverá exigir o preenchimento do relato pendente.
-- O relato será vinculado à tarefa e à visita originais.
-- Deve registrar separadamente o horário efetivo da pausa/interrupção e o horário real em que o relato foi posteriormente preenchido.
-- O relato deverá explicar o que aconteceu e por que a atividade ficou sem o registro adequado.
-
-A definição exata do critério de “relato adequado” e das situações em que uma visita será finalizada automaticamente ainda requer especificação.
+- O técnico poderá finalizar manualmente a execução da visita, registrando horário e coordenadas GPS do checkout.
+- O sistema não deve finalizar automaticamente uma execução que ainda esteja ativa.
+- Somente execuções pausadas poderão ser finalizadas pelo processo automático de limite da jornada.
+- O horário efetivo de finalização automática será o horário em que a execução foi pausada; o horário em que o sistema processou o fechamento será armazenado separadamente.
+- As coordenadas efetivas serão as registradas no evento de pausa; não fabricar coordenadas no momento posterior do processamento.
 
 ## 5. Reabertura e edição de visitas finalizadas
 
@@ -292,4 +275,5 @@ A próxima etapa técnica deverá produzir um modelo lógico e uma matriz de con
 
 ## Histórico de alterações
 
+- 2026-11-08 — v0.2.0: atualização para execução/sessões no nível da visita, finalização da visita anterior mediante relato, limiares GPS de 200 m/50 m e catálogo global de tipos editável independentemente por empresa.
 - 2026-11-08 — v0.1.0: criação do baseline funcional de Operação e confronto inicial com o schema Supabase consultado em tempo real, somente leitura.
