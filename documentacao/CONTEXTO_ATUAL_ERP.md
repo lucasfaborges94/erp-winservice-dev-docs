@@ -267,3 +267,21 @@ O responsável compartilhou a saída dos comandos executados na raiz local de `e
 **Classificação:** inspeção parcial da estrutura e validação positiva de três regras de exclusão. Os arquivos de configuração e código ainda não foram lidos/revisados; a listagem não comprova ausência de segredos ou adequação integral do scaffold. Nenhum arquivo local foi alterado nesta etapa; nenhum commit/push ou operação no Supabase foi realizado.
 
 **Próxima ação:** ler o conteúdo de `AGENTS.md`, `README.md`, `package.json`, configurações TypeScript/Nest/Vitest/Oxlint e arquivos `src/` e `test/`; validar também os padrões de `.env` e cobertura antes de preparar o primeiro commit.
+
+
+## 10. Revisão de conteúdo do scaffold local — 2026-11-09
+
+O responsável compartilhou o conteúdo de apps/api e novos resultados de git check-ignore. A revisão confirma que o scaffold contém somente o endpoint e testes padrão “Hello World”; não há módulos de domínio, autenticação, integração Supabase ou endpoints de negócio.
+
+**Pontos que exigem ajuste antes do primeiro commit:**
+- AGENTS.md e README.md incluem instruções e conteúdo promocional do NestJS Observe, embora a opção tenha sido recusada para o projeto. Remover essas instruções/recomendações ou substituir os arquivos por documentação alinhada à ADR-0019.
+- package.json inclui @nestjs/mau e o script deploy: nest deploy, direcionados ao fluxo Mau/AWS, enquanto a hospedagem aprovada é VPS/Easypanel. Remover a dependência e o script, atualizando package-lock.json com npm.
+- O README é o template padrão do Nest e contém orientação de deploy em Mau/Observe e licença MIT do framework, não uma descrição correta da aplicação privada (UNLICENSED). Substituir por README mínimo do serviço e instruções locais coerentes.
+
+**Itens sem ressalva identificada nesta leitura:** configurações Nest, TypeScript, Vitest e Oxlint são compatíveis com o scaffold inicial observado; imports ESM usam extensão .js; src/ e test/ contêm apenas o controlador/serviço padrão e testes correspondentes. A revisão não é uma auditoria de segurança de dependências.
+
+**.gitignore:** .env e .env.local foram confirmados ignorados. A regra de exceção !.env.example apareceu na saída de git check-ignore -v; confirmar com teste de código de saída que .env.example realmente não é ignorado. apps/api/coverage não apareceu na saída apresentada, portanto sua exclusão ainda não está comprovada.
+
+**Estado:** revisão de conteúdo concluída parcialmente, com ajustes recomendados antes de versionar. Não houve alteração nos arquivos locais, commit/push, nem operação no Supabase. O HEAD remoto do repositório de aplicação continua 0a6f7ac84a56b092a949817345b5d278abfbfdf7; não contém o scaffold local.
+
+**Próxima ação:** alinhar AGENTS.md, README.md e package.json à ADR-0019, atualizar o lockfile, validar .env.example e coverage, repetir build/testes/lint e só então revisar o diff final para o primeiro commit.
