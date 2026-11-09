@@ -1483,3 +1483,29 @@ A decisão foi formalizada na ADR-0019, em estado APROVADA. Responsabilidades, m
 **Limites:** nenhuma aprovação técnica adicional foi presumida. Nenhum código, role, policy, função, grant, migration ou dado do Supabase foi alterado. Não foi executada consulta nova ao Supabase nesta sessão; as observações são provenientes dos relatórios versionados e devem ser reconfirmadas no Gate G0.
 
 **Próxima ação:** obter aprovação/ajustes do responsável sobre os seis pontos da seção 12 da especificação. Se aprovada, executar somente leitura G0/G1 e prova técnica em ambiente não produtivo, mantendo produção intocada.
+
+
+
+### Sessão técnica — aprovação da especificação e reconciliação inicial G0/G1 (2026-11-09)
+
+**Estado:** especificação técnica APROVADA como direção para prova de conceito; G0 e G1 iniciados e parcialmente concluídos, ambos ainda bloqueados para avanço. Nenhuma alteração no Supabase.
+
+**Aprovação do responsável:** aprovação explícita dos seis pontos da seção 12 de `documentacao/ESPECIFICACAO_TECNICA_AUTENTICACAO_CONTEXTO_RLS.md`: JWT Supabase validado pela API; resolução via `users.auth_user_identifier`; empresa solicitada pelo cliente e revalidada no servidor; conexão PostgreSQL por role dedicada sem BYPASSRLS e sem `service_role` no caminho normal; identidade/empresa em contexto transaction-local; RLS e backend como barreiras complementares; gates de auditoria, backup restaurável, ensaio e autorização específica mantidos. O responsável também confirmou a continuidade com VPS/Easypanel aprovada na ADR-0019. O mecanismo de acesso/deploy automatizado e restrito ainda será projetado.
+
+**Fontes e ambiente:** consulta do HEAD e documentos obrigatórios no repositório documental, ADR-0017, ADR-0018, ADR-0019, modelo de autorização e especificação técnica. Projeto Supabase `voaovwphncwbrwtcqnsc` (Winservice), `ACTIVE_HEALTHY`, PostgreSQL `17.6.1.141`, região `sa-east-1`.
+
+**G0 — inspeção somente leitura realizada:**
+- 5 `auth.users`, 5 `public.users`; 5/5 vínculos únicos e não nulos por `users.auth_user_identifier = auth.users.id`; zero duplicidades; FK `users_auth_user_identifier_fkey` validada.
+- `auth.uid()` lê `request.jwt.claim.sub` ou `request.jwt.claims.sub`.
+- Roles: `anon` e `authenticated` sem BYPASSRLS; `service_role` e `postgres` com BYPASSRLS; `authenticator` login habilitado sem BYPASSRLS. Nenhuma role de runtime dedicada foi demonstrada.
+- 38 tabelas públicas com RLS, nenhuma com FORCE RLS; 23 policies. Persistem predicados `true` em tabelas operacionais. A policy SELECT de `users` compara `auth.uid()` com `users.identifier`; a policy SELECT de `company_users` compara `auth.uid()` com `company_users.user_identifier`. A relação de identidade destas policies precisa ser corrigida/validada contra o mapeamento Auth aprovado, sem presumir equivalência.
+- `company_user_roles` sem policy observada. Grants amplos a anon/authenticated/service_role em `users`, `company_users` e `company_user_roles` exigem revisão coordenada.
+- `company_users.role_identifier` ainda existe e não pode ser usado, conforme ADR-0018; `public.can_view_expense` permanece SECURITY DEFINER e deve ser tratada como dependência obsoleta.
+- `public.authorize_integration_sync_event` permanece SECURITY DEFINER e executável por anon/authenticated; integrações estão fora do MVP, mas a exposição atual deve ser isolada como risco.
+- Zero migrations registradas, tabela `supabase_migrations.schema_migrations` ausente, zero branches e zero Edge Functions.
+
+**G0 não concluído:** falta obter/revisar backup restaurável e baseline SQL reconciliado, identificar configuração de conexão/pooler e executar ensaio de restauração. **G1 não concluído:** correspondência estrutural Auth→ERP está confirmada; faltam prova JWT ponta a ponta, fluxo de provisionamento e teste de claim com role não privilegiada em ambiente não produtivo. G2–G5 não iniciados.
+
+**Limites operacionais:** foram executadas apenas consultas de metadados e agregações sem expor dados pessoais. Não houve DDL/DML, criação/alteração de role, policy, função, grant, migration, configuração ou dado. Não houve teste de exploração, conexão da API, teste de pool ou restauração. A aprovação da especificação não autoriza mudança em produção.
+
+**Próxima ação:** concluir G0 obtendo um backup lógico restaurável e estabelecendo baseline SQL versionável; confirmar a rota/pooler e a role não privilegiada disponíveis; preparar ambiente de ensaio sem tocar produção. Só então executar prova G1/G2.
