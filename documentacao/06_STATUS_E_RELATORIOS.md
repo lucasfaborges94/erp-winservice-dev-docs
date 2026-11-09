@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 1.9.5  
+**Versão:** 1.9.6  
 **Data-base:** 2026-11-08
 
 ## 1. Resumo executivo
@@ -223,7 +223,7 @@ Achados confirmados: 1 registro em `permissions` (`customer/view`, sem código e
 
 ## Histórico de alterações
 
-- 2026-11-08 — v1.9.4: registra aprovação do protocolo de consulta por mensagem, registro incremental de sessões e criação do índice de contexto operacional.\n- 2026-11-08 — v1.9.3: registra auditoria somente leitura das tabelas atuais de permissões após aprovação do modelo físico.
+- 2026-11-08 — v1.9.6: registra bloqueio de identificação do repositório de implementação e baseline de migrations.\n- 2026-11-08 — v1.9.4: registra aprovação do protocolo de consulta por mensagem, registro incremental de sessões e criação do índice de contexto operacional.\n- 2026-11-08 — v1.9.3: registra auditoria somente leitura das tabelas atuais de permissões após aprovação do modelo físico.
 - 2026-11-08 — v1.9.2: registra a aprovação do modelo físico do catálogo de permissões; implementação e DDL continuam não autorizados.
 - 2026-11-08 — v1.4.0: registra formalização da memória documental oficial, atualização do protocolo de retomada e preparação para continuar o MVP na próxima sessão.
 - 2026-11-08 — v1.3.0: registra requisitos/pendências, avaliações por tentativa, evidências e uploads idempotentes, coleta de assinatura e aceite digital versionado.
@@ -367,3 +367,11 @@ Esta atualização é documental. Não representa alteração de código, banco,
 O responsável aprovou a convenção semântica `entidade.ação`, em minúsculas, para os códigos estáveis do catálogo de permissões. O registro legado `customer/view` deverá ser mapeado para `customer.view`, condicionado à validação na migration. Os exemplos documentados não constituem uma matriz completa nem autorização para criar permissões indiscriminadamente.
 
 A proposta física foi atualizada para v0.4.0, e o contexto operacional e a continuidade foram atualizados. Próxima etapa: identificar o repositório/baseline oficial de migrations, validar o mapeamento legado e concluir a especificação executável. Nenhuma alteração foi realizada no Supabase; a aprovação não autoriza DDL/DML ou execução de migrations.
+
+
+## 21. Identificação do repositório de implementação — 2026-11-08
+
+A consulta à integração GitHub listou somente `lucasfaborges94/erp-winservice-dev-docs` entre os repositórios acessíveis. Buscas por repositórios do proprietário com os termos `erp`, `winservice` e `backend` não localizaram repositório de implementação; os resultados disponíveis apontaram apenas para o repositório documental. Essa cobertura não permite afirmar que inexista código em outra conta, organização ou ambiente.
+
+**Estado:** bloqueado para auditoria de dependências em código e confirmação do baseline de migrations. É necessário obter a URL/nome do repositório de implementação e validar o acesso. Nenhuma alteração no código ou Supabase foi executada. Não preparar nem executar migrations presumindo um baseline não verificado.
+
