@@ -131,3 +131,14 @@ O merge não executou build ou testes. Permanecem como evidência os resultados 
 **Limites:** nenhuma operação Supabase, migration ou deploy foi realizada. Os gates de segurança da seção 7 da ADR-0019 continuam bloqueando endpoints de negócio e conexão de clientes até especificação e validação. A integração remota não alterou a cópia local do responsável.
 
 **Próxima atividade:** retomar a sequência da ADR-0019 pela especificação técnica de JWT, seleção/validação de empresa ativa, papéis/permissões, contexto transacional PostgreSQL/RLS, privilégios e testes negativos multiempresa. Não executar alterações no Supabase nem deploy sem autorização operacional específica e gates documentados.
+
+
+### Estrutura isolada para hardening do Supabase — 2026-11-09
+
+Foi criada no repositório privado `lucasfaborges94/erp-winservice-app` a branch Git `work/supabase-hardening`, baseada na `main` após o merge do PR #1, commit-base `2e73ce3f2377a8403992ee5b5b46fe4657b2eb56`. A branch contém atualização de `supabase/README.md` documentando a organização prevista de migrations, baseline, testes e regras de segurança. A branch não altera a `main` nem o banco principal.
+
+O projeto Supabase de produção identificado é `Winservice` (`voaovwphncwbrwtcqnsc`), região `sa-east-1`, PostgreSQL 17.6.1.141. A consulta de branches retornou lista vazia. O custo cotado para uma branch Supabase é **US$ 0,01344 por hora**; a criação não foi executada porque requer confirmação explícita do responsável após ciência do custo.
+
+**Limitação crítica:** a ferramenta informa que branches Supabase recebem migrations do projeto principal, mas não copiam dados de produção. O inventário estrutural versionado em `supabase/baseline/` não é dump restaurável; a consulta anterior registrou zero migrations e ausência de histórico `supabase_migrations.schema_migrations`. Portanto, criar uma branch Supabase neste momento não produziria réplica do schema real. Primeiro é necessário estabelecer e validar uma baseline de migrations/restauração, ou o responsável deve decidir conscientemente criar um ambiente vazio temporário.
+
+Nenhuma tabela, policy RLS, função, trigger, dado ou configuração do projeto principal foi alterada. Nenhum dado de produção foi copiado. Nenhum deploy foi realizado.
