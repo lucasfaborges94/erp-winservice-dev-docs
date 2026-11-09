@@ -1,7 +1,7 @@
 # Governança documental do ERP Winservice
 
-**Versão:** 0.3.0  
-**Data de atualização:** 2026-11-07
+**Versão:** 0.4.0  
+**Data de atualização:** 2026-11-08
 
 ## 1. Objetivo
 
@@ -40,6 +40,16 @@ Durante e após o trabalho:
 - Registrar mudanças, testes, evidências, pendências e próximo passo.
 - Atualizar os documentos afetados e o registro de continuidade.
 - Não alegar execução, teste ou publicação sem evidência.
+
+### 3.1 Consulta por mensagem e atualização incremental
+
+A consulta ao repositório é obrigatória antes de cada resposta relacionada ao ERP, inclusive dentro de uma conversa em andamento. A IA deve reler a última mensagem do usuário, consultar a versão atual de `00_FONTE_DA_VERDADE.md`, o protocolo de atuação, o contexto operacional, a continuidade e os documentos/ADRs pertinentes antes de responder.
+
+Após a resposta, verificar se houve informação nova a persistir. Registrar progressivamente aprovações, decisões, requisitos, correções, descobertas, mudanças de estado, riscos, pendências e próximos passos. Não esperar o encerramento de uma conversa longa para registrar pontos-chave.
+
+Uma sessão pode abranger várias mensagens correlatas. Atualizar o mesmo registro enquanto o trabalho prossegue; criar registros separados para sessões ou marcos independentes, não para cada mensagem. Mensagens sem avanço não exigem commit artificial, mas continuam exigindo consulta prévia.
+
+O documento `CONTEXTO_ATUAL_ERP.md` serve como índice e resumo operacional, não como substituto das fontes normativas.
 
 ## 4. Separação oficial × rascunho
 
@@ -177,3 +187,8 @@ Quando uma ferramenta não puder acessar o repositório, o agente deve informar 
 
 - 2026-11-07 — v0.3.0: integração do protocolo independente de fornecedor e do processo formal de continuidade e transferência.
 - 2026-11-07 — v0.2.0: inclusão da governança formal de ADRs individuais, estados, aprovação explícita, substituição e tratamento de decisões legadas.
+
+
+## Histórico de alterações
+
+- 2026-11-08 — v0.4.0: estabelece consulta obrigatória por mensagem, registro incremental de pontos-chave e uso de CONTEXTO_ATUAL_ERP.md como índice operacional.
