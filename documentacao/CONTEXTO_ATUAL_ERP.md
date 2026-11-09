@@ -109,7 +109,7 @@ O repositório de aplicação `lucasfaborges94/erp-winservice-app` foi inicializ
 - `supabase/baseline/2026-11-08-schema-inventory.json`;
 - `supabase/baseline/2026-11-08-advisors.json`.
 
-O inventário foi capturado em modo somente leitura no projeto `voaovwphncwbrwtcqnsc`, PostgreSQL `17.6.1.141`, região `sa-east-1`. Ele registra metadados do schema `public`, sem dados de linhas ou segredos: 38 tabelas, 461 colunas, 206 constraints, 110 índices, 11 funções, 18 triggers, 23 policies, 34 sequences, 8 extensões instaladas e 1.064 concessões de privilégios de tabela.
+O inventário foi capturado em modo somente leitura no projeto `voaovwphncwbrwtcqnsc`, PostgreSQL `17.6.1.141`, região `sa-east-1`. Ele registra metadados do schema `public`, sem dados de linhas ou segredos: 310 tabelas, 461 colunas, 206 constraints, 110 índices, 11 funções, 18 triggers, 23 policies, 34 sequences, 8 extensões instaladas e 1.064 concessões de privilégios de tabela.
 
 Contagens pontuais confirmadas por SQL somente leitura: 26 visitas, 103 clientes, 99 endereços, 1 empresa, 1 vínculo em `company_users`, 2 associações em `company_user_roles`, 3 papéis, 1 permissão, zero linhas em `role_permissions` e `user_permissions`. A coluna legada `company_users.role_identifier`, sua FK e a função `public.can_view_expense(uuid)` ainda existem; nenhuma foi alterada.
 
@@ -133,6 +133,6 @@ Nenhuma chamada RPC de negócio, teste de exploração ou leitura de payload/seg
 
 ## Matriz inicial de RLS/grants/tenant — 2026-11-08
 
-Foi consultado o catálogo PostgreSQL das 38 tabelas de public. RLS está habilitado em 38/38; FORCE RLS está desabilitado em 38/38; grants explícitos para anon e authenticated foram observados em 38/38; 26 tabelas não possuem policies; 8 tabelas têm policy com predicado literal true (em users, apenas INSERT). 21 tabelas não possuem company_identifier na captura, incluindo visits, work_orders, equipments, quotations e company_user_roles. A matriz por tabela e limitações está em [MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md](auditorias/MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md).
+Foi consultado o catálogo PostgreSQL das 310 tabelas de public. RLS está habilitado em 38/38; FORCE RLS está desabilitado em 38/38; grants explícitos para anon e authenticated foram observados em 38/38; 26 tabelas não possuem policies; 10 tabelas têm policy com predicado literal true (em users, apenas INSERT). 23 tabelas não possuem company_identifier na captura, incluindo visits, work_orders, equipments, quotations e company_user_roles. A matriz por tabela e limitações está em [MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md](auditorias/MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md).
 
 O grant amplo não ignora RLS por si só; tabelas sem policy tendem a negar acesso para papéis sujeitos a RLS. O risco mais direto está nas policies permissivas sem filtro de empresa e nas funções privilegiadas identificadas no relatório de segurança. Nenhuma alteração foi feita no banco.
