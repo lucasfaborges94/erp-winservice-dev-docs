@@ -129,3 +129,10 @@ Foi realizada nova inspeção somente leitura dos Security Advisors, definiçõe
 Achados prioritários: (1) `public.authorize_integration_sync_event(...)` é SECURITY DEFINER, executável por anon/authenticated, e o corpo consultado não apresentou validação de assinatura/segredo do webhook antes de inserir payload em `integration_sync_queue`; (2) policies permissivas com `USING (true)`/ `WITH CHECK (true)` em tabelas operacionais como customers, addresses, customer_contacts e visits não implementam o isolamento por empresa exigido pela ADR-0017; (3) `can_view_expense` permanece legado e fora do MVP conforme ADR-0018; (4) 26 tabelas com RLS sem policy exigem triagem individual, não sendo automaticamente exposição; (5) sete funções apresentam search_path mutável; (6) proteção contra senhas vazadas está desabilitada.
 
 Nenhuma chamada RPC de negócio, teste de exploração ou leitura de payload/segredo foi executada. Nenhuma policy, função, grant ou configuração foi alterada. Próximo passo: revisar contrato de autenticação do webhook e produzir matriz de classificação/acesso por tabela, mantendo o dump restaurável como gate obrigatório antes de correções/migrations.
+
+
+## Matriz inicial de RLS/grants/tenant — 2026-11-08
+
+Foi consultado o catálogo PostgreSQL das 38 tabelas de public. RLS está habilitado em 38/38; FORCE RLS está desabilitado em 38/38; grants explícitos para anon e authenticated foram observados em 38/38; 26 tabelas não possuem policies; 8 tabelas têm policy com predicado literal true (em users, apenas INSERT). 21 tabelas não possuem company_identifier na captura, incluindo visits, work_orders, equipments, quotations e company_user_roles. A matriz por tabela e limitações está em [MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md](auditorias/MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md).
+
+O grant amplo não ignora RLS por si só; tabelas sem policy tendem a negar acesso para papéis sujeitos a RLS. O risco mais direto está nas policies permissivas sem filtro de empresa e nas funções privilegiadas identificadas no relatório de segurança. Nenhuma alteração foi feita no banco.
