@@ -242,3 +242,13 @@ O responsável informou que executou localmente a geração do scaffold NestJS e
 - [IDENTIDADE_VISUAL_E_PALETA.md](IDENTIDADE_VISUAL_E_PALETA.md) registra a proposta de paleta semântica para textos, botões, fundos e cards.
 - Correção visual expressa: o título do card secundário usa `#0A223A` sobre fundo `#F8FAFC`; corpo `#263445`; informação auxiliar `#667085`.
 - Estado: proposta documental v0.1.0 registrada em 2026-11-09; validação WCAG 2.2 e adoção definitiva ainda pendentes.
+
+## 10. Validação local do scaffold NestJS — 2026-11-09
+
+O responsável reportou a criação de `.gitignore` na raiz do repositório de aplicação, com exclusões para `node_modules/`, `dist/`, `coverage/`, `*.tsbuildinfo`, `.env` e `.env.*`, preservando `.env.example`. A existência e o conteúdo foram informados pelo terminal local; ainda não estão versionados nem verificáveis remotamente.
+
+Na pasta `apps/api`, foram executados com sucesso, conforme saída compartilhada: `npm.cmd run build` (Nest build sem erros), `npm.cmd test` (1 arquivo/1 teste aprovado) e `npm.cmd run test:e2e` (1 arquivo/1 teste aprovado). O comando `npm.cmd run lint` foi iniciado e não apresentou diagnósticos na saída fornecida, mas o trecho compartilhado não inclui o código de saída; resultado final do lint permanece pendente de confirmação por `$LASTEXITCODE`.
+
+**Estado:** build, testes unitários e e2e aprovados localmente; lint aguardando confirmação do exit code; scaffold e `.gitignore` ainda não confirmados no GitHub; nenhum commit/push informado. Nenhum módulo de negócio, integração Supabase ou alteração no banco foi realizado.
+
+**Próxima ação:** confirmar o exit code do lint e revisar `git status --short`/arquivos gerados antes de versionar o scaffold.
