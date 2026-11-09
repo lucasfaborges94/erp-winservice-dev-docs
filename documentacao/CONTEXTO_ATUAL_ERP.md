@@ -285,3 +285,12 @@ O responsável compartilhou o conteúdo de apps/api e novos resultados de git ch
 **Estado:** revisão de conteúdo concluída parcialmente, com ajustes recomendados antes de versionar. Não houve alteração nos arquivos locais, commit/push, nem operação no Supabase. O HEAD remoto do repositório de aplicação continua 0a6f7ac84a56b092a949817345b5d278abfbfdf7; não contém o scaffold local.
 
 **Próxima ação:** alinhar AGENTS.md, README.md e package.json à ADR-0019, atualizar o lockfile, validar .env.example e coverage, repetir build/testes/lint e só então revisar o diff final para o primeiro commit.
+
+
+## 11. Ajuste de dependência e validação final do .gitignore — 2026-11-09
+
+O responsável executou a remoção de @nestjs/mau dentro de apps/api. A primeira execução na raiz do repositório informou “up to date”; a execução correta em apps/api removeu 50 pacotes, auditou 287 pacotes e reportou zero vulnerabilidades. A remoção foi feita pelo npm; o conteúdo atualizado de package.json/package-lock.json ainda não foi compartilhado para inspeção direta.
+
+O .gitignore teve validação adicional: apps/api/coverage/placeholder foi confirmado ignorado pela regra coverage/. git check-ignore -q apps/api/.env.example retornou código 1, confirmando que .env.example não está ignorado e permanece elegível para versionamento. A saída anterior também confirmou .env e .env.local ignorados.
+
+**Estado:** validações de .gitignore concluídas para os casos testados; dependência Mau removida localmente conforme saída npm. Permanecem pendentes a remoção do script deploy, revisão/adequação de AGENTS.md e README.md, leitura do package.json/package-lock.json atualizados, repetição de build/testes/lint e revisão do diff final. Nenhum commit/push foi confirmado; nenhuma operação no Supabase foi realizada.
