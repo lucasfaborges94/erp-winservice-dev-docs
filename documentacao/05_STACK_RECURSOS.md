@@ -16,7 +16,8 @@
 | Auvo | Integração externa opcional | Não é dependência |
 | Isa | Agente de IA para processos permitidos | Política de autonomia definida |
 | VPS + Easypanel | Hospedagem de serviços e aplicações | Ambiente existente; topologia final a documentar |
-| Git / repositório | Controle de versão e histórico de alterações | Estratégia e URL do repositório a registrar |
+| Git / repositório documental | Governança, requisitos, ADRs e continuidade | `lucasfaborges94/erp-winservice-dev-docs` |
+| Git / repositório de aplicação | Código-fonte, migrations, testes e CI/CD | Aprovado: `lucasfaborges94/erp-winservice-app`, privado, branch `main`; criação pendente de confirmação |
 
 ## 2. Recursos e práticas técnicas
 
