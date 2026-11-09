@@ -98,3 +98,25 @@ O responsável compartilhou a URL `https://github.com/lucasfaborges94/erp-winser
 ### Confirmação de acesso ao repositório de aplicação — 2026-11-08
 
 A integração GitHub passou a acessar `https://github.com/lucasfaborges94/erp-winservice-app`. Metadados confirmados: ID `1450814205`, proprietário `lucasfaborges94`, visibilidade `private`, branch padrão `main`, repositório não arquivado e permissão `admin` para a integração. O tamanho informado é zero. A consulta de conteúdo da branch `main` retornou HTTP 404 com a mensagem `This repository is empty`; a listagem de commits retornou HTTP 409 (`Git Repository is empty`). Portanto, a existência, privacidade, branch e permissão estão confirmadas, mas ainda não há arquivos, commits, código, workflow ou baseline de migrations. Nenhum arquivo foi criado e nenhuma alteração foi feita no Supabase.
+
+
+### Delegação operacional do Supabase e baseline estrutural — 2026-11-08
+
+O responsável determinou que o agente atual será o operador exclusivo para executar alterações no projeto Supabase do ERP. A delegação define quem executa as operações; não elimina os gates de segurança, revisão, preflight, backup restaurável, autorização operacional específica e verificação posterior já exigidos pelos documentos e ADRs. Não interpretar a delegação como autorização irrestrita para qualquer DDL/DML.
+
+O repositório de aplicação `lucasfaborges94/erp-winservice-app` foi inicializado com:
+- `supabase/README.md`;
+- `supabase/baseline/2026-11-08-schema-inventory.json`;
+- `supabase/baseline/2026-11-08-advisors.json`.
+
+O inventário foi capturado em modo somente leitura no projeto `voaovwphncwbrwtcqnsc`, PostgreSQL `17.6.1.141`, região `sa-east-1`. Ele registra metadados do schema `public`, sem dados de linhas ou segredos: 38 tabelas, 461 colunas, 206 constraints, 110 índices, 11 funções, 18 triggers, 23 policies, 34 sequences, 8 extensões instaladas e 1.064 concessões de privilégios de tabela.
+
+Contagens pontuais confirmadas por SQL somente leitura: 26 visitas, 103 clientes, 99 endereços, 1 empresa, 1 vínculo em `company_users`, 2 associações em `company_user_roles`, 3 papéis, 1 permissão, zero linhas em `role_permissions` e `user_permissions`. A coluna legada `company_users.role_identifier`, sua FK e a função `public.can_view_expense(uuid)` ainda existem; nenhuma foi alterada.
+
+O Supabase retornou zero migrations e a relação `supabase_migrations.schema_migrations` não existe. Portanto, não há baseline executável de migrations. O arquivo JSON é um inventário estrutural datado, **não é um dump restaurável**. A integração disponível não oferece `pg_dump` nem Supabase CLI nesta sessão; gerar o baseline SQL completo continua pendente.
+
+Os advisors foram registrados separadamente. Principais achados:
+- Segurança: 26 tabelas com RLS habilitado sem policy; 7 funções com `search_path` mutável; 2 funções `SECURITY DEFINER` executáveis por `anon` e `authenticated`; proteção contra senhas vazadas desabilitada.
+- Performance: 89 FKs sem índice de cobertura; 2 pares de índices duplicados; 12 índices sem uso observado; 1 policy com reavaliação desnecessária de função Auth por linha.
+
+Nenhuma alteração foi feita no banco. O inventário é a referência estrutural conhecida desta captura; confirmar drift no Supabase real antes de cada alteração e atualizar o snapshot após mudanças controladas.
