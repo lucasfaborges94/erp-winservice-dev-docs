@@ -1633,8 +1633,8 @@ O responsável criou `.gitignore` na raiz do repositório de aplicação, com pa
 - `npm.cmd run build`: concluído sem mensagens de erro.
 - `npm.cmd test`: 1 arquivo e 1 teste aprovados.
 - `npm.cmd run test:e2e`: 1 arquivo e 1 teste aprovados.
-- `npm.cmd run lint`: comando iniciado sem diagnósticos na saída apresentada; o código de saída não foi incluído, portanto aguarda confirmação.
+- `npm.cmd run lint`: concluído; Oxlint informou `Finished in 9.1s on 6 files with 111 rules using 4 threads`, sem diagnósticos de lint reportados.
 
-**Estado:** build, testes unitários e e2e aprovados conforme evidência do terminal compartilhada; lint pendente de confirmação objetiva; scaffold e `.gitignore` permanecem locais, sem commit/push confirmado. Nenhum módulo de negócio ou integração Supabase foi implementado e nenhuma operação no banco foi realizada.
+**Estado:** build, testes unitários, e2e e lint aprovados conforme evidência do terminal compartilhada; scaffold e `.gitignore` permanecem locais, sem commit/push confirmado. Nenhum módulo de negócio ou integração Supabase foi implementado e nenhuma operação no banco foi realizada.
 
-**Próxima ação:** confirmar `$LASTEXITCODE` do lint e revisar o estado/arquivos do Git antes de versionar a fundação da API.
+**Próxima ação:** revisar o estado/arquivos do Git e validar as exclusões do `.gitignore` antes de versionar a fundação da API.
