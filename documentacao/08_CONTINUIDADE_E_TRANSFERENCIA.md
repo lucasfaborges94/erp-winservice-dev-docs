@@ -1653,3 +1653,23 @@ O responsável compartilhou a saída dos comandos executados na raiz local de `e
 **Classificação:** inspeção parcial da estrutura e validação positiva de três regras de exclusão. Os arquivos de configuração e código ainda não foram lidos/revisados; a listagem não comprova ausência de segredos ou adequação integral do scaffold. Nenhum arquivo local foi alterado nesta etapa; nenhum commit/push ou operação no Supabase foi realizado.
 
 **Próxima ação:** ler o conteúdo de `AGENTS.md`, `README.md`, `package.json`, configurações TypeScript/Nest/Vitest/Oxlint e arquivos `src/` e `test/`; validar também os padrões de `.env` e cobertura antes de preparar o primeiro commit.
+
+
+### Continuação — revisão do conteúdo do scaffold NestJS (2026-11-09)
+
+O responsável compartilhou a saída integral de leitura dos arquivos de apps/api e validações adicionais do .gitignore.
+
+**Contexto consultado:** HEAD remoto do repositório documental main verificado antes desta resposta; Fonte da Verdade, Protocolo de Atuação, Contexto Atual, Continuidade, Leia-me, Roadmap, Status, Stack/Recursos e ADR-0019 consultados. O HEAD do repositório de aplicação foi consultado novamente e permanece 0a6f7ac84a56b092a949817345b5d278abfbfdf7.
+
+**Revisão dos arquivos locais:**
+- AGENTS.md contém orientação para enviar telemetria de produção ao NestJS Observe e instruções de instalação/link da ferramenta. Isso conflita com a escolha registrada de não instalar Observe nesta fundação.
+- README.md é o template padrão do NestJS e contém seções recomendando Mau/AWS e NestJS Observe, além de texto de licença MIT do framework que não deve ser confundido com a licença da aplicação privada.
+- package.json inclui @nestjs/mau e script deploy para nest deploy; não correspondem ao destino aprovado VPS/Easypanel e não são necessários para o scaffold.
+- Configurações nest-cli.json, tsconfig.json, tsconfig.build.json, Vitest, Oxlint e .gitattributes foram lidas sem identificação de bloqueio imediato. Os arquivos TypeScript ainda são exclusivamente o Hello World padrão e os testes correspondentes.
+- Não há implementação de domínio, autenticação, tenancy, autorização, integração Supabase ou API REST /api/v1; isso é esperado nesta etapa e os gates da ADR-0019 continuam impedindo endpoints de negócio.
+
+**Validação de exclusões:** .env e .env.local foram confirmados ignorados. A saída para .env.example mostrou a regra de negação !.env.example, mas deve ser confirmada por código de saída de git check-ignore -q. A saída compartilhada não mostrou correspondência para apps/api/coverage; portanto, não registrar a regra de cobertura como validada.
+
+**Recomendação antes do primeiro commit:** retirar/reformular o conteúdo Observe de AGENTS.md e README.md; substituir o README por instruções próprias da API e do ambiente VPS/Easypanel; remover @nestjs/mau e o script deploy do package.json, regenerando package-lock.json. Depois, repetir build, testes e lint e revisar git diff/git status antes de autorizar o commit.
+
+**Estado:** nenhuma alteração local foi feita pelo assistente; nenhum commit/push do scaffold foi confirmado; nenhuma operação no Supabase foi realizada. A revisão não equivale a auditoria de vulnerabilidades de dependências nem a aprovação para criar endpoints de negócio.
