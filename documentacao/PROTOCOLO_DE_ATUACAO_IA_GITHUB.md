@@ -24,6 +24,26 @@ Sequência mínima obrigatória:
 
 A leitura deve ser proporcional: os documentos de entrada e a sessão mais recente são obrigatórios; os demais documentos devem ser selecionados conforme as dependências da tarefa. Não é necessário carregar todos os arquivos indiscriminadamente.
 
+## 0.1 Barreira obrigatória antes de CADA resposta
+
+A consulta ao GitHub não ocorre apenas no início de uma conversa. Ela é obrigatória antes de cada resposta relacionada ao ERP Winservice, mesmo que a conversa esteja em andamento e a mensagem pareça ser uma continuação simples.
+
+Para cada mensagem do usuário:
+
+1. Ler integralmente a mensagem mais recente.
+2. Consultar novamente `00_FONTE_DA_VERDADE.md` na branch `main).
+3. Consultar este protocolo e o último registro em `08_CONTINUIDADE_E_TRANSFERENCIA.md`, além de `CONTEXTO_ATUAL_ERP.md), quando existente.
+4. Verificar o HEAD/commits atuais e identificar mudanças posteriores ao último registro de continuidade, quando a integração permitir.
+5. Consultar os documentos especializados e ADRs individuais pertinentes ao assunto.
+6. Classificar a mensagem como consulta, aprovação, correção, novo requisito, implementação ou continuidade.
+7. Responder somente após validar as fontes, explicitando lacunas e divergências.
+
+A consulta anterior na mesma conversa não é suficiente. Não presumir que o contexto permanece atual.
+
+Depois de formular a resposta, identificar se foram introduzidos ou confirmados pontos que devam ser persistidos. Atualizar os documentos adequados e verificar a gravação quando houver mudança relevante. Não criar commits artificiais para mensagens sem conteúdo novo.
+
+Se o GitHub estiver inacessível, declarar a limitação e não substituir a documentação vigente pelo histórico da conversa.
+
 ## 1. Regra obrigatória: verificar o GitHub antes de pedir ações locais
 
 Sempre que o usuário solicitar continuidade, inspeção, auditoria, leitura, alteração ou documentação relacionada ao repositório:
@@ -93,7 +113,14 @@ Nesses casos, explicar o que não está acessível e solicitar somente a evidên
 
 ## 7. Regra de manutenção da memória documental
 
-Ao longo do trabalho, identificar o tipo de conhecimento produzido e registrá-lo no local correto:
+Ao longo de cada interação e sessão, identificar o tipo de conhecimento produzido e registrá-lo no local correto. A atualização deve ser incremental: não esperar o fim de uma conversa longa para registrar uma aprovação ou ponto-chave.
+
+- Manter `documentacao/CONTEXTO_ATUAL_ERP.md` como índice operacional resumido, com HEAD verificado, etapa, estado, decisões relevantes, pendências, última atividade e próxima ação. Esse arquivo aponta para as fontes completas e nunca as substitui.
+- Registrar cada sessão relevante e seus marcos em `documentacao/08_CONTINUIDADE_E_TRANSFERENCIA.md` ou em arquivo individual `documentacao/sessoes/AAAA-MM-DD-titulo-curto.md`.
+- Ao longo de uma sessão em andamento, acrescentar os pontos-chave conforme forem confirmados: deliberações, decisões, requisitos, correções, descobertas, artefatos, testes, riscos e pendências.
+- Não criar uma sessão artificial para cada mensagem. Uma sessão pode abranger várias mensagens correlatas; criar/atualizar seu registro quando houver avanço ou ponto-chave persistente e encerrá-lo com estado e próxima ação.
+
+Identificar o tipo de conhecimento produzido e registrá-lo no local correto:
 
 - decisão arquitetural ou de governança aprovada: ADR individual e índice correspondente;
 - requisito ou regra de negócio: especificação funcional/processual pertinente;
@@ -106,6 +133,16 @@ Não duplicar o mesmo conteúdo em vários documentos sem necessidade. Usar refe
 
 ## 8. Regra de continuidade
 
-Este protocolo deve ser consultado no início de toda nova sessão de trabalho que envolva o repositório. Em caso de dúvida, a regra é verificar primeiro o GitHub e só depois solicitar intervenção local.
+Este protocolo deve ser consultado no início de toda nova sessão e obrigatoriamente antes de cada resposta sobre o ERP que envolva o repositório. Em caso de dúvida, a regra é verificar primeiro o GitHub e só depois solicitar intervenção local.
 
 A existência deste documento não substitui a autorização humana para decisões de produto, arquitetura, segurança, alterações no banco ou operações irreversíveis.
+
+
+## 9. Registro incremental de sessões e pontos-chave
+
+- Uma sessão relevante deve ter um registro identificável, com objetivo, contexto consultado, trabalho efetivamente realizado, aprovações, propostas, artefatos, verificações, pendências, riscos e próxima ação.
+- Registrar pontos-chave assim que forem confirmados, especialmente aprovações explícitas e alterações de entendimento.
+- Quando várias mensagens fizerem parte do mesmo trabalho contínuo, atualizar o registro da mesma sessão; não criar um arquivo por mensagem.
+- Ao encerrar ou pausar o trabalho, marcar o estado real (EM_ANDAMENTO, CONCLUÍDA ou BLOQUEADA) e indicar o próximo passo acionável.
+- Manter o índice das sessões em `08_CONTINUIDADE_E_TRANSFERENCIA.md` e o resumo rápido em `CONTEXTO_ATUAL_ERP.md` sincronizados.
+- Só registrar como executado o que tiver evidência. Se o conteúdo foi apenas discutido ou aprovado, registrar como deliberação/aprovação documental, não como implementação.
