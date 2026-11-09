@@ -17,7 +17,7 @@
 | Isa | Agente de IA para processos permitidos | Política de autonomia definida |
 | VPS + Easypanel | Hospedagem de serviços e aplicações | Ambiente existente; topologia final a documentar |
 | Git / repositório documental | Governança, requisitos, ADRs e continuidade | `lucasfaborges94/erp-winservice-dev-docs` |
-| Git / repositório de aplicação | Código-fonte, migrations, testes e CI/CD | Confirmado: `lucasfaborges94/erp-winservice-app`, privado, branch `main`, integração com permissão admin; repositório atualmente vazio |
+| Git / repositório de aplicação | Código-fonte, migrations, testes e CI/CD | Confirmado: `lucasfaborges94/erp-winservice-app`, privado, branch `main`, integração com permissão admin; inicializado com inventário estrutural Supabase e README, ainda sem migrations |
 
 ## 2. Recursos e práticas técnicas
 
@@ -59,3 +59,10 @@ Nunca registrar neste documento senhas, tokens, chaves privadas, service-role ke
 ## 6. Verificação do repositório de aplicação — 2026-11-08
 
 A integração GitHub confirmou metadados do repositório `lucasfaborges94/erp-winservice-app`: privado, branch padrão `main`, não arquivado e permissão `admin` para a integração. As APIs de conteúdo e commits confirmaram que o repositório está vazio. Nenhum código, migration ou pipeline foi criado. A estrutura inicial e a estratégia de migrations permanecem por definir; qualquer baseline deverá ser reconciliado com o estado real do Supabase antes de ser criado.
+
+
+## 6.1 Delegação operacional e baseline Supabase — 2026-11-08
+
+O responsável designou o agente atual como operador exclusivo para executar alterações no Supabase. A execução continuará subordinada aos gates de segurança, revisão, preflight, backup restaurável e autorização operacional específica já registrados; a delegação não será interpretada como autorização irrestrita.
+
+O repositório de aplicação contém o inventário estrutural inicial em `supabase/baseline/2026-11-08-schema-inventory.json` e o relatório de advisors em `supabase/baseline/2026-11-08-advisors.json`. Ainda não há dump SQL restaurável nem baseline de migrations: o Supabase retornou zero migrations, a relação de histórico não existe e a integração disponível não fornece Supabase CLI/`pg_dump`.
