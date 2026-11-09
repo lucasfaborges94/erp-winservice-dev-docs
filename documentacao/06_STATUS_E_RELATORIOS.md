@@ -108,3 +108,14 @@ Foram integrados 19 arquivos, com 5.357 adições e nenhuma remoção. O escopo 
 **Limites:** não há autenticação, tenancy, autorização, RLS, módulos/endpoints de negócio ou integração Supabase implementados. Nenhuma migration, operação Supabase ou deploy foi realizado. Os gates da seção 7 da ADR-0019 permanecem obrigatórios antes de endpoints de negócio ou conexão de clientes.
 
 **Estado:** scaffold integrado à `main`; PR #1 encerrado como merged. Próxima etapa deve respeitar a sequência da ADR-0019, começando pela especificação técnica de autenticação, empresa ativa, autorização, contexto transacional e acesso ao banco. Não presumir autorização para alterar Supabase ou fazer deploy.
+
+
+## 39. Branch de trabalho para hardening Supabase criada — 2026-11-09
+
+O repositório privado `lucasfaborges94/erp-winservice-app` recebeu a branch `work/supabase-hardening`, criada a partir de `main` no commit `2e73ce3f2377a8403992ee5b5b46fe4657b2eb56`. Na branch foi atualizado `supabase/README.md` com a estrutura prevista para migrations, baseline e testes, além das regras de segurança. A `main` não foi alterada.
+
+O projeto Supabase Winservice (`voaovwphncwbrwtcqnsc`, região `sa-east-1`, PostgreSQL 17.6.1.141) não possui branches de desenvolvimento cadastradas na consulta. O custo retornado para criar uma branch é US$ 0,01344/hora. A criação está pendente de confirmação explícita do responsável.
+
+A branch Supabase não foi criada porque a ferramenta aplica migrations do projeto principal, não copia dados de produção e a situação documentada é zero migrations, sem baseline restaurável. O inventário estrutural existente não substitui dump restaurável nem migrations. Criar agora uma branch não garante cópia do schema real; a baseline precisa ser reconciliada e validada primeiro, salvo decisão expressa de criar ambiente vazio.
+
+**Impacto/segurança:** nenhuma alteração foi realizada no banco principal, nenhuma migration foi aplicada, nenhum dado foi copiado e nenhum deploy foi realizado. Próximo passo: obter confirmação do custo e decidir se aguardamos a baseline restaurável ou provisionamos conscientemente um ambiente vazio.
