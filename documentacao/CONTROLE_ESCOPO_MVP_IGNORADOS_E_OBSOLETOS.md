@@ -1,6 +1,6 @@
 # Controle de escopo do MVP — itens ignorados, futuros e obsoletos
 
-**Versão:** 0.2.0  
+**Versão:** 0.3.0  
 **Data de criação:** 2026-11-08  
 **Estado:** inventário incremental  
 **Escopo de referência:** MVP operacional do ERP Winservice
@@ -43,6 +43,8 @@ A classificação documental não autoriza excluir tabelas, funções, colunas, 
 | Chat omnichannel próprio | Módulo/capacidade | **FUTURO** | Não incluir como entrega do MVP operacional. Chatwoot permanece solução transitória conforme o mapa de módulos; o Chat próprio será avaliado futuramente. | Mapa de módulos e ADR-0007. Não confundir com a máquina de estados operacional de visitas. |
 | SaaS / administração da plataforma (onboarding, planos, limites, faturamento SaaS e suporte multiempresa) | Módulo/capacidade | **FUTURO** | Fora da entrega operacional inicial; planejar em etapa futura. | O mapa de módulos classifica explicitamente esse domínio como futuro. |
 
+| Integrações externas e conectores (incluindo Auvo), webhooks, sincronizações, filas e infraestrutura dedicada | Capacidade transversal | **FORA_MVP** | Não implementar nem tornar dependência dos fluxos operacionais do MVP. Tratar autenticação, autorização, isolamento e demais problemas específicos quando a frente de integrações for desenvolvida. A API interna necessária às aplicações/módulos não é automaticamente excluída e será definida separadamente. | Deliberação explícita do responsável em 2026-11-08. |
+
 ## 4. Regras de uso do inventário
 
 1. Antes de especificar uma tabela, funcionalidade ou processo, verificar se já consta neste inventário.
@@ -72,5 +74,6 @@ A classificação documental não autoriza excluir tabelas, funções, colunas, 
 
 ## Histórico
 
+- 2026-11-08 — v0.3.0: confirma integrações externas fora do MVP e distingue a API interna, ainda pendente de definição.
 - 2026-11-08 — v0.2.0: incorpora esclarecimentos do responsável sobre documentos, canais de contato, relação equipamento–OS substituída por equipamento–visita, catálogos genéricos, template técnico e integrações; registra classificações e tratamentos sem autorizar exclusões físicas.
 - 2026-11-08 — v0.1.0: criação do inventário incremental; inclusão da tabela `public.expenses`, função associada, domínio Financeiro, check-in inicial automático, estruturas conceituais substituídas, relação N:M não incluída no desenho inicial, Chat próprio futuro e administração SaaS futura.
