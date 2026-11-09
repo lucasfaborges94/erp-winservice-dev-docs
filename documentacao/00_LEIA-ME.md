@@ -27,7 +27,8 @@ Esta documentação é a referência persistente para planejar, especificar, des
     ├── 05_STACK_RECURSOS.md
     ├── 06_STATUS_E_RELATORIOS.md
     ├── 07_GOVERNANCA_DOCUMENTAL.md
-    ├── 08_CONTINUIDADE_E_TRANSFERENCIA.md\n    ├── CONTEXTO_ATUAL_ERP.md
+    ├── 08_CONTINUIDADE_E_TRANSFERENCIA.md\n    ├── IDENTIDADE_VISUAL_E_PALETA.md
+    ├── CONTEXTO_ATUAL_ERP.md
     ├── MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md
     ├── MODELO_FUNCIONAL_OPERACIONAL_MVP.md
     ├── MODELO_LOGICO_DADOS_OPERACAO.md
@@ -54,7 +55,8 @@ Esta documentação é a referência persistente para planejar, especificar, des
 12. [Modelo funcional operacional do MVP](MODELO_FUNCIONAL_OPERACIONAL_MVP.md) — requisitos funcionais de Operação, incluindo requisitos, evidências e aceite digital; não substitui ADRs nem comprova implementação.
 13. [Modelo lógico de dados e matriz de conformidade — Operação](MODELO_LOGICO_DADOS_OPERACAO.md) — proposta técnica para validação; não aprovada como modelo físico.
 14. [Base de Conhecimento do ERP](BASE_CONHECIMENTO_ERP.md) — arquitetura aprovada conceitualmente para organizar conhecimento compartilhado por humanos e agentes de IA; contratos e conteúdos detalhados serão construídos progressivamente.
-15. [Rascunho](RASCUNHO.md) — ideias e propostas ainda não aprovadas.
+15. [Identidade visual e paleta semântica](IDENTIDADE_VISUAL_E_PALETA.md) — proposta de cores semânticas para textos, botões, fundos e cards; inclui regra explícita de contraste para o título do card secundário.
+16. [Rascunho](RASCUNHO.md) — ideias e propostas ainda não aprovadas.
 
 ## Regras essenciais
 
@@ -75,6 +77,8 @@ Esta documentação é a referência persistente para planejar, especificar, des
 Esses arquivos são fotografias técnicas daquela data, não garantia de que o ambiente continua idêntico.
 
 ## Histórico deste arquivo
+
+- 2026-11-09 — inclusão do documento de identidade visual e paleta semântica no mapa documental.
 
 - 2026-11-08 — atualização: inclui o índice operacional CONTEXTO_ATUAL_ERP.md e a regra de consulta por mensagem/registro incremental.\n- 2026-11-08 — v1.1.0: inclui a arquitetura da Base de Conhecimento do ERP e atualiza o mapa dos artefatos de Operação.
 - 2026-11-08 — atualização do mapa documental para incluir a arquitetura da Base de Conhecimento do ERP e a consolidação do ciclo operacional único da visita.
