@@ -95,3 +95,16 @@ A branch `review/api-scaffold-2026-11-09` está no commit `970dc9c1658fdc0077972
 A inspeção do patch e da ADR-0019 confirma que o PR contém apenas scaffold NestJS/Hello World, configurações, documentação e testes de exemplo. Não implementa autenticação, tenancy, autorização, RLS, módulos/endpoints de negócio, integração Supabase ou deploy.
 
 **Estado:** PR mergeable, aberto e aguardando revisão/decisão humana. Nenhum merge foi executado. Merge depende de autorização explícita específica. Nenhuma operação Supabase ou deploy foi realizada.
+
+
+## 38. PR #1 integrado — scaffold NestJS na main — 2026-11-09
+
+Após autorização explícita do responsável, o PR #1 — [chore(api): add NestJS scaffold for ERP](https://github.com/lucasfaborges94/erp-winservice-app/pull/1) — foi integrado com estratégia de merge commit. A operação usou o SHA esperado do head `970dc9c1658fdc007797283aec669fbc99b50d20`; o GitHub retornou `merged: true`.
+
+**Verificação posterior:** PR #1 está fechado e merged (`merged_at: 2026-11-09T13:25:11Z`). Commit de merge: `2e73ce3f2377a8403992ee5b5b46fe4657b2eb56`. A referência `main` do repositório de aplicação foi consultada e aponta para esse mesmo SHA. O commit tem como pais a base `0a6f7ac84a56b092a949817345b5d278abfbfdf7` e o head do PR `970dc9c1658fdc007797283aec669fbc99b50d20`; verificação de assinatura informada pelo GitHub: válida.
+
+Foram integrados 19 arquivos, com 5.357 adições e nenhuma remoção. O escopo permanece scaffold NestJS/Hello World, configurações, documentação e testes de exemplo. Build, unitários (1/1), e2e (1/1) e lint (0 warnings/0 errors) foram reportados anteriormente pelo responsável como executados localmente; não houve nova execução de testes nesta operação.
+
+**Limites:** não há autenticação, tenancy, autorização, RLS, módulos/endpoints de negócio ou integração Supabase implementados. Nenhuma migration, operação Supabase ou deploy foi realizado. Os gates da seção 7 da ADR-0019 permanecem obrigatórios antes de endpoints de negócio ou conexão de clientes.
+
+**Estado:** scaffold integrado à `main`; PR #1 encerrado como merged. Próxima etapa deve respeitar a sequência da ADR-0019, começando pela especificação técnica de autenticação, empresa ativa, autorização, contexto transacional e acesso ao banco. Não presumir autorização para alterar Supabase ou fazer deploy.
