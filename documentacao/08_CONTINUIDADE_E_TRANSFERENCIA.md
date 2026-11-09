@@ -1314,3 +1314,12 @@ A integração GitHub disponível nesta sessão foi inspecionada e não expõe a
 5. Registrar o endereço do repositório de aplicação no contexto, stack e documentação de governança.
 
 **Limites:** nenhuma alteração foi feita no Supabase; nenhum repositório foi criado nesta sessão; nenhum código, migration ou pipeline foi adicionado.
+
+
+### Complemento da sessão — tentativa de verificação do repositório de aplicação (2026-11-08)
+
+O responsável compartilhou a URL `https://github.com/lucasfaborges94/erp-winservice-app` para confirmação da criação. A chamada de leitura de metadados do repositório pela integração retornou HTTP 404. A listagem dos repositórios acessíveis da conta `lucasfaborges94` retornou somente `erp-winservice-dev-docs`.
+
+**Conclusão limitada:** `erp-winservice-app` não está visível/acessível à integração GitHub usada nesta sessão. O resultado não prova que o repositório inexista: pode estar privado e sem acesso concedido à integração. Não foi possível confirmar proprietário efetivo, visibilidade, branch padrão, permissões ou existência. Nenhuma alteração foi feita no repositório de aplicação ou no Supabase.
+
+**Próximo passo:** conceder à integração GitHub acesso ao repositório privado (se ele já foi criado) e solicitar nova verificação. Após acesso confirmado, validar que é privado e usa `main`, então definir a estrutura inicial e o fluxo de migrations conforme documentação aprovada.
