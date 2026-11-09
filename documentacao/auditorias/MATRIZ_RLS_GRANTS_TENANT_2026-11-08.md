@@ -7,13 +7,13 @@
 
 ## 1. Resumo
 
-- 38 tabelas base no schema public.
+- 310 tabelas base no schema public.
 - RLS habilitado em 38/38; FORCE ROW LEVEL SECURITY desabilitado em 38/38.
-- Grants explícitos para `anon` e `authenticated` foram observados em 38/38 tabelas. O conjunto de privilégios concedidos inclui DELETE, INSERT, REFERENCES, SELECT, TRIGGER, TRUNCATE e UPDATE.
+- Grants explícitos para `anon` e `authenticated` foram observados em 38/310 tabelas. O conjunto de privilégios concedidos inclui DELETE, INSERT, REFERENCES, SELECT, TRIGGER, TRUNCATE e UPDATE.
 - 26 tabelas sem policy.
 - 12 tabelas com uma ou mais policies.
-- 8 tabelas com pelo menos uma policy contendo predicado literal `true` em USING ou WITH CHECK; em `users`, o predicado true pertence à policy de INSERT, enquanto SELECT permanece limitado ao próprio usuário.
-- 21 tabelas sem a coluna `company_identifier` na captura atual; isso inclui entidades operacionais importantes como `visits`, `work_orders`, `equipments` e `quotations`, cuja tenancy deverá ser resolvida conforme o plano Parte A antes da liberação multiempresa.
+- 10 tabelas com pelo menos uma policy contendo predicado literal `true` em USING ou WITH CHECK; em `users`, o predicado true pertence à policy de INSERT, enquanto SELECT permanece limitado ao próprio usuário.
+- 23 tabelas sem a coluna `company_identifier` na captura atual; isso inclui entidades operacionais importantes como `visits`, `work_orders`, `equipments` e `quotations`, cuja tenancy deverá ser resolvida conforme o plano Parte A antes da liberação multiempresa.
 - `company_user_roles` não possui atualmente `company_identifier`, embora a ADR-0018 exija tenant e FKs compostas na migração.
 
 **Interpretação:** grants permitem que os papéis alcancem os objetos pela Data API, mas RLS determina quais linhas podem ser acessadas. O grant amplo não significa, sozinho, que RLS esteja sendo ignorado. Entretanto, policies permissivas com `true` não fornecem isolamento por tenant; tabelas sem policy tendem a negar acesso para papéis sujeitos a RLS. Funções SECURITY DEFINER e owners/bypass RLS precisam ser avaliados separadamente.
