@@ -23,3 +23,18 @@ O responsável reportou a execução de `npm.cmd pkg delete scripts.deploy` no d
 **Estado:** validação automatizada aprovada após a remoção reportada de Mau e do script deploy. A execução do comando de remoção não substitui a inspeção do conteúdo final do package.json; package-lock.json, AGENTS.md e README.md atualizados ainda precisam ser revisados. Nenhum commit/push do scaffold foi confirmado. O scaffold permanece sem módulos/endpoints de negócio e sujeito aos gates da ADR-0019. Nenhuma operação Supabase foi realizada.
 
 **Próximo passo:** revisar os quatro arquivos atualizados e o diff/status local antes de preparar o primeiro commit.
+
+## 32. Revisão dos arquivos atualizados do scaffold API — 2026-11-09
+
+O responsável compartilhou a leitura local atualizada de `AGENTS.md`, `README.md`, `package.json` e as primeiras 40 linhas de `package-lock.json`.
+
+**Resultados da revisão:**
+- `package.json`: script `deploy` ausente; `@nestjs/mau` ausente; licença `UNLICENSED` preservada.
+- `package-lock.json`: lockfile v3; o pacote raiz nas linhas fornecidas corresponde às dependências e devDependencies do manifesto. Inspeção incompleta, pois somente as primeiras 40 linhas foram disponibilizadas.
+- `AGENTS.md`: ainda contém instruções de instalação/uso do NestJS Observe, não adotado na fundação; requer remoção/adequação.
+- `README.md`: permanece o template NestJS com referências a Mau/AWS, Observe e MIT do framework; requer substituição por documentação da API ERP.
+- Build, testes unitários (1 teste), e2e (1 teste) e lint (0 warnings/0 errors) foram reportados como aprovados após a limpeza.
+
+**Estado:** manifests apresentam alinhamento aparente na parte inspecionada; não há auditoria integral do lockfile. Documentação local ainda não está pronta para commit. O scaffold não foi confirmado no repositório remoto de aplicação e não há commit/push confirmado.
+
+**Próximo passo:** revisar AGENTS.md e README.md após ajuste, conferir lockfile integral, diff e status local. Não criar commit sem revisão e autorização explícita.
