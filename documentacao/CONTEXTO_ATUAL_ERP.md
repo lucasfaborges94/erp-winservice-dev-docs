@@ -63,3 +63,10 @@ O responsável executou a remoção local de `package.json` e `package-lock.json
 A branch `review/api-scaffold-2026-11-09` foi consultada no GitHub. A comparação com `main` informa 3 commits à frente, 0 atrás, e 19 arquivos adicionados, todos concentrados no scaffold em `apps/api` e configurações relacionadas. A revisão dos manifests e documentos confirma `UNLICENSED`, ausência de Mau e do script `deploy`, e documentação alinhada à ADR-0019.
 
 **Estado:** scaffold revisado e gates locais reportados como aprovados após sincronização. Nenhum endpoint de negócio, autenticação, tenancy, integração Supabase ou deploy foi implementado. Branch ainda não integrada à `main`. Próxima decisão: autorização explícita para abrir PR da branch de revisão contra `main`; não realizar merge sem aprovação específica.
+
+
+### Pull Request aberto para integração do scaffold — 2026-11-09
+
+Após autorização explícita do responsável, foi criado o [PR #1 — chore(api): add NestJS scaffold for ERP](https://github.com/lucasfaborges94/erp-winservice-app/pull/1), de `review/api-scaffold-2026-11-09` para `main` no repositório de aplicação. O GitHub confirmou estado `open`, não draft, 3 commits, 19 arquivos alterados (5.357 adições, 0 remoções), head `970dc9c1658fdc007797283aec669fbc99b50d20` e base `0a6f7ac84a56b092a949817345b5d278abfbfdf7`. A resposta inicial da API retornou `mergeable: false`; isso foi registrado como estado retornado pelo GitHub, sem inferir a causa nem afirmar conflito confirmado.
+
+**Estado:** PR aberto e aguardando revisão; nenhum merge foi executado. Não há autorização para deploy, alterações no Supabase ou implementação de endpoints de negócio. Próximo passo: revisar PR #1 e esclarecer o estado de mergeabilidade antes de qualquer integração.
