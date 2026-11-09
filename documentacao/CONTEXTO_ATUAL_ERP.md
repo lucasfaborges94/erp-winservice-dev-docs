@@ -28,3 +28,15 @@ O responsável compartilhou a saída local atualizada de `AGENTS.md`, `README.md
 **Validação automatizada reportada na sessão:** build, unitários (1/1), e2e (1/1) e lint (0 warnings/0 errors) aprovados após a limpeza.
 
 **Estado:** a revisão textual está concluída, mas AGENTS.md e README.md ainda precisam de ajuste. Não há commit/push do scaffold confirmado; o repositório remoto de aplicação continua no HEAD baseline anteriormente consultado, sem o scaffold. Próximo passo: adequar os dois documentos, compartilhar seu conteúdo atualizado e a saída integral de conferência do lockfile/status/diff; só então revisar o conjunto para o primeiro commit.
+
+### Publicação e revisão remota do scaffold da API — 2026-11-09
+
+O responsável confirmou o commit local `01d00ea` (`chore(api): add NestJS API scaffold`) e o push da branch `review/api-scaffold-2026-11-09` no repositório privado `lucasfaborges94/erp-winservice-app`. A integração GitHub confirmou a existência da branch e a leitura dos 19 arquivos publicados. O scaffold contém NestJS/TypeScript, ESM, Express, Vitest, Oxlint e configurações; o código funcional ainda é somente o Hello World de exemplo, sem módulos ou endpoints de negócio.
+
+**Revisão remota:** `apps/api/package.json` não contém `@nestjs/mau` nem script `deploy`; licença `UNLICENSED`. O `package-lock.json` usa lockfile v3, corresponde ao manifesto raiz quanto às dependências e devDependencies e não contém referências a Mau. `AGENTS.md` e `README.md` foram corrigidos diretamente na branch de revisão para remover instruções de NestJS Observe/Mau e documentar a arquitetura/gates da ADR-0019. As gravações foram confirmadas pela integração; os arquivos devem ser relidos e validados após a gravação.
+
+**Ponto local pendente:** a saída do commit mostrou `package.json` e `package-lock.json` na raiz como não rastreados (`??`), fora dos 19 arquivos commitados. A origem e necessidade desses dois arquivos ainda não foram verificadas; não adicionar nem excluir sem inspeção. Os avisos LF/CRLF não impediram o commit/push.
+
+**Testes:** build, unitários (1/1), e2e (1/1) e lint (0 warnings/0 errors) haviam sido reportados pelo responsável antes do push. Esta revisão remota não executou os testes. Como README/AGENTS foram ajustados remotamente após o push, será necessária nova validação local depois de sincronizar a branch.
+
+**Estado:** scaffold publicado em branch de revisão, não integrado à main. Nenhuma operação Supabase ou deploy foi realizada. Próximo passo: concluir a releitura remota das correções, solicitar inspeção dos dois manifests não rastreados da raiz e então pedir sincronização da branch e repetição dos testes locais; não abrir/mesclar PR antes de resolver os pontos de revisão.
