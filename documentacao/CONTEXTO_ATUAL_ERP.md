@@ -81,3 +81,14 @@ A branch `review/api-scaffold-2026-11-09` permanece no commit `970dc9c1658fdc007
 A revisão do patch e da ADR-0019 confirma que o conteúdo segue limitado ao scaffold NestJS/Hello World, configurações, documentação e testes de exemplo. Não há módulos ou endpoints de negócio, autenticação, tenancy, autorização, integração Supabase ou deploy. Os gates da seção 7 da ADR-0019 continuam obrigatórios antes de conectar clientes ou implementar endpoints de negócio.
 
 **Estado:** PR aberto e atualmente mergeable, aguardando decisão/revisão humana. Nenhum merge foi executado. Nenhuma alteração no Supabase ou deploy foi realizada. Merge continua dependendo de autorização explícita específica do responsável.
+
+
+### Integração do scaffold da API na main — 2026-11-09
+
+Após autorização explícita do responsável nesta sessão, foi executado o merge do PR #1 — [chore(api): add NestJS scaffold for ERP](https://github.com/lucasfaborges94/erp-winservice-app/pull/1) — usando a estratégia de merge commit e protegendo a operação com o SHA esperado da branch (`970dc9c1658fdc007797283aec669fbc99b50d20`). O GitHub retornou `merged: true`.
+
+**Evidência pós-operação:** PR #1 está `closed` e `merged: true`, com `merged_at: 2026-11-09T13:25:11Z`. O commit de merge é `2e73ce3f2377a8403992ee5b5b46fe4657b2eb56`; a referência `main` do repositório `lucasfaborges94/erp-winservice-app` foi consultada e aponta exatamente para esse SHA. O commit possui os pais esperados: base anterior `0a6f7ac84a56b092a949817345b5d278abfbfdf7` e head do PR `970dc9c1658fdc007797283aec669fbc99b50d20`. A assinatura do commit aparece como verificada pelo GitHub.
+
+**Escopo integrado:** 19 arquivos, 5.357 adições e 0 remoções. O código continua limitado ao scaffold NestJS/Hello World, configurações, documentação e testes de exemplo. Build, testes unitários (1/1), e2e (1/1) e lint (0 warnings/0 errors) foram reportados anteriormente como executados localmente pelo responsável; não foram executados novamente pelo merge. Não há implementação de autenticação, tenancy, autorização, RLS, módulos/endpoints de negócio, integração Supabase ou deploy.
+
+**Estado e limites:** scaffold integrado à `main`. Nenhuma operação Supabase, migration ou deploy foi executada. Os gates da seção 7 da ADR-0019 continuam obrigatórios antes de endpoints de negócio ou conexão de clientes. A branch local do responsável não foi alterada por esta operação remota.
