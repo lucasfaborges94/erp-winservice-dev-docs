@@ -371,7 +371,7 @@ A proposta física foi atualizada para v0.4.0, e o contexto operacional e a cont
 
 ## 21. Identificação do repositório de implementação — 2026-11-08
 
-A consulta à integração GitHub listou somente `lucasfaborges94/erp-winservice-dev-docs` entre os repositórios acessíveis. Buscas por repositórios do proprietário com os termos `erp`, `winservice` e `backend` não localizaram repositório de implementação; os resultados disponíveis apontaram apenas para o repositório documental. Essa cobertura não permite afirmar que inexista código em outra conta, organização ou ambiente.
+O responsável confirmou que não existe outro repositório além de `lucasfaborges94/erp-winservice-dev-docs`; não há repositório separado de código-fonte da aplicação.
 
-**Estado:** bloqueado para auditoria de dependências em código e confirmação do baseline de migrations. É necessário obter a URL/nome do repositório de implementação e validar o acesso. Nenhuma alteração no código ou Supabase foi executada. Não preparar nem executar migrations presumindo um baseline não verificado.
+**Estado:** não há dependências de aplicação em outro repositório nem baseline Git de migrations a auditar. Próxima etapa: inspecionar, somente para leitura, o histórico de migrations e o schema real do Supabase; em seguida, propor o local e o fluxo de versionamento das migrations futuras. Nenhuma alteração no código ou Supabase foi executada.
 
