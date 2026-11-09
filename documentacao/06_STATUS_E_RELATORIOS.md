@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 1.9.3  
+**Versão:** 1.9.4  
 **Data-base:** 2026-11-08
 
 ## 1. Resumo executivo
@@ -9,7 +9,7 @@ O projeto está em fase de definição arquitetural, organização de governanç
 
 A prioridade da primeira versão é Operação, com substituição gradual por módulos.
 
-A documentação passou a definir explicitamente o repositório GitHub como memória documental oficial e persistente, com procedimento obrigatório de recuperação e manutenção do contexto entre sessões. Históricos de conversa e memórias internas de IA são auxiliares. O estado efetivamente implementado deve ser verificado no código, nas migrações e nos ambientes correspondentes.
+A documentação passou a exigir consulta ao GitHub antes de cada resposta sobre o ERP, com registro incremental de sessões e pontos-chave. O repositório GitHub é a memória documental oficial e persistente, com procedimento obrigatório de recuperação e manutenção do contexto entre sessões. Históricos de conversa e memórias internas de IA são auxiliares. O estado efetivamente implementado deve ser verificado no código, nas migrações e nos ambientes correspondentes.
 
 ## 2. Estado conhecido
 
@@ -223,7 +223,7 @@ Achados confirmados: 1 registro em `permissions` (`customer/view`, sem código e
 
 ## Histórico de alterações
 
-- 2026-11-08 — v1.9.3: registra auditoria somente leitura das tabelas atuais de permissões após aprovação do modelo físico.
+- 2026-11-08 — v1.9.4: registra aprovação do protocolo de consulta por mensagem, registro incremental de sessões e criação do índice de contexto operacional.\n- 2026-11-08 — v1.9.3: registra auditoria somente leitura das tabelas atuais de permissões após aprovação do modelo físico.
 - 2026-11-08 — v1.9.2: registra a aprovação do modelo físico do catálogo de permissões; implementação e DDL continuam não autorizados.
 - 2026-11-08 — v1.4.0: registra formalização da memória documental oficial, atualização do protocolo de retomada e preparação para continuar o MVP na próxima sessão.
 - 2026-11-08 — v1.3.0: registra requisitos/pendências, avaliações por tentativa, evidências e uploads idempotentes, coleta de assinatura e aceite digital versionado.
@@ -349,3 +349,14 @@ Documentos atualizados:
 - [Plano de migração Parte A](relatorios/PLANO_MIGRACAO_FUNDACAO_MULTIEMPRESA_PARTE_A_MVP.md) — v0.3.0.
 
 A decisão documental não autoriza execução de DDL/DML ou migration no Supabase.
+
+
+## 19. Protocolo de consulta contínua e contexto operacional — 2026-11-08
+
+O responsável aprovou o protocolo de consulta obrigatória ao repositório antes de cada resposta relacionada ao ERP, inclusive durante conversas em andamento. A regra exige releitura da mensagem mais recente, consulta da fonte da verdade, do protocolo de atuação, do contexto operacional, da continuidade e dos documentos/ADRs pertinentes.
+
+Foi estabelecido registro incremental de sessões e pontos-chave: aprovações, decisões, requisitos, correções, descobertas, mudanças de estado, artefatos, testes, riscos, pendências e próximos passos devem ser registrados conforme forem confirmados. Uma sessão pode abranger várias mensagens correlatas; não se deve criar um registro artificial por mensagem.
+
+Foi criado `documentacao/CONTEXTO_ATUAL_ERP.md` como índice operacional e resumo rápido, sem autoridade para substituir documentos normativos ou evidências.
+
+Esta atualização é documental. Não representa alteração de código, banco, migrations, policies, funções, triggers ou infraestrutura.
