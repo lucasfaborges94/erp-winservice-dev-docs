@@ -51,7 +51,13 @@ Também permanecem frentes registradas no histórico de continuidade, incluindo 
 
 Em 2026-11-08, foi aprovada a convenção semântica `entidade.ação` para `permission_code`, em minúsculas e independente dos nomes físicos das tabelas. O registro legado `customer/view` deverá ser mapeado para `customer.view`, sujeito à validação no plano de migração. A aprovação não define a matriz completa de permissões nem autoriza alterações no Supabase. Especificação: [proposta física do catálogo de permissões v0.4.0](relatorios/PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md).
 
-## 6. Índice por assunto
+## 6. Bloqueio de identificação do repositório de implementação
+
+Na consulta de 2026-11-08, a integração GitHub disponibilizou somente `lucasfaborges94/erp-winservice-dev-docs` na listagem de repositórios acessíveis. Buscas por repositórios do proprietário com os termos `erp`, `winservice` e `backend` não localizaram repositório de implementação; os resultados encontrados apontaram apenas para o repositório documental. Isso não prova que não exista código em outra conta/organização ou fora do escopo de acesso da integração.
+
+**Bloqueio:** não é possível auditar dependências em código, localizar migrations existentes ou confirmar o baseline oficial. Próxima ação: obter do responsável a URL/nome do repositório de implementação e confirmar acesso. Até lá, não produzir migration como se o baseline estivesse conhecido nem executar alterações no Supabase.
+
+## 7. Índice por assunto
 
 | Assunto | Fonte a consultar |
 |---|---|
@@ -69,7 +75,7 @@ Em 2026-11-08, foi aprovada a convenção semântica `entidade.ação` para `per
 | Migração multiempresa | [relatorios/PLANO_MIGRACAO_FUNDACAO_MULTIEMPRESA_PARTE_A_MVP.md](relatorios/PLANO_MIGRACAO_FUNDACAO_MULTIEMPRESA_PARTE_A_MVP.md) |
 | Catálogo de permissões | [relatorios/PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md](relatorios/PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md) |
 
-## 7. Registro incremental de sessões
+## 8. Registro incremental de sessões
 
 - Registrar aprovações, decisões, requisitos, correções, descobertas, mudanças de estado, artefatos, testes, riscos, bloqueios e próximos passos assim que forem confirmados.
 - Uma sessão pode abranger várias mensagens correlatas; atualizar seu registro em vez de criar um arquivo por mensagem.
@@ -77,6 +83,6 @@ Em 2026-11-08, foi aprovada a convenção semântica `entidade.ação` para `per
 - Não registrar como implementado algo que foi apenas discutido, especificado ou aprovado.
 - Não gerar commits artificiais quando não houver mudança relevante.
 
-## 8. Última atualização
+## 9. Última atualização
 
-Este índice foi atualizado em 2026-11-08 para registrar a convenção aprovada de códigos de permissão. O HEAD exato deve ser verificado no GitHub a cada consulta; não presumir que o commit desta atualização continua sendo o HEAD atual. O HEAD exato deve ser verificado no GitHub a cada consulta; não presumir que o commit desta criação continua sendo o HEAD atual.
+Este índice foi atualizado em 2026-11-08 para registrar a convenção aprovada de códigos de permissão e o bloqueio de identificação do repositório de implementação. O HEAD exato deve ser verificado no GitHub a cada consulta; não presumir que o commit desta atualização continua sendo o HEAD atual. O HEAD exato deve ser verificado no GitHub a cada consulta; não presumir que o commit desta criação continua sendo o HEAD atual.
