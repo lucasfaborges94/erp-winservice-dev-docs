@@ -38,3 +38,13 @@ O responsável compartilhou a leitura local atualizada de `AGENTS.md`, `README.m
 **Estado:** manifests apresentam alinhamento aparente na parte inspecionada; não há auditoria integral do lockfile. Documentação local ainda não está pronta para commit. O scaffold não foi confirmado no repositório remoto de aplicação e não há commit/push confirmado.
 
 **Próximo passo:** revisar AGENTS.md e README.md após ajuste, conferir lockfile integral, diff e status local. Não criar commit sem revisão e autorização explícita.
+
+## 33. Publicação e revisão remota do scaffold da API — 2026-11-09
+
+O responsável confirmou o commit `01d00ea` (`chore(api): add NestJS API scaffold`) e o push da branch `review/api-scaffold-2026-11-09` no repositório privado de aplicação. A integração GitHub confirmou a branch e os arquivos publicados (19 arquivos, 5.379 inserções). O scaffold contém apenas a fundação NestJS e Hello World de exemplo; não há módulos/endpoints de negócio.
+
+**Verificações remotas:** `apps/api/package.json` não contém Mau nem script `deploy`, mantém `UNLICENSED`; o lockfile v3 corresponde às dependências/devDependencies do manifesto raiz e não contém referências a Mau. `AGENTS.md` e `README.md` foram substituídos diretamente na branch de revisão para refletir a arquitetura aprovada, retirar recomendações de Observe/Mau e registrar os gates da ADR-0019. A revisão do código não executou testes.
+
+**Pendência:** a saída local de Git mostrou dois arquivos não rastreados na raiz (`package.json` e `package-lock.json`), ausentes do commit. Sua origem e necessidade precisam ser esclarecidas antes de adicionar ou excluir. Os testes build, unitário 1/1, e2e 1/1 e lint 0 warnings/0 errors foram reportados como aprovados anteriormente; após sincronizar as correções remotas de documentação, repetir essas verificações localmente.
+
+**Estado:** branch publicada para revisão, ainda não integrada à main. Nenhuma operação Supabase ou deploy. Próximos passos: validar os arquivos corrigidos após releitura, inspecionar os manifests soltos da raiz e repetir os gates locais antes de considerar integração.
