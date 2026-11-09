@@ -375,3 +375,42 @@ O responsável confirmou que não existe outro repositório além de `lucasfabor
 
 **Estado:** não há dependências de aplicação em outro repositório nem baseline Git de migrations a auditar. Próxima etapa: inspecionar, somente para leitura, o histórico de migrations e o schema real do Supabase; em seguida, propor o local e o fluxo de versionamento das migrations futuras. Nenhuma alteração no código ou Supabase foi executada.
 
+
+
+## 22. Delegação operacional e baseline estrutural do Supabase — 2026-11-08
+
+O responsável determinou que o agente atual será o operador exclusivo para executar alterações no Supabase do ERP. A delegação identifica o operador autorizado, mas não dispensa revisão, preflight, backup restaurável, gates de aprovação já existentes, nem validação após cada mudança. Nenhuma alteração de banco foi autorizada ou executada por esta deliberação isolada.
+
+### Estado real consultado
+
+Projeto `voaovwphncwbrwtcqnsc` (Winservice), região `sa-east-1`, PostgreSQL `17.6.1.141`, estado `ACTIVE_HEALTHY`.
+
+Inventário estrutural do schema `public` capturado em modo somente leitura e versionado em `lucasfaborges94/erp-winservice-app/supabase/baseline/2026-11-08-schema-inventory.json`:
+- 38 tabelas e 461 colunas;
+- 206 constraints e 110 índices;
+- 11 funções e 18 triggers;
+- 23 policies RLS;
+- 34 sequences e 8 extensões instaladas;
+- 1.064 concessões de privilégios de tabela.
+
+Contagens de linhas confirmadas por consultas somente leitura: 26 visitas, 103 clientes, 99 endereços, 1 empresa, 1 linha em `company_users`, 2 em `company_user_roles`, 3 papéis, 1 permissão, 0 em `role_permissions` e 0 em `user_permissions`.
+
+A coluna `company_users.role_identifier` permanece no schema, com a FK `company_users_role_identifier_fkey`; a função `public.can_view_expense(uuid)` também permanece. Isso confirma que os itens da ADR-0018 ainda não foram implementados fisicamente.
+
+### Migrations e limites do artefato
+
+A listagem de migrations retornou zero e `supabase_migrations.schema_migrations` não existe. O arquivo JSON é um inventário estrutural datado, sem dados de linhas, segredos ou credenciais; não é dump restaurável nem migration inicial. A integração Supabase desta sessão não disponibiliza Supabase CLI/`pg_dump`, portanto o baseline SQL restaurável permanece pendente. Não presumir equivalência integral do JSON a um backup físico/lógico.
+
+### Advisors — triagem inicial
+
+Relatório: `supabase/baseline/2026-11-08-advisors.json`.
+- Segurança: 26 tabelas com RLS habilitado sem policy; 7 funções com `search_path` mutável; 2 funções `SECURITY DEFINER` executáveis por `anon` e `authenticated`; proteção contra senhas vazadas desabilitada.
+- Performance: 89 FKs sem índice de cobertura; 2 pares de índices duplicados; 12 índices sem uso observado; 1 policy com reavaliação de função Auth por linha.
+
+Os avisos exigem triagem individual contra os contratos de acesso e a arquitetura aprovada. Nenhuma policy, função, grant, índice ou configuração de Auth foi alterada.
+
+### Próximos passos
+
+1. Obter um dump SQL estrutural restaurável com Supabase CLI/`pg_dump`, revisar o resultado e estabelecer o baseline versionado de migrations sem aplicar nada ao remoto.
+2. Auditar os achados de segurança, priorizando funções `SECURITY DEFINER` expostas e o modelo de RLS, sem aplicar correções presumidas.
+3. Concluir a especificação executável da fundação multiempresa e do catálogo de permissões, reconciliando-a com este inventário e com o estado remoto imediatamente antes da execução.
