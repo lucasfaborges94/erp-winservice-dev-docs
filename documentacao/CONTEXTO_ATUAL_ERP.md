@@ -219,3 +219,12 @@ O responsável determinou que os dados atualmente armazenados no Supabase não d
 **Escopo ainda a detalhar antes da execução:** identificar todas as tabelas e dependências afetadas; separar dados transacionais/de domínio de identidades e infraestrutura do Supabase Auth; definir quais contas/perfis de teste serão preservados ou recriados; projetar ordem transacional de limpeza e inserção; garantir consistência referencial, isolamento multiempresa e cobertura dos cenários do MVP. A expressão “todos os dados do banco” não será interpretada automaticamente como autorização para excluir usuários Auth, configurações, storage, funções, roles ou objetos de schema.
 
 **Gate operacional:** a autorização do responsável para substituir os dados está registrada, mas a execução permanece BLOQUEADA até existir backup restaurável, ensaio de restauração isolado, inventário atualizado e plano revisado de limpeza/repopulação. Não executar DDL/DML destrutivo em produção antes desses gates e de confirmação do escopo exato. Nenhuma alteração no Supabase foi realizada nesta deliberação.
+
+
+## Confirmação de escopo — substituir também identidades e dados Auth (2026-11-09)
+
+Em resposta à delimitação, o responsável confirmou: “Pode substituir tudo”. Para o plano de reset, considerar autorizada a substituição integral dos DADOS armazenados, incluindo registros de domínio/transacionais do ERP, perfis ERP e identidades/contas de teste do Supabase Auth, com criação de uma nova massa fictícia. O plano deve prever recriação coerente de usuários Auth e respectivos vínculos `users.auth_user_identifier`, empresas, vínculos e papéis conforme os requisitos vigentes.
+
+A autorização refere-se aos dados, não à destruição indiscriminada do schema ou da plataforma. Não remover automaticamente tabelas/colunas, migrations, funções, triggers, policies, grants, roles PostgreSQL, extensões, configurações do projeto, buckets/objetos Storage ou Edge Functions; alterações estruturais exigem especificação e autorização próprias. O destino/escopo de objetos Storage deve ser inventariado e tratado separadamente se houver conteúdo armazenado.
+
+**Execução continua BLOQUEADA** até backup restaurável que cubra banco e Auth, ensaio isolado de restauração, inventário atualizado e plano revisado com ordem de exclusão/recriação e validações. Nenhuma operação foi executada no Supabase.
