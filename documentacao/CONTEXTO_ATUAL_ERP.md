@@ -137,3 +137,12 @@ Nenhuma chamada RPC de negócio, teste de exploração ou leitura de payload/seg
 Foi consultado o catálogo PostgreSQL das 310 tabelas de public. RLS está habilitado em 38/38; FORCE RLS está desabilitado em 38/38; grants explícitos para anon e authenticated foram observados em 38/38; 26 tabelas não possuem policies; 10 tabelas têm policy com predicado literal true (em users, apenas INSERT). 23 tabelas não possuem company_identifier na captura, incluindo visits, work_orders, equipments, quotations e company_user_roles. A matriz por tabela e limitações está em [MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md](auditorias/MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md).
 
 O grant amplo não ignora RLS por si só; tabelas sem policy tendem a negar acesso para papéis sujeitos a RLS. O risco mais direto está nas policies permissivas sem filtro de empresa e nas funções privilegiadas identificadas no relatório de segurança. Nenhuma alteração foi feita no banco.
+
+
+## Deliberação — integrações fora do MVP (2026-11-08)
+
+O responsável determinou que integrações externas não façam parte do MVP. Auvo, conectores, webhooks, sincronizações, filas e infraestrutura específica de integração não devem ser implementados nem constituir dependência dos fluxos operacionais desta entrega. Os problemas técnicos próprios dessa frente serão tratados quando o desenvolvimento das integrações for retomado.
+
+Essa exclusão não elimina automaticamente a necessidade de uma API interna para servir as aplicações e os módulos do ERP. O protocolo/API interna continua como questão arquitetural em aberto e deve ser definido separadamente. A classificação de integrações como fora do MVP também não autoriza remover objetos já existentes no Supabase.
+
+A auditoria anterior identificou a RPC `public.authorize_integration_sync_event(...)` como SECURITY DEFINER e executável por `anon`/`authenticated`, sem validação de autenticidade visível no corpo inspecionado. O conector está fora do escopo de implementação do MVP; contudo, a existência e a exposição atuais desse objeto permanecem um risco de segurança do ambiente a ser isolado/avaliado antes de qualquer disponibilização pública, sem presumir que a exclusão funcional por si só o desative. Nenhuma alteração no banco foi executada nesta deliberação.
