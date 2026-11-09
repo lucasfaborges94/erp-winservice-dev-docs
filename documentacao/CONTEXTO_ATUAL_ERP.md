@@ -120,3 +120,12 @@ Os advisors foram registrados separadamente. Principais achados:
 - Performance: 89 FKs sem índice de cobertura; 2 pares de índices duplicados; 12 índices sem uso observado; 1 policy com reavaliação desnecessária de função Auth por linha.
 
 Nenhuma alteração foi feita no banco. O inventário é a referência estrutural conhecida desta captura; confirmar drift no Supabase real antes de cada alteração e atualizar o snapshot após mudanças controladas.
+
+
+## Triagem de segurança Supabase — 2026-11-08
+
+Foi realizada nova inspeção somente leitura dos Security Advisors, definições de funções e policies do schema public. O relatório detalhado está em [AUDITORIA_SEGURANCA_SUPABASE_2026-11-08.md](auditorias/AUDITORIA_SEGURANCA_SUPABASE_2026-11-08.md).
+
+Achados prioritários: (1) `public.authorize_integration_sync_event(...)` é SECURITY DEFINER, executável por anon/authenticated, e o corpo consultado não apresentou validação de assinatura/segredo do webhook antes de inserir payload em `integration_sync_queue`; (2) policies permissivas com `USING (true)`/ `WITH CHECK (true)` em tabelas operacionais como customers, addresses, customer_contacts e visits não implementam o isolamento por empresa exigido pela ADR-0017; (3) `can_view_expense` permanece legado e fora do MVP conforme ADR-0018; (4) 26 tabelas com RLS sem policy exigem triagem individual, não sendo automaticamente exposição; (5) seis funções apresentam search_path mutável; (6) proteção contra senhas vazadas está desabilitada.
+
+Nenhuma chamada RPC de negócio, teste de exploração ou leitura de payload/segredo foi executada. Nenhuma policy, função, grant ou configuração foi alterada. Próximo passo: revisar contrato de autenticação do webhook e produzir matriz de classificação/acesso por tabela, mantendo o dump restaurável como gate obrigatório antes de correções/migrations.
