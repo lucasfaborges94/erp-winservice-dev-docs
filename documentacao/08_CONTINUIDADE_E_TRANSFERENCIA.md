@@ -81,3 +81,14 @@ Esses arquivos vazios estão fora do diretório da API e não participam do scaf
 **Estado verificado:** validação local do scaffold após sincronização aprovada nos quatro gates. O escopo testado permanece apenas o Hello World e a fundação NestJS. Não houve teste de autenticação, tenancy, RLS, integração Supabase ou deploy. Branch de revisão ainda não integrada à main. Nenhuma operação Supabase foi realizada.
 
 **Próximo passo:** remover os dois manifests vazios não rastreados da raiz e confirmar status limpo. Depois, concluir revisão e decidir integração via PR; não antecipar implementação de endpoints de negócio antes dos gates da ADR-0019.
+
+
+### Continuação — remoção dos manifests vazios e revisão da branch — 2026-11-09
+
+O responsável executou `Remove-Item package.json` e `Remove-Item package-lock.json` na raiz do repositório local, seguidos de `git status --short`. A saída compartilhada não apresentou nenhuma linha após o comando, indicando working tree limpa no momento da verificação.
+
+A consulta remota confirmou a branch `review/api-scaffold-2026-11-09` no repositório `lucasfaborges94/erp-winservice-app`. A comparação `main...review/api-scaffold-2026-11-09` retornou estado `ahead`, 3 commits à frente, 0 atrás, com 19 arquivos adicionados. Foram revisados `apps/api/package.json`, `apps/api/package-lock.json`, `apps/api/README.md` e `apps/api/AGENTS.md`: manifesto `UNLICENSED`, sem `@nestjs/mau` ou script `deploy`; lockfile v3 alinhado às dependências diretas; documentação descreve o scaffold real e os gates da ADR-0019.
+
+Build, testes unitários (1/1), e2e (1/1) e lint (0 warnings/0 errors) foram executados localmente pelo responsável após sincronização e reportados como aprovados. A evidência cobre apenas o scaffold/Hello World. Não há implementação de negócio, autenticação, tenancy, RLS, integração Supabase ou deploy. Nenhuma operação Supabase foi realizada.
+
+**Próximo passo:** solicitar decisão explícita para abrir PR da branch de revisão contra `main`. Não realizar merge sem aprovação específica.
