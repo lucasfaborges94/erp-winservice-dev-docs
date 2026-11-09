@@ -164,11 +164,11 @@ A auditoria anterior identificou a RPC `public.authorize_integration_sync_event(
 
 **MVP:** integrações externas, webhooks, sincronizações com terceiros, filas e infraestrutura dedicada de integração permanecem fora do escopo conforme deliberação do responsável. A sincronização offline do próprio app técnico é requisito operacional e não deve ser confundida com integração externa.
 
-**Estrutura de código prevista, ainda não criada:** `apps/api` com módulos por domínio (auth, companies, users, permissions, customers, equipments, work-orders, visits, tasks e audit), além de contratos compartilhados quando necessário. O framework NestJS está aprovado pela ADR-0019; a estrutura de código ainda não foi criada.
+**Estrutura inicial criada localmente, ainda não versionada:** `apps/api` foi gerada com NestJS CLI 12.0.12, Node.js v26.13.0, npm 11.20.0, ESM e Vitest, sem NestJS Observe e sem repositório Git aninhado. O responsável confirmou inicialização em modo desenvolvimento e resposta `Hello world!` em `http://localhost:3000`. O `git status --short` local mostrou `?? apps/`. A árvore remota do repositório de aplicação ainda não contém `apps/api`; não há commit/push confirmado. Build de produção, testes automatizados e revisão do scaffold permanecem pendentes. A estrutura de módulos de domínio ainda não foi implementada.
 
 **Justificativa:** centraliza regras e autorização, preserva separação por domínio e permite evolução sem custo operacional prematuro de microsserviços. A escolha de NestJS integra a direção aprovada pela ADR-0019.
 
-**Próximos passos:** especificar e testar autenticação, empresa ativa, contexto RLS e acesso ao banco; definir contratos REST e fronteiras dos módulos; reconciliar policies e baseline de migrations; só então criar estrutura, testes e pipeline no repositório de aplicação. A aprovação arquitetural não autoriza alterações no Supabase nem implantação.
+**Próximos passos:** revisar os arquivos gerados em `apps/api`; executar build e testes automatizados; publicar o scaffold no repositório de aplicação após revisão; então avançar na especificação/implementação dos módulos respeitando os gates de autenticação, empresa ativa, contexto RLS e acesso ao banco. Reconciliar policies e baseline de migrations antes de endpoints de negócio. A aprovação arquitetural não autoriza alterações no Supabase nem implantação.
 
 
 ## Especificação técnica de autenticação e contexto RLS — 2026-11-09
