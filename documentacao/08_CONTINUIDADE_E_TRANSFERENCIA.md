@@ -1339,3 +1339,29 @@ A consulta de conteúdo em `main` retornou HTTP 404 com a mensagem `This reposit
 3. Só depois estabelecer testes, validações automatizadas e CI/CD, sem incluir segredos no Git.
 
 **Limites:** nesta verificação não foi criado arquivo nem commit no repositório de aplicação. Nenhuma alteração foi feita no Supabase, em migrations, policies, funções, triggers ou infraestrutura. A confirmação de acesso não representa autorização para DDL/DML ou implantação.
+
+
+### Sessão — 2026-11-08 — delegação operacional do Supabase e inventário estrutural inicial
+
+**Deliberação do responsável:** o agente atual será o operador exclusivo para executar alterações no projeto Supabase do ERP. A delegação não revoga os gates de revisão, preflight, backup restaurável e autorização operacional específica definidos nos documentos e ADRs.
+
+**Trabalho realizado em modo somente leitura:**
+- Confirmado projeto Supabase `voaovwphncwbrwtcqnsc`, Winservice, região `sa-east-1`, PostgreSQL `17.6.1.141`, estado saudável.
+- Capturado inventário estrutural do schema `public`: 38 tabelas, 461 colunas, 206 constraints, 110 índices, 11 funções, 18 triggers, 23 policies, 34 sequences, 8 extensões instaladas e 1.064 concessões de privilégios.
+- Confirmadas contagens: 26 visitas, 103 clientes, 99 endereços, 1 empresa, 1 `company_users`, 2 `company_user_roles`, 3 papéis, 1 permissão, 0 `role_permissions` e 0 `user_permissions`.
+- Confirmada a permanência física de `company_users.role_identifier`, sua FK e `public.can_view_expense(uuid)`, conforme dependências registradas na ADR-0018.
+- Listagem de migrations retornou zero e `supabase_migrations.schema_migrations` não existe.
+- Executados Supabase Advisors de segurança e performance; relatório integral salvo no repositório de aplicação.
+
+**Artefatos no repositório de aplicação:**
+- `supabase/README.md`;
+- `supabase/baseline/2026-11-08-schema-inventory.json` — inventário estrutural sem linhas de dados ou segredos; não é dump restaurável;
+- `supabase/baseline/2026-11-08-advisors.json` — achados dos advisors.
+
+**Limitação:** a integração Supabase disponível não fornece Supabase CLI/`pg_dump`; não foi possível produzir nesta etapa um dump SQL completo e restaurável nem baseline executável de migrations. Não foi criado arquivo de migration.
+
+**Advisors — achados a triar:** 26 tabelas RLS sem policy; 7 funções com search_path mutável; 2 funções SECURITY DEFINER executáveis por anon/authenticated; proteção contra senhas vazadas desabilitada; 89 FKs sem índice de cobertura; 2 pares de índices duplicados; 12 índices sem uso observado; 1 policy com initplan Auth.
+
+**Limites:** nenhuma alteração foi feita no Supabase. Nenhum dado de linha, credencial, token ou segredo foi versionado. Nenhuma migration, policy, função, grant, índice ou configuração foi alterada.
+
+**Próximo passo:** estabelecer um dump SQL restaurável/baseline com CLI ou ferramenta equivalente, revisar os achados de segurança e concluir a especificação executável da fundação multiempresa e do catálogo de permissões. Consultar o banco real imediatamente antes de qualquer alteração e verificar o resultado depois.
