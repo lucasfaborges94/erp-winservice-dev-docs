@@ -1509,3 +1509,15 @@ A decisão foi formalizada na ADR-0019, em estado APROVADA. Responsabilidades, m
 **Limites operacionais:** foram executadas apenas consultas de metadados e agregações sem expor dados pessoais. Não houve DDL/DML, criação/alteração de role, policy, função, grant, migration, configuração ou dado. Não houve teste de exploração, conexão da API, teste de pool ou restauração. A aprovação da especificação não autoriza mudança em produção.
 
 **Próxima ação:** concluir G0 obtendo um backup lógico restaurável e estabelecendo baseline SQL versionável; confirmar a rota/pooler e a role não privilegiada disponíveis; preparar ambiente de ensaio sem tocar produção. Só então executar prova G1/G2.
+
+### Continuação da sessão técnica — procedimento de backup e baseline (2026-11-09)
+
+**Estado:** procedimento documentado; execução pendente; G0 permanece PARCIAL.
+
+**Pesquisa realizada:** consultada a documentação oficial atual do Supabase sobre Database Backups, Backup and Restore using the CLI e Restore to a new project. A CLI orienta três dumps (roles, schema e data), mas exclui schemas gerenciados como auth e storage e schemas de extensões; customizações próprias nesses schemas exigem diff/captura específica. O recurso beta de restauração para novo projeto é mais abrangente para banco e Auth, mas não copia Storage objects nem configurações de Auth/API, Realtime e extensões; requer plano pago/backups físicos e pode gerar custo adicional. Extensões com efeitos externos devem ser avaliadas antes da clonagem.
+
+**Artefato criado:** `documentacao/PROCEDIMENTO_BACKUP_BASELINE_SUPABASE.md`, contendo opções, comandos oficiais, controles de sigilo, sequência G0 e evidências esperadas. O procedimento está proposto e não executado.
+
+**Limites:** nenhuma operação no Supabase foi executada. Nenhum dump foi gerado, nenhuma restauração foi testada e nenhum dado foi alterado. Arquivo data.sql contém potencialmente dados pessoais e deverá permanecer criptografado fora do Git/chat. O baseline lógico deve ser revisado e seu escopo de exclusão documentado; não deve ser chamado de backup integral do projeto.
+
+**Próxima ação:** executar localmente a captura lógica via Supabase CLI em ambiente controlado e disponibilizar somente roles.sql e schema.sql após revisão/remoção de segredos e dados pessoais. Manter data.sql privado. Depois, revisar os artefatos e planejar ensaio de restauração compatível. Se a prova exigir restauração integral do Auth, avaliar clone físico para novo projeto após estimativa e aprovação de custo.
