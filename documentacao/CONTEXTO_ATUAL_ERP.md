@@ -14,3 +14,17 @@ O `AGENTS.md` mantém uma seção de telemetria e instruções operacionais do N
 O responsável reportou a execução local, dentro de `apps/api`, de `npm.cmd pkg delete scripts.deploy`, seguida de build, testes unitários, testes e2e e lint. Todos os comandos terminaram sem erro: build NestJS aprovado; Vitest unitário com 1 arquivo/1 teste aprovado; Vitest e2e com 1 arquivo/1 teste aprovado; Oxlint com 0 warnings e 0 errors. A remoção do script foi executada, mas o conteúdo atualizado do manifesto ainda não foi inspecionado diretamente. O lockfile também permanece não verificado.
 
 **Próximo passo:** receber/revisar AGENTS.md, README.md, package.json e package-lock.json atualizados; conferir consistência e diff/status local antes de qualquer commit. Nenhum commit/push do scaffold foi confirmado.
+
+### Revisão local dos arquivos após remoção do script deploy — 2026-11-09
+
+O responsável compartilhou a saída local atualizada de `AGENTS.md`, `README.md`, `package.json` e as primeiras 40 linhas de `package-lock.json`.
+
+**Constatações:**
+- `package.json` não contém o script `deploy` e não lista `@nestjs/mau`; a licença da aplicação permanece `UNLICENSED`. As dependências diretas NestJS, reflect-metadata e rxjs, além das ferramentas de desenvolvimento, aparecem no manifesto.
+- O trecho inicial do `package-lock.json` mostra `lockfileVersion: 3` e o manifesto raiz com as mesmas dependências diretas e devDependencies apresentadas no `package.json`. Como só foram fornecidas 40 linhas, não foi possível auditar integralmente os pacotes resolvidos nem pesquisar referências residuais a Mau.
+- `AGENTS.md` ainda contém a seção “Production data: NestJS Observe” e instruções para instalar/vincular Observe. Essa orientação conflita com a decisão de não adotar a ferramenta na fundação e deve ser removida ou substituída por instruções neutras de diagnóstico.
+- `README.md` continua sendo o template NestJS, com conteúdo de Mau/AWS, Observe e licença MIT do framework. Deve ser substituído por documentação própria da API; a licença do app permanece `UNLICENSED`.
+
+**Validação automatizada reportada na sessão:** build, unitários (1/1), e2e (1/1) e lint (0 warnings/0 errors) aprovados após a limpeza.
+
+**Estado:** a revisão textual está concluída, mas AGENTS.md e README.md ainda precisam de ajuste. Não há commit/push do scaffold confirmado; o repositório remoto de aplicação continua no HEAD baseline anteriormente consultado, sem o scaffold. Próximo passo: adequar os dois documentos, compartilhar seu conteúdo atualizado e a saída integral de conferência do lockfile/status/diff; só então revisar o conjunto para o primeiro commit.
