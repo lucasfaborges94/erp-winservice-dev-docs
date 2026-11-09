@@ -55,9 +55,9 @@ Em 2026-11-08, foi aprovada a convenção semântica `entidade.ação` para `per
 
 - Repositório documental oficial: `lucasfaborges94/erp-winservice-dev-docs`.
 - Em 2026-11-08, o responsável aprovou a criação de um repositório separado de código-fonte com o nome `lucasfaborges94/erp-winservice-app`, visibilidade privada e branch principal `main`.
-- **Estado:** criação ainda não confirmada. A integração GitHub disponível nesta sessão não expõe operação de criação de repositório; portanto, não foi criado nem verificado. Não presumir URL, existência ou permissões.
-- Após a criação pelo responsável, verificar acesso e metadados, registrar o endereço e estabelecer estrutura inicial, versionamento de migrations, testes e CI/CD.
-- Até a confirmação, permanece válido que não existe repositório de aplicação acessível/identificado e não há baseline Git de migrations para auditar.
+- **Estado verificado em 2026-11-08:** repositório criado e acessível pela integração GitHub; privado, branch padrão `main`, proprietário `lucasfaborges94`, permissão da integração `admin`.
+- O repositório está vazio: API de conteúdo retornou 404 com mensagem `This repository is empty` e a listagem de commits retornou HTTP 409 (`Git Repository is empty`). Não há código, arquivos, workflows ou baseline Git de migrations para auditar.
+- Próximo passo: definir a estrutura inicial e o fluxo de migrations conforme arquitetura e stack aprovadas, sem presumir frameworks ou módulos; reconciliar o estado real do Supabase antes de criar baseline.
 
 ## 7. Índice por assunto
 
@@ -93,3 +93,8 @@ Atualizado em 2026-11-08 para registrar a aprovação do repositório privado de
 ### Verificação de acesso ao repositório de aplicação — 2026-11-08
 
 O responsável compartilhou a URL `https://github.com/lucasfaborges94/erp-winservice-app`. A consulta direta de metadados pela integração GitHub retornou HTTP 404; a listagem de repositórios acessíveis para o proprietário retornou somente `erp-winservice-dev-docs`. Portanto, o repositório de aplicação **não está visível/acessível à integração nesta verificação**. Isso não permite distinguir entre repositório inexistente e repositório privado sem acesso concedido à integração. Permanecem não verificados existência, visibilidade, branch padrão e permissões. Não iniciar estruturação nem versionamento de migrations até confirmar acesso e metadados.
+
+
+### Confirmação de acesso ao repositório de aplicação — 2026-11-08
+
+A integração GitHub passou a acessar `https://github.com/lucasfaborges94/erp-winservice-app`. Metadados confirmados: ID `1450814205`, proprietário `lucasfaborges94`, visibilidade `private`, branch padrão `main`, repositório não arquivado e permissão `admin` para a integração. O tamanho informado é zero. A consulta de conteúdo da branch `main` retornou HTTP 404 com a mensagem `This repository is empty`; a listagem de commits retornou HTTP 409 (`Git Repository is empty`). Portanto, a existência, privacidade, branch e permissão estão confirmadas, mas ainda não há arquivos, commits, código, workflow ou baseline de migrations. Nenhum arquivo foi criado e nenhuma alteração foi feita no Supabase.
