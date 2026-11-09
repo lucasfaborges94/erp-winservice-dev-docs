@@ -475,3 +475,10 @@ A listagem do projeto Supabase retornou zero migrations registradas e nenhuma Ed
 ## 12. Complemento — fonte única de atribuição de papéis (ADR-0018)
 
 O responsável aprovou a ADR-0018, que define `company_user_roles` como fonte única de papéis por vínculo usuário–empresa. O campo `company_users.role_identifier` e seu valor legado foram explicitamente desconsiderados; não haverá reconciliação nem migração desse valor. A coluna deverá ser removida do schema físico após tratamento das dependências técnicas identificadas. A decisão não altera `company_admin` nem concede papéis automaticamente.
+
+
+## 20. Especificação técnica da API — referência pendente de aprovação (2026-11-09)
+
+Foi criada a proposta `documentacao/ESPECIFICACAO_TECNICA_AUTENTICACAO_CONTEXTO_RLS.md` para detalhar a validação de identidade Auth, empresa ativa, autorização e propagação transacional do contexto até RLS. O documento é **PROPOSTA TÉCNICA PARA APROVAÇÃO**: não substitui ADRs, não altera o estado deste modelo conceitual e não autoriza implementação ou alteração no Supabase.
+
+A proposta recomenda prova técnica de conexão PostgreSQL com role dedicada sem BYPASSRLS e contexto estritamente transaction-local, condicionada à reconciliação dos roles, grants, funções Auth, pooler e policies reais. A relação entre `auth.users.id`, `users.auth_user_identifier` e `users.identifier` permanece pendente de confirmação no banco atual.
