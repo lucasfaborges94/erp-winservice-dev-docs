@@ -75,3 +75,12 @@ A comparação remota entre `main` e `review/api-scaffold-2026-11-09` confirmou 
 **Verificações locais reportadas pelo responsável após sincronização:** build aprovado; testes unitários 1 arquivo/1 teste; e2e 1 arquivo/1 teste; lint 0 warnings/0 errors. O escopo permanece limitado ao scaffold/Hello World. Não há endpoints ou módulos de negócio, nem evidência de autenticação, tenancy, RLS, integração Supabase ou deploy. Nenhuma operação Supabase foi realizada.
 
 **Estado:** revisão técnica do scaffold concluída para fins de abertura de PR. A branch não foi integrada à `main`. A abertura de PR depende de autorização explícita do responsável; merge exige aprovação específica posterior.
+
+
+## 36. PR #1 aberto para integração do scaffold — 2026-11-09
+
+Após autorização explícita do responsável, foi aberto [PR #1 — chore(api): add NestJS scaffold for ERP](https://github.com/lucasfaborges94/erp-winservice-app/pull/1), da branch `review/api-scaffold-2026-11-09` para `main`. GitHub confirmou estado aberto, não draft, 3 commits, 19 arquivos alterados, 5.357 adições e nenhuma remoção. Head: `970dc9c1658fdc007797283aec669fbc99b50d20`; base: `0a6f7ac84a56b092a949817345b5d278abfbfdf7`.
+
+O campo `mergeable` foi retornado como `false` na criação. A causa não foi apurada; não declarar conflito confirmado sem inspeção adicional. O corpo do PR registra os resultados de build, testes e lint compartilhados pelo responsável, bem como o escopo ainda limitado ao scaffold e os gates de segurança pendentes da ADR-0019.
+
+**Estado:** PR aberto aguardando revisão. Nenhum merge, deploy ou operação Supabase foi realizado. Próximo passo: revisar o PR e esclarecer a condição de mergeabilidade. Merge depende de aprovação específica posterior.
