@@ -103,3 +103,16 @@ O projeto Supabase de produção identificado é `Winservice` (`voaovwphncwbrwtc
 **Limitação crítica:** a ferramenta informa que branches Supabase recebem migrations do projeto principal, mas não copiam dados de produção. O inventário estrutural versionado em `supabase/baseline/` não é dump restaurável; a consulta anterior registrou zero migrations e ausência de histórico `supabase_migrations.schema_migrations`. Portanto, criar uma branch Supabase neste momento não produziria réplica do schema real. Primeiro é necessário estabelecer e validar uma baseline de migrations/restauração, ou o responsável deve decidir conscientemente criar um ambiente vazio temporário.
 
 Nenhuma tabela, policy RLS, função, trigger, dado ou configuração do projeto principal foi alterada. Nenhum dado de produção foi copiado. Nenhum deploy foi realizado.
+
+
+### Retomada da fundação de autenticação e RLS — 2026-11-09 — revalidação somente leitura (Supabase MCP; horário observado pelos Advisors: 2026-11-09T13:37:36.793Z).
+
+A especificação técnica de autenticação, empresa ativa, autorização, contexto transacional e RLS já está elaborada e aprovada, conforme `documentacao/ESPECIFICACAO_TECNICA_AUTENTICACAO_CONTEXTO_RLS.md`. Não é necessário reabrir sua definição; a próxima sequência é completar os gates de prova.
+
+**Estado da aplicação:** repositório `lucasfaborges94/erp-winservice-app`, branch `main`, commit `2e73ce3f2377a8403992ee5b5b46fe4657b2eb56`. A API continua somente com scaffold NestJS/Hello World. O manifesto não contém biblioteca de JWT, conexão PostgreSQL ou módulos de autenticação; não há implementação de negócio.
+
+**Revalidação somente leitura do Supabase:** projeto Winservice `voaovwphncwbrwtcqnsc`, `ACTIVE_HEALTHY`, PostgreSQL `17.6.1.141`; zero migrations retornadas; 38 tabelas em `public`, todas com RLS habilitado. Advisors: 26 tabelas sem policy, 7 funções com search_path mutável, 2 funções SECURITY DEFINER executáveis por anon/authenticated e proteção contra senhas vazadas desabilitada. Detalhes, limitações e interpretação em `documentacao/auditorias/REVALIDACAO_G0_SUPABASE_2026-11-09.md`.
+
+**Gates:** G0 permanece parcial; faltam backup restaurável, baseline SQL reconciliada, verificação de pooler/conexão e ensaio de restauração. G1 permanece parcial; validação JWT ponta a ponta e provisionamento ainda não comprovados. G2–G5 não iniciados.
+
+**Próxima ação:** obter backup restaurável e realizar ensaio de restauração isolado; preparar baseline SQL reconciliada e registrar parâmetros não secretos do pooler. Não executar DDL/DML, migrations, ajustes de segurança ou deploy sem autorização operacional específica e gates concluídos.

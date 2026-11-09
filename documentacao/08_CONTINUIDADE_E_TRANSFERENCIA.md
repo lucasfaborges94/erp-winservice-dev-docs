@@ -142,3 +142,31 @@ O projeto Supabase de produção identificado é `Winservice` (`voaovwphncwbrwtc
 **Limitação crítica:** a ferramenta informa que branches Supabase recebem migrations do projeto principal, mas não copiam dados de produção. O inventário estrutural versionado em `supabase/baseline/` não é dump restaurável; a consulta anterior registrou zero migrations e ausência de histórico `supabase_migrations.schema_migrations`. Portanto, criar uma branch Supabase neste momento não produziria réplica do schema real. Primeiro é necessário estabelecer e validar uma baseline de migrations/restauração, ou o responsável deve decidir conscientemente criar um ambiente vazio temporário.
 
 Nenhuma tabela, policy RLS, função, trigger, dado ou configuração do projeto principal foi alterada. Nenhum dado de produção foi copiado. Nenhum deploy foi realizado.
+
+
+## Retomada — especificação aprovada e revalidação do Gate G0 — 2026-11-09
+
+**Objetivo:** retomar a sequência de segurança da API após a especificação técnica aprovada, validando o estado atual do Supabase antes de qualquer implementação de negócio.
+
+**Fontes consultadas:** HEAD `c207bc4719ae97dc01f212cea17cb3422f478407` do repositório documental; Fonte da Verdade, protocolo GitHub, Leia-me, Charter, índice de ADRs, roadmap, escopo, stack, governança, contexto, status, continuidade, ADR-0017, ADR-0018, ADR-0019, especificação técnica de autenticação/contexto/RLS e auditoria de segurança anterior. Repositório de aplicação consultado em `main`, commit `2e73ce3f2377a8403992ee5b5b46fe4657b2eb56`.
+
+**Constatação documental:** a especificação técnica de JWT, seleção de empresa ativa, papéis em `company_user_roles`, conexão PostgreSQL, contexto transaction-local e RLS já está aprovada. A especificação registra G0 e G1 como parciais e G2–G5 como não iniciados.
+
+**Revalidação executada (somente leitura):**
+- Supabase Winservice: `ACTIVE_HEALTHY`, PostgreSQL `17.6.1.141`, região `sa-east-1`.
+- Zero migrations retornadas pela integração.
+- 38 tabelas listadas em `public`, todas com RLS habilitado.
+- Advisors: 26 tabelas sem policy; 7 funções com search_path mutável; 2 funções SECURITY DEFINER executáveis por anon/authenticated (`authorize_integration_sync_event` e `can_view_expense`); proteção contra senhas vazadas desabilitada.
+- A ausência de policy não foi interpretada isoladamente como exposição; deve ser avaliada com grants, funções privilegiadas, views e caminhos de serviço.
+
+**Estado da API:** `main` em `2e73ce3f2377a8403992ee5b5b46fe4657b2eb56`; scaffold NestJS/Hello World, sem JWT, conexão PostgreSQL, autenticação, tenancy ou módulos de negócio. Build/testes/lint anteriormente reportados foram executados antes da integração e não foram repetidos nesta retomada.
+
+**Trabalho realizado:** consulta do estado documental e da aplicação; inspeção somente leitura de metadados do projeto, migrations, tabelas e Security Advisors; registro dos resultados em `documentacao/auditorias/REVALIDACAO_G0_SUPABASE_2026-11-09.md`.
+
+**Não realizado:** nenhum DDL/DML, migration, grant, policy, função, alteração de Auth, dado, configuração ou deploy. Nenhum teste JWT, pooler ou restauração foi executado.
+
+**Pendências G0:** backup SQL restaurável; baseline SQL reconciliada; documentação da configuração e compatibilidade do pooler; ensaio de restauração em ambiente não produtivo.
+
+**Pendências G1:** prova de validação JWT Supabase na API, mapeamento Auth→ERP ponta a ponta e fluxo de provisionamento comprovado.
+
+**Próxima ação acionável:** obter backup restaurável e preparar ensaio de restauração isolado, sem tocar no projeto principal. Após evidenciar G0, implementar a prova G1 de forma isolada na API, com testes de tokens válidos/inválidos e mapeamento de identidade. Não iniciar endpoints de negócio antes dos gates.

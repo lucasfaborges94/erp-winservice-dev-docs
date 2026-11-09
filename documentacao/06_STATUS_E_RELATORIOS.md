@@ -119,3 +119,16 @@ O projeto Supabase Winservice (`voaovwphncwbrwtcqnsc`, região `sa-east-1`, Post
 A branch Supabase não foi criada porque a ferramenta aplica migrations do projeto principal, não copia dados de produção e a situação documentada é zero migrations, sem baseline restaurável. O inventário estrutural existente não substitui dump restaurável nem migrations. Criar agora uma branch não garante cópia do schema real; a baseline precisa ser reconciliada e validada primeiro, salvo decisão expressa de criar ambiente vazio.
 
 **Impacto/segurança:** nenhuma alteração foi realizada no banco principal, nenhuma migration foi aplicada, nenhum dado foi copiado e nenhum deploy foi realizado. Próximo passo: obter confirmação do custo e decidir se aguardamos a baseline restaurável ou provisionamos conscientemente um ambiente vazio.
+
+
+## Revalidação G0 do Supabase — 2026-11-09
+
+Foi realizada nova consulta somente leitura ao projeto Winservice (`voaovwphncwbrwtcqnsc`), que retornou `ACTIVE_HEALTHY`, PostgreSQL `17.6.1.141`, zero migrations registradas e 38 tabelas no schema `public`, todas com RLS habilitado.
+
+Os Security Advisors retornaram: 26 tabelas sem policy apesar de RLS habilitado; 7 funções com search_path mutável; 2 funções SECURITY DEFINER executáveis por `anon` e `authenticated` (`authorize_integration_sync_event` e `can_view_expense`); e proteção contra senhas vazadas desabilitada. A ausência de policy não foi classificada automaticamente como vazamento, pois pode resultar em negação por padrão; grants, funções e caminhos de serviço precisam ser avaliados em conjunto.
+
+**G0 continua PARCIAL:** não foram comprovados backup restaurável, baseline SQL reconciliada, configuração/compatibilidade do pooler ou ensaio de restauração. **G1 continua PARCIAL:** ainda não há prova JWT ponta a ponta na API. A API permanece no scaffold NestJS sem autenticação ou módulos de negócio.
+
+Relatório completo: `documentacao/auditorias/REVALIDACAO_G0_SUPABASE_2026-11-09.md`.
+
+Nenhuma alteração de banco, Auth, RLS, grants, funções, dados ou deploy foi realizada. Próxima ação: obter backup restaurável, ensaiar restauração em ambiente isolado e preparar baseline reconciliada antes de iniciar a prova G1.
