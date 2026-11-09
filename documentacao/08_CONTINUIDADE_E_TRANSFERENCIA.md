@@ -1536,3 +1536,12 @@ O responsável esclareceu que não deseja análise retrospectiva dos dados atuai
 A autorização define o objetivo de trabalho, mas não representa execução nem dispensa os controles de segurança. A substituição será planejada a partir do schema, requisitos e ADRs vigentes, preservando integridade referencial, vínculos multiempresa e cenários do MVP. Antes de executar, será necessário especificar o escopo exato: tabelas de domínio/transacionais, dados de autenticação e perfis de acesso, cadastros-base e eventuais dados/configurações que não devem ser removidos. “Todos os dados” não será presumido como autorização para apagar contas Auth ou objetos/configurações de plataforma.
 
 **Estado:** APROVADO COMO OBJETIVO; EXECUÇÃO BLOQUEADA. O Gate G0 continua parcial: não há evidência registrada de backup restaurável e ensaio de restauração. Próxima ação: preparar backup restaurável/ensaio e, em paralelo, elaborar plano de reset e seed baseado exclusivamente no modelo vigente. Nenhuma operação de escrita foi realizada no Supabase.
+
+
+### Confirmação do responsável — substituir todos os dados, inclusive Auth (2026-11-09)
+
+Após ser perguntado se as contas do Supabase Auth deveriam ser preservadas ou substituídas, o responsável confirmou: “Pode substituir tudo”. Registrar como autorização para substituir a totalidade dos dados, inclusive identidades/contas de teste do Supabase Auth, perfis ERP e dados operacionais/transacionais, por uma nova massa fictícia criada pelo agente. O seed deverá recriar identidades Auth de teste e mapear corretamente `users.auth_user_identifier`, além de montar empresas, vínculos, papéis e dados de domínio conforme o modelo vigente.
+
+A expressão “tudo” fica delimitada a DADOS. Não significa autorização para destruir o schema, remover objetos de banco, roles/grants/policies/funções, extensões ou configurações do projeto. Storage deve ser inventariado e sua limpeza/reposição tratada explicitamente no plano, pois objetos e metadados podem estar fora do conjunto de dados SQL usual.
+
+**Estado:** escopo de dados aprovado, execução bloqueada por G0 parcial. Antes de qualquer operação remota, concluir backup restaurável com Auth, ensaio em projeto isolado, inventário e plano transacional/reexecutável de reset+seed, revisão de segurança e preflight. Nenhum dado foi alterado nesta interação.
