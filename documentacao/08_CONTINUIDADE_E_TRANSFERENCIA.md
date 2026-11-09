@@ -1378,7 +1378,7 @@ A consulta de conteúdo em `main` retornou HTTP 404 com a mensagem `This reposit
 2. Policies permissivas com `USING (true)`/ `WITH CHECK (true)` foram observadas em tabelas operacionais, incluindo customers, addresses, customer_contacts e visits, sem filtro de vínculo/empresa. A policy ALL de companies também usa predicado true. Isso diverge da ADR-0017. Não foram feitas leituras de linhas via Data API nem testes com sessões reais.
 3. `can_view_expense` permanece SECURITY DEFINER e executável por anon/authenticated, mas está fora do MVP e reservada ao futuro Financeiro conforme ADR-0018; não reutilizar como mecanismo geral.
 4. Advisor listou 26 tabelas RLS sem policy; classificar individualmente, pois ausência de policy normalmente nega acesso a papéis sujeitos a RLS.
-5. Seis funções apresentam search_path mutável: set_updated_fields, set_created_by, ensure_primary_address, set_created_fields, set_visit_address_snapshot e update_updated_at, além de prevent_changes (sete no total conforme Advisor). Correção exige revisão individual.
+5. Sete funções apresentam search_path mutável: set_updated_fields, set_created_by, ensure_primary_address, set_created_fields, set_visit_address_snapshot e update_updated_at, além de prevent_changes (sete no total conforme Advisor). Correção exige revisão individual.
 6. Proteção contra senhas vazadas está desabilitada.
 
 **Artefato:** `documentacao/auditorias/AUDITORIA_SEGURANCA_SUPABASE_2026-11-08.md`.
