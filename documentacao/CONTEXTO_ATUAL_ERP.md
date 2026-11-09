@@ -55,9 +55,10 @@ Em 2026-11-08, foi aprovada a convenção semântica `entidade.ação` para `per
 
 - Repositório documental oficial: `lucasfaborges94/erp-winservice-dev-docs`.
 - Em 2026-11-08, o responsável aprovou a criação de um repositório separado de código-fonte com o nome `lucasfaborges94/erp-winservice-app`, visibilidade privada e branch principal `main`.
-- **Estado verificado em 2026-11-08:** repositório criado e acessível pela integração GitHub; privado, branch padrão `main`, proprietário `lucasfaborges94`, permissão da integração `admin`.
-- O repositório está vazio: API de conteúdo retornou 404 com mensagem `This repository is empty` e a listagem de commits retornou HTTP 409 (`Git Repository is empty`). Não há código, arquivos, workflows ou baseline Git de migrations para auditar.
-- Próximo passo: definir a estrutura inicial e o fluxo de migrations conforme arquitetura e stack aprovadas, sem presumir frameworks ou módulos; reconciliar o estado real do Supabase antes de criar baseline.
+- **Estado verificado em 2026-11-08/09:** repositório criado e acessível pela integração GitHub; privado, branch padrão `main`, proprietário `lucasfaborges94`, permissão da integração `admin`.
+- O repositório deixou de estar vazio. HEAD verificado: `0a6f7ac84a56b092a949817345b5d278abfbfdf7` (`docs(supabase): document initial advisor findings`). Há quatro commits e artefatos em `supabase/README.md` e `supabase/baseline/` (inventário estrutural e relatório de advisors, datados de 2026-11-08/09).
+- Não há evidência de API implementada, aplicação web/mobile, migrations executáveis ou baseline SQL restaurável. O inventário é estrutural e não substitui dump restaurável nem migration.
+- Próximo passo: definir a estrutura de aplicação e o contrato/forma da API sem presumir framework; reconciliar o estado real do Supabase antes de criar baseline de migrations.
 
 ## 7. Índice por assunto
 
