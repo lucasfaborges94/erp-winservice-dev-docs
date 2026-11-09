@@ -423,3 +423,10 @@ Nova consulta somente leitura aos Advisors e ao catálogo PostgreSQL identificou
 A definição das policies atuais não satisfaz o isolamento multiempresa aprovado na ADR-0017. A gravidade prática depende também de grants e caminhos de acesso; não foi realizado teste de exploração nem leitura de dados/payloads. RLS sem policy não foi classificado automaticamente como vazamento.
 
 Nenhuma alteração foi executada no Supabase. Próxima atividade: especificar autenticação do webhook e matriz de acesso por tabela/ator/operação. Backup restaurável e ensaio não produtivo continuam gates obrigatórios antes de correções.
+
+
+## Matriz RLS, grants e tenant — 2026-11-08
+
+A inspeção somente leitura das 38 tabelas de public confirmou RLS habilitado em 38/38, FORCE RLS desabilitado em 38/38, grants explícitos para anon/authenticated em 38/38 e 26 tabelas sem policies. Foram identificadas 8 tabelas com policy contendo predicado literal true (em users, somente na policy de INSERT). 21 tabelas não possuem company_identifier na fotografia, incluindo visits, work_orders, equipments, quotations e company_user_roles. Detalhes em [auditorias/MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md](auditorias/MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md).
+
+A matriz não representa teste de sessão nem prova de exposição de dados; grants e RLS atuam em conjunto. Policies sem filtro de tenant divergem da ADR-0017. Nenhuma alteração no Supabase foi realizada.
