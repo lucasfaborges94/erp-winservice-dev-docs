@@ -1603,3 +1603,24 @@ O responsável executou `npm.cmd run start:dev` a partir de `apps/api` após con
 **Limites:** nenhum módulo de negócio foi implementado; nenhuma conexão ou operação no Supabase foi realizada; nenhum commit/push do scaffold foi confirmado.
 
 **Próxima atividade:** revisar a estrutura e os arquivos gerados, executar build e testes automatizados, corrigir eventuais problemas e então versionar o scaffold no repositório de aplicação. Manter os gates da ADR-0019 antes de endpoints de negócio.
+
+
+### Registro — identidade visual e paleta semântica (2026-11-09)
+
+**Estado:** proposta documental registrada; validação final pendente.
+
+**Objetivo:** inserir no repositório a proposta de derivações semânticas da paleta institucional Winservice e corrigir a regra visual do card secundário, cujo título estava ilegível na visualização de referência.
+
+**Trabalho realizado:** criado `documentacao/IDENTIDADE_VISUAL_E_PALETA.md` (v0.1.0), com cores semânticas para título, subtítulo, corpo, sobrescrito, legenda, rótulo, link, botões, fundos e cards; tokens CSS; diretrizes de aplicação; e requisito de validação WCAG 2.2.
+
+**Correção registrada:** card secundário com fundo `#F8FAFC`, título `#0A223A`, corpo `#263445` e informação auxiliar `#667085`. A cor do título deve ser declarada explicitamente, sem depender de herança implícita.
+
+**Arquivos alterados:**
+- Criado: `documentacao/IDENTIDADE_VISUAL_E_PALETA.md`.
+- Atualizado: `documentacao/00_LEIA-ME.md`.
+- Atualizado: `documentacao/CONTEXTO_ATUAL_ERP.md`.
+- Atualizado: este registro de continuidade.
+
+**Commits:** criação da paleta: `e87a99d15409c75fab0dc7a6ddb65eaff0b02c00`; atualização do índice e contexto registrada em commits subsequentes nesta sessão.
+
+**Limites:** a documentação registra uma proposta de padronização visual, não uma ADR nem aprovação definitiva de design system. Nenhum código de aplicação, CSS de produção ou componente do ERP foi alterado. A validação de contraste WCAG 2.2 permanece pendente.
