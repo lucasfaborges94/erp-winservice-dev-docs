@@ -414,3 +414,12 @@ Os avisos exigem triagem individual contra os contratos de acesso e a arquitetur
 1. Obter um dump SQL estrutural restaurável com Supabase CLI/`pg_dump`, revisar o resultado e estabelecer o baseline versionado de migrations sem aplicar nada ao remoto.
 2. Auditar os achados de segurança, priorizando funções `SECURITY DEFINER` expostas e o modelo de RLS, sem aplicar correções presumidas.
 3. Concluir a especificação executável da fundação multiempresa e do catálogo de permissões, reconciliando-a com este inventário e com o estado remoto imediatamente antes da execução.
+
+
+## 23. Triagem de segurança Supabase — 2026-11-08
+
+Nova consulta somente leitura aos Advisors e ao catálogo PostgreSQL identificou findings prioritários detalhados em [auditorias/AUDITORIA_SEGURANCA_SUPABASE_2026-11-08.md](auditorias/AUDITORIA_SEGURANCA_SUPABASE_2026-11-08.md): RPC `authorize_integration_sync_event` SECURITY DEFINER executável por anon/authenticated sem validação de assinatura/segredo visível no corpo; policies permissivas sem filtro de tenant em tabelas operacionais; função legada `can_view_expense` exposta, mas fora do MVP conforme ADR-0018; 26 tabelas RLS sem policy; seis funções com search_path mutável; proteção contra senhas vazadas desabilitada.
+
+A definição das policies atuais não satisfaz o isolamento multiempresa aprovado na ADR-0017. A gravidade prática depende também de grants e caminhos de acesso; não foi realizado teste de exploração nem leitura de dados/payloads. RLS sem policy não foi classificado automaticamente como vazamento.
+
+Nenhuma alteração foi executada no Supabase. Próxima atividade: especificar autenticação do webhook e matriz de acesso por tabela/ator/operação. Backup restaurável e ensaio não produtivo continuam gates obrigatórios antes de correções.
