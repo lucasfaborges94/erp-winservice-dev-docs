@@ -1545,3 +1545,48 @@ Após ser perguntado se as contas do Supabase Auth deveriam ser preservadas ou s
 A expressão “tudo” fica delimitada a DADOS. Não significa autorização para destruir o schema, remover objetos de banco, roles/grants/policies/funções, extensões ou configurações do projeto. Storage deve ser inventariado e sua limpeza/reposição tratada explicitamente no plano, pois objetos e metadados podem estar fora do conjunto de dados SQL usual.
 
 **Estado:** escopo de dados aprovado, execução bloqueada por G0 parcial. Antes de qualquer operação remota, concluir backup restaurável com Auth, ensaio em projeto isolado, inventário e plano transacional/reexecutável de reset+seed, revisão de segurança e preflight. Nenhum dado foi alterado nesta interação.
+
+
+### Sessão — 2026-11-09 — scaffold inicial da API NestJS
+
+**Responsável/agente:** responsável pelo projeto e assistente  
+**Ferramenta/ambiente:** Windows PowerShell; Node.js v26.13.0; npm 11.20.0; NestJS CLI 12.0.12  
+**Branch:** main (repositório local; estado remoto ainda não atualizado)  
+**Commit inicial:** 0a6f7ac84a56b092a949817345b5d278abfbfdf7  
+**Commit final:** não informado; nenhuma publicação confirmada  
+**Etapa do roadmap:** fundação técnica da API — sequência da ADR-0019  
+**Módulo/processo:** estrutura inicial NestJS  
+**Estado:** EM_ANDAMENTO
+
+#### 1. Objetivo
+Criar a estrutura inicial da API interna no repositório de aplicação, dentro de `apps/api`, sem criar repositório Git aninhado e sem alterar o Supabase.
+
+#### 2. Contexto consultado
+Fonte da Verdade, Protocolo de Atuação IA/GitHub, Contexto Atual, Continuidade, ADR-0019 e Stack/Recursos, todos na branch main durante a sessão. HEAD documental consultado: `653e8de28e513c635762d0fa083a65a232cb1186`.
+
+#### 3. Trabalho realizado
+O responsável executou `npx.cmd @nestjs/cli@latest new api --package-manager npm --skip-git` a partir de `C:\Projetos\erp-winservice-app\apps`. O instalador reportou criação dos arquivos NestJS e conclusão bem-sucedida. Foi selecionado ESM com Vitest e recusado NestJS Observe.
+
+#### 4. Decisões
+- Seguir a ADR-0019: monólito modular NestJS/TypeScript no repositório privado existente.
+- Manter ESM + Vitest na fundação inicial.
+- Não adicionar NestJS Observe nesta etapa.
+
+#### 5. Artefatos alterados
+- Scaffold local em `apps/api`, conforme saída do terminal compartilhada pelo responsável; arquivos ainda não verificados na árvore remota.
+
+#### 6. Verificações e testes
+- Geração do scaffold: CLI reportou sucesso.
+- Inicialização HTTP, build, testes e estado do Git: pendentes.
+
+#### 7. Estado ao encerrar
+- Concluído: geração local do scaffold reportada.
+- Pendente: verificar Git, iniciar API, testar endpoint padrão, revisar arquivos e publicar commit.
+- Não iniciado: módulos de domínio, autenticação/tenancy, integração Supabase e endpoints de negócio.
+- Supabase: nenhuma operação executada.
+
+#### 8. Próxima atividade recomendada
+Executar `git status --short` na raiz do repositório; iniciar a API com `npm run start:dev` em `apps/api`; validar a resposta em `http://localhost:3000`; interromper com Ctrl+C e retornar os resultados. Em seguida revisar o scaffold antes de qualquer implementação de negócio.
+
+#### 9. Riscos e observações
+A instalação local não equivale a implementação versionada. Node.js v26 é uma versão de linha ímpar; monitorar compatibilidade das dependências e do ambiente de deploy, sem trocar a versão agora sem evidência de incompatibilidade.
