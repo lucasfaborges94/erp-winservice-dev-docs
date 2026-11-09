@@ -2,7 +2,7 @@
 
 **Projeto:** ERP Winservice  
 **Data:** 2026-11-08  
-**Versão:** 0.3.0  
+**Versão:** 0.4.0  
 **Estado:** APROVADA COMO MODELO FÍSICO — NÃO IMPLEMENTADA  
 **Base arquitetural:** ADR-0011, ADR-0017 e modelo de autorização multiempresa  
 **Banco avaliado:** Supabase PostgreSQL 17.6 — projeto `voaovwphncwbrwtcqnsc`
@@ -273,7 +273,7 @@ A aprovação desta proposta não autoriza DDL, DML, alteração de dados, RLS, 
 ## 9. Decisões não tomadas por esta proposta
 
 - Matriz completa de permissões por módulo.
-- Lista e convenção final de códigos de permissão.
+- Matriz completa de permissões por módulo e inventário dos códigos necessários além da convenção já aprovada.
 - Quais atributos de uma permissão a empresa pode personalizar.
 - Política detalhada para permissões removidas do catálogo global.
 - Interface e fluxo de aprovação de adoção/restauração.
@@ -281,6 +281,12 @@ A aprovação desta proposta não autoriza DDL, DML, alteração de dados, RLS, 
 - Contrato de contexto transacional e policies RLS.
 
 Esses itens não devem ser presumidos como aprovados.
+
+### 9.1 Convenção aprovada para códigos estáveis
+
+Em 2026-11-08, o responsável aprovou a convenção semântica `entidade.ação` para `permission_code`, em minúsculas e com identificadores estáveis independentes dos nomes físicos das tabelas. Exemplos: `customer.view`, `customer.create`, `customer.update`, `visit.view`, `visit.create` e `visit.cancel`.
+
+O registro legado atual `entity=customer`, `field=NULL`, `action=view` deverá ser mapeado para `customer.view`, sujeito à validação no plano de migração. A convenção não define, por si só, a matriz completa de permissões nem aprova a criação de todos os exemplos. Mudança semântica incompatível exige novo código; alterações de descrição ou de implementação física não devem renomear um código estável.
 
 ## 10. Referências
 
@@ -310,10 +316,11 @@ Esta auditoria é somente leitura. Não foram alterados dados, constraints, poli
 
 Em 2026-11-08, o responsável aprovou o modelo físico descrito nesta proposta, incluindo catálogo global versionado, catálogo efetivo materializado por empresa, adoção voluntária, preservação de customizações, histórico/restauração e referências das permissões efetivas por `role_permissions` e `user_permissions`.
 
-A aprovação não resolve as decisões explicitamente listadas na seção 9, não define a matriz completa de permissões nem autoriza implementação física. Permanecem obrigatórios o inventário de dependências, a definição dos códigos estáveis, a validação dos registros existentes, o repositório/baseline de migrations e autorização operacional específica antes de qualquer alteração no Supabase.
+A aprovação do modelo físico não autoriza implementação. A convenção `entidade.ação` para códigos estáveis foi aprovada separadamente em 2026-11-08 e está registrada na seção 9.1. Permanecem obrigatórios o inventário de dependências, o mapeamento validado dos registros existentes, a identificação do repositório/baseline de migrations e autorização operacional específica antes de qualquer alteração no Supabase.
 
 ## Histórico de alterações
 
+- 2026-11-08 — v0.4.0: registro da aprovação da convenção estável `entidade.ação`; mapeamento proposto do registro legado `customer/view` para `customer.view`, condicionado à validação da migration.
 - 2026-11-08 — v0.3.0: inclusão da auditoria somente leitura das tabelas e dependências atuais de permissões; aprovação do modelo preservada.
 - 2026-11-08 — v0.2.0: modelo físico aprovado pelo responsável; limites de implementação e decisões ainda pendentes preservados.
 - 2026-11-08 — v0.1.0: proposta inicial do modelo físico do catálogo global versionado e catálogo efetivo customizável por empresa.
