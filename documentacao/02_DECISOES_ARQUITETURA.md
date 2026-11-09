@@ -92,7 +92,6 @@ Consultar a ficha [ADR-0011](decisoes/ADR-0011-catalogo-permissoes-global-versio
 - Matriz definitiva de papéis e permissões.
 - Estratégia completa de sincronização offline e resolução de conflitos.
 - Topologia final de infraestrutura, alta disponibilidade e escalabilidade.
-- Protocolo/API interna entre módulos.
 - Estratégia de observabilidade, filas e processamento assíncrono.
 - Modelo de versionamento e promoção de banco entre ambientes.
 - Estratégia final de autenticação, MFA e gestão de segredos.
@@ -100,6 +99,7 @@ Consultar a ficha [ADR-0011](decisoes/ADR-0011-catalogo-permissoes-global-versio
 
 ## 7. Registro de alteração
 
+- **2026-11-08 — v0.8.0:** inclusão da ADR-0019, aprovada, que define a arquitetura da API interna como monólito modular TypeScript/NestJS com REST versionada.
 - **2026-11-08 — v0.7.0:** inclusão da ADR-0018, aprovada, que define `company_user_roles` como fonte única de papéis por vínculo e descarta `company_users.role_identifier` e seus dados legados.
 - **2026-11-08 — v0.6.0:** inclusão da ADR-0017, aprovada, sobre tenancy compartilhada e autorização multiempresa; definição da seleção da empresa ativa na sessão para usuários com múltiplos vínculos.
 - **2026-11-08 — v0.5.0:** inclusão da ADR-0016, aprovada, sobre histórico imutável append-only.
