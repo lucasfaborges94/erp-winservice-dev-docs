@@ -27,7 +27,7 @@ Esta documentação é a referência persistente para planejar, especificar, des
     ├── 05_STACK_RECURSOS.md
     ├── 06_STATUS_E_RELATORIOS.md
     ├── 07_GOVERNANCA_DOCUMENTAL.md
-    ├── 08_CONTINUIDADE_E_TRANSFERENCIA.md
+    ├── 08_CONTINUIDADE_E_TRANSFERENCIA.md\n    ├── CONTEXTO_ATUAL_ERP.md
     ├── MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md
     ├── MODELO_FUNCIONAL_OPERACIONAL_MVP.md
     ├── MODELO_LOGICO_DADOS_OPERACAO.md
@@ -49,7 +49,7 @@ Esta documentação é a referência persistente para planejar, especificar, des
 7. [Stack e recursos](05_STACK_RECURSOS.md) — tecnologias, ferramentas, ambientes e recursos.
 8. [Status e relatórios](06_STATUS_E_RELATORIOS.md) — situação consolidada, entregas, riscos, pendências e relatórios.
 9. [Governança documental](07_GOVERNANCA_DOCUMENTAL.md) — regras de aprovação, atualização e versionamento.
-10. [Continuidade e transferência](08_CONTINUIDADE_E_TRANSFERENCIA.md) — encerramento e retomada de trabalho entre pessoas e ferramentas.
+10. [Continuidade e transferência](08_CONTINUIDADE_E_TRANSFERENCIA.md) — sessões, pontos-chave, encerramento e retomada entre pessoas e ferramentas.\n11. [Contexto atual do ERP](CONTEXTO_ATUAL_ERP.md) — índice operacional resumido para recuperação rápida; não substitui fontes normativas.
 11. [Modelo de autorização e isolamento multiempresa](MODELO_DE_AUTORIZACAO_E_ISOLAMENTO_MULTIEMPRESA.md) — proposta técnica para discussão; não aprovada.
 12. [Modelo funcional operacional do MVP](MODELO_FUNCIONAL_OPERACIONAL_MVP.md) — requisitos funcionais de Operação, incluindo requisitos, evidências e aceite digital; não substitui ADRs nem comprova implementação.
 13. [Modelo lógico de dados e matriz de conformidade — Operação](MODELO_LOGICO_DADOS_OPERACAO.md) — proposta técnica para validação; não aprovada como modelo físico.
@@ -76,7 +76,7 @@ Esses arquivos são fotografias técnicas daquela data, não garantia de que o a
 
 ## Histórico deste arquivo
 
-- 2026-11-08 — v1.1.0: inclui a arquitetura da Base de Conhecimento do ERP e atualiza o mapa dos artefatos de Operação.
+- 2026-11-08 — atualização: inclui o índice operacional CONTEXTO_ATUAL_ERP.md e a regra de consulta por mensagem/registro incremental.\n- 2026-11-08 — v1.1.0: inclui a arquitetura da Base de Conhecimento do ERP e atualiza o mapa dos artefatos de Operação.
 - 2026-11-08 — atualização do mapa documental para incluir a arquitetura da Base de Conhecimento do ERP e a consolidação do ciclo operacional único da visita.
 - 2026-11-08 — v1.0.0: explicita o repositório como memória documental oficial do projeto e os históricos de conversa como contexto auxiliar.
 - 2026-11-08 — v0.9.0: atualização do mapa documental para incluir o escopo consolidado de requisitos, evidências e aceite digital nos modelos funcional e lógico.
