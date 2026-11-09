@@ -148,11 +148,11 @@ Essa exclusão não elimina automaticamente a necessidade de uma API interna par
 A auditoria anterior identificou a RPC `public.authorize_integration_sync_event(...)` como SECURITY DEFINER e executável por `anon`/`authenticated`, sem validação de autenticidade visível no corpo inspecionado. O conector está fora do escopo de implementação do MVP; contudo, a existência e a exposição atuais desse objeto permanecem um risco de segurança do ambiente a ser isolado/avaliado antes de qualquer disponibilização pública, sem presumir que a exclusão funcional por si só o desative. Nenhuma alteração no banco foi executada nesta deliberação.
 
 
-### Proposta arquitetural para API interna — 2026-11-08
+### Arquitetura da API interna — aprovada em 2026-11-08
 
-**Estado:** recomendação apresentada ao responsável; NÃO APROVADA. Não criar estrutura de API, selecionar dependências de produção ou iniciar implementação até aprovação e ADR correspondente.
+**Estado:** APROVADA pelo responsável e formalizada na [ADR-0019](decisoes/ADR-0019-arquitetura-api-interna.md).
 
-**Recomendação:** monólito modular com API própria em TypeScript/NestJS, hospedada inicialmente na VPS existente via Easypanel, mantendo o Supabase como PostgreSQL/fonte de verdade e Supabase Auth como provedor de identidade. WeWeb e FlutterFlow consumiriam a API ERP para operações de negócio. Não adotar microsserviços no MVP.
+**Decisão aprovada:** monólito modular com API própria em TypeScript/NestJS, hospedada inicialmente na VPS existente via Easypanel, mantendo o Supabase como PostgreSQL/fonte de verdade e Supabase Auth como provedor de identidade. WeWeb e FlutterFlow consumiriam a API ERP para operações de negócio. Não adotar microsserviços no MVP.
 
 **Responsabilidades propostas:**
 - API: casos de uso, regras de negócio, validação de JWT, seleção/validação de empresa ativa, autorização por vínculo e papéis em `company_user_roles`, auditoria, idempotência e sincronização offline.
@@ -164,8 +164,8 @@ A auditoria anterior identificou a RPC `public.authorize_integration_sync_event(
 
 **MVP:** integrações externas, webhooks, sincronizações com terceiros, filas e infraestrutura dedicada de integração permanecem fora do escopo conforme deliberação do responsável. A sincronização offline do próprio app técnico é requisito operacional e não deve ser confundida com integração externa.
 
-**Estrutura de código sugerida, ainda não criada:** `apps/api` com módulos por domínio (auth, companies, users, permissions, customers, equipments, work-orders, visits, tasks e audit), além de contratos compartilhados quando necessário. Não há framework ou estrutura aprovada atualmente.
+**Estrutura de código prevista, ainda não criada:** `apps/api` com módulos por domínio (auth, companies, users, permissions, customers, equipments, work-orders, visits, tasks e audit), além de contratos compartilhados quando necessário. Não há framework ou estrutura aprovada atualmente.
 
-**Justificativa:** centraliza regras e autorização, preserva separação por domínio e permite evolução sem custo operacional prematuro de microsserviços. A escolha de NestJS é recomendação técnica, não decisão vigente.
+**Justificativa:** centraliza regras e autorização, preserva separação por domínio e permite evolução sem custo operacional prematuro de microsserviços. A escolha de NestJS integra a direção aprovada pela ADR-0019.
 
-**Próximos passos condicionados à aprovação:** (1) aprovar ou ajustar a direção arquitetural; (2) elaborar ADR específica para API/backend; (3) especificar autenticação, empresa ativa, contexto RLS e acesso a banco; (4) definir contratos e fronteiras de módulos; (5) só então criar estrutura, testes e pipeline no repositório de aplicação.
+**Próximos passos:** especificar e testar autenticação, empresa ativa, contexto RLS e acesso ao banco; definir contratos REST e fronteiras dos módulos; reconciliar policies e baseline de migrations; só então criar estrutura, testes e pipeline no repositório de aplicação. A aprovação arquitetural não autoriza alterações no Supabase nem implantação.
