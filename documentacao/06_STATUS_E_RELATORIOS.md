@@ -1,6 +1,6 @@
 # Status do desenvolvimento e relatórios periódicos — ERP Winservice
 
-**Versão:** 1.9.4  
+**Versão:** 1.9.5  
 **Data-base:** 2026-11-08
 
 ## 1. Resumo executivo
@@ -360,3 +360,10 @@ Foi estabelecido registro incremental de sessões e pontos-chave: aprovações, 
 Foi criado `documentacao/CONTEXTO_ATUAL_ERP.md` como índice operacional e resumo rápido, sem autoridade para substituir documentos normativos ou evidências.
 
 Esta atualização é documental. Não representa alteração de código, banco, migrations, policies, funções, triggers ou infraestrutura.
+
+
+## 20. Convenção de códigos estáveis de permissões aprovada — 2026-11-08
+
+O responsável aprovou a convenção semântica `entidade.ação`, em minúsculas, para os códigos estáveis do catálogo de permissões. O registro legado `customer/view` deverá ser mapeado para `customer.view`, condicionado à validação na migration. Os exemplos documentados não constituem uma matriz completa nem autorização para criar permissões indiscriminadamente.
+
+A proposta física foi atualizada para v0.4.0, e o contexto operacional e a continuidade foram atualizados. Próxima etapa: identificar o repositório/baseline oficial de migrations, validar o mapeamento legado e concluir a especificação executável. Nenhuma alteração foi realizada no Supabase; a aprovação não autoriza DDL/DML ou execução de migrations.
