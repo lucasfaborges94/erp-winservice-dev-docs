@@ -1527,3 +1527,12 @@ A decisão foi formalizada na ADR-0019, em estado APROVADA. Responsabilidades, m
 ### Esclarecimento do responsável sobre dados mockup — 2026-11-09
 
 O responsável informou que os dados atualmente inseridos no Supabase são mockups de teste, mantidos deliberadamente como pistas sobre a lógica e o funcionamento do banco em construção. A análise de dados de linhas poderá, portanto, ser utilizada para compreender regras e relacionamentos, conforme essa classificação declarada. Isso não permite presumir que todo o conteúdo de um dump esteja livre de segredos, hashes de autenticação, tokens ou credenciais; a triagem continua obrigatória. O procedimento de backup foi ajustado para admitir o compartilhamento privado de data.sql após essa verificação, sem publicação no GitHub por padrão. Nenhuma alteração no Supabase foi realizada por este esclarecimento.
+
+
+### Deliberação — substituir dados atuais por massa fictícia nova (2026-11-09)
+
+O responsável esclareceu que não deseja análise retrospectiva dos dados atuais para inferir regras de negócio, pois a lógica vigente já está sendo construída e deve ser obtida dos artefatos atuais do projeto. Autorizou apagar os dados existentes e substituí-los por dados fictícios elaborados pelo agente.
+
+A autorização define o objetivo de trabalho, mas não representa execução nem dispensa os controles de segurança. A substituição será planejada a partir do schema, requisitos e ADRs vigentes, preservando integridade referencial, vínculos multiempresa e cenários do MVP. Antes de executar, será necessário especificar o escopo exato: tabelas de domínio/transacionais, dados de autenticação e perfis de acesso, cadastros-base e eventuais dados/configurações que não devem ser removidos. “Todos os dados” não será presumido como autorização para apagar contas Auth ou objetos/configurações de plataforma.
+
+**Estado:** APROVADO COMO OBJETIVO; EXECUÇÃO BLOQUEADA. O Gate G0 continua parcial: não há evidência registrada de backup restaurável e ensaio de restauração. Próxima ação: preparar backup restaurável/ensaio e, em paralelo, elaborar plano de reset e seed baseado exclusivamente no modelo vigente. Nenhuma operação de escrita foi realizada no Supabase.
