@@ -46,3 +46,17 @@ Os resultados locais reportados anteriormente continuam válidos como evidência
 **Limites e estado:** a inspeção depende da saída local fornecida; o assistente não acessou a máquina. O repositório remoto de aplicação ainda não contém o scaffold no HEAD consultado. Nenhum commit/push foi confirmado. Não houve operação no Supabase.
 
 **Próxima atividade:** ajustar AGENTS.md e README.md, depois conferir o lockfile completo, `git diff --check`, `git status --short` e o diff integral. Revisar todos os arquivos antes de qualquer commit; não criar commit sem autorização explícita.
+
+### Continuação — scaffold publicado para revisão remota (2026-11-09)
+
+O responsável executou e compartilhou a saída do commit `01d00ea` (`chore(api): add NestJS API scaffold`) e push da branch `review/api-scaffold-2026-11-09` para `lucasfaborges94/erp-winservice-app`. A branch e os arquivos foram localizados pela integração GitHub. O commit adicionou 19 arquivos (5.379 inserções), incluindo `.gitignore`, configurações, manifests, lockfile, arquivos de aplicação e testes.
+
+**Revisão remota dos manifests:** `apps/api/package.json` está sem Mau e sem script deploy, mantém `UNLICENSED`; lockfile v3 corresponde ao manifesto raiz nas dependências/devDependencies e não contém referências a `@nestjs/mau`. O scaffold permanece no Hello World, sem endpoints ou módulos de negócio.
+
+**Correções remotas realizadas pelo agente na branch de revisão:** substituídos `apps/api/AGENTS.md` e `apps/api/README.md` para remover orientação de NestJS Observe/Mau e refletir a arquitetura aprovada e os gates de segurança da ADR-0019. Commits individuais de atualização confirmados pela integração; nenhuma alteração foi feita na main.
+
+**Pendência local identificada:** a saída de `git status --short` mostrou `?? package-lock.json` e `?? package.json` na raiz. Esses arquivos não fazem parte do commit do scaffold e sua origem/necessidade não está esclarecida. Solicitar inspeção local antes de qualquer inclusão ou exclusão.
+
+**Testes:** o responsável já havia reportado build, unitário (1/1), e2e (1/1) e lint (0 warnings/0 errors) aprovados. A revisão remota não executou testes. Como README e AGENTS foram modificados na branch após o push, repetir as verificações localmente depois de sincronizar.
+
+**Estado:** branch de revisão publicada; não integrada à main. Nenhuma operação Supabase ou deploy. Próxima ação: reler os arquivos corrigidos no GitHub, esclarecer os manifests não rastreados na raiz e solicitar atualização local + nova execução de build/testes/lint antes de qualquer integração.
