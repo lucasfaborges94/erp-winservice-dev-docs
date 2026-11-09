@@ -1295,3 +1295,22 @@ Nenhum código, arquivo do Supabase, schema, dado, migration, policy, grant, fun
 O responsável esclareceu que não existe outro repositório além de `lucasfaborges94/erp-winservice-dev-docs`. A solicitação anterior por URL de repositório de implementação não se aplica; não há código-fonte separado a fornecer ou auditar.
 
 **Próximo passo revisado:** inspecionar em modo somente leitura o histórico de migrations disponível no Supabase e o schema efetivo, incluindo funções, triggers, policies, constraints e dependências relevantes. Como não há baseline Git de migrations em repositório de aplicação, após a auditoria será necessário propor o local e o fluxo de versionamento das migrations futuras. Nenhuma alteração no Supabase está autorizada por este esclarecimento.
+
+
+
+### Sessão — 2026-11-08 — aprovação de repositório separado para código-fonte
+
+**Estado:** nome, proprietário, visibilidade e branch principal aprovados; repositório ainda não criado/verificado.
+
+O responsável aprovou a criação do repositório `lucasfaborges94/erp-winservice-app`, privado, com branch principal `main`. O repositório documental `lucasfaborges94/erp-winservice-dev-docs` permanece separado e continua sendo a fonte oficial de requisitos, decisões, ADRs e continuidade.
+
+A integração GitHub disponível nesta sessão foi inspecionada e não expõe ação de criação de repositório. Por isso, nenhuma criação foi executada e não se declara que o repositório exista. O responsável deverá criá-lo pela interface do GitHub e compartilhar/confirmar a URL; em seguida, verificar metadados, branch, permissões e acesso pela integração.
+
+**Próximos passos após a criação:**
+1. Confirmar que o repositório está privado e que a branch padrão é `main`.
+2. Definir a estrutura inicial do monorepo/repositório conforme a arquitetura e stack efetivamente aprovadas, sem inventar módulos ou frameworks.
+3. Estabelecer convenção e baseline de migrations, reconciliando o estado real do Supabase antes de criar baseline.
+4. Configurar testes, validações automatizadas e CI/CD com segredos gerenciados fora do Git.
+5. Registrar o endereço do repositório de aplicação no contexto, stack e documentação de governança.
+
+**Limites:** nenhuma alteração foi feita no Supabase; nenhum repositório foi criado nesta sessão; nenhum código, migration ou pipeline foi adicionado.
