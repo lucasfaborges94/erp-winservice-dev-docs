@@ -60,3 +60,24 @@ O responsável executou e compartilhou a saída do commit `01d00ea` (`chore(api)
 **Testes:** o responsável já havia reportado build, unitário (1/1), e2e (1/1) e lint (0 warnings/0 errors) aprovados. A revisão remota não executou testes. Como README e AGENTS foram modificados na branch após o push, repetir as verificações localmente depois de sincronizar.
 
 **Estado:** branch de revisão publicada; não integrada à main. Nenhuma operação Supabase ou deploy. Próxima ação: reler os arquivos corrigidos no GitHub, esclarecer os manifests não rastreados na raiz e solicitar atualização local + nova execução de build/testes/lint antes de qualquer integração.
+
+
+### Continuação — validação local após sincronização e manifests vazios — 2026-11-09
+
+O responsável executou `git switch review/api-scaffold-2026-11-09` e `git pull --ff-only`. A branch já estava selecionada e foi atualizada por fast-forward de `01d00ea` para `970dc9c`, recebendo as correções de `apps/api/AGENTS.md` e `apps/api/README.md` feitas pelo agente no GitHub.
+
+Na pasta `apps/api`, executou e compartilhou os resultados:
+- `npm.cmd run build`: sucesso;
+- `npm.cmd test`: 1 arquivo/1 teste aprovado;
+- `npm.cmd run test:e2e`: 1 arquivo/1 teste aprovado;
+- `npm.cmd run lint`: 0 warnings/0 errors.
+
+A inspeção do status mostrou apenas dois arquivos não rastreados na raiz. O conteúdo informado foi:
+- `package.json`: objeto JSON vazio (`{}`);
+- `package-lock.json`: lockfile v3 com `packages: {}`.
+
+Esses arquivos vazios estão fora do diretório da API e não participam do scaffold; não há indicação de que configurem workspace ou dependências. Foi recomendada sua remoção local, ainda pendente de confirmação. Não devem ser adicionados ao Git.
+
+**Estado verificado:** validação local do scaffold após sincronização aprovada nos quatro gates. O escopo testado permanece apenas o Hello World e a fundação NestJS. Não houve teste de autenticação, tenancy, RLS, integração Supabase ou deploy. Branch de revisão ainda não integrada à main. Nenhuma operação Supabase foi realizada.
+
+**Próximo passo:** remover os dois manifests vazios não rastreados da raiz e confirmar status limpo. Depois, concluir revisão e decidir integração via PR; não antecipar implementação de endpoints de negócio antes dos gates da ADR-0019.
