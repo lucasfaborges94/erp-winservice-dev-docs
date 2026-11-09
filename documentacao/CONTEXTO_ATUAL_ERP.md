@@ -180,3 +180,23 @@ Foi criada a proposta `documentacao/ESPECIFICACAO_TECNICA_AUTENTICACAO_CONTEXTO_
 **Achado que bloqueia implementação:** a auditoria estrutural anterior registrou divergência potencial entre `users.identifier`, `users.auth_user_identifier`, `company_users.user_identifier` e policies que comparam `auth.uid()`. A relação física e o fluxo de provisionamento devem ser confirmados no Supabase atual.
 
 **Próxima ação:** responsável revisar/aprovar ou ajustar a proposta. Após aprovação, executar G0/G1 em modo somente leitura e prova técnica não produtiva; não alterar produção nem executar migrations sem backup restaurável, ensaio, revisão e autorização operacional específica.
+
+
+## Aprovação da especificação técnica e reconciliação G0/G1 — 2026-11-09
+
+O responsável aprovou a `ESPECIFICACAO_TECNICA_AUTENTICACAO_CONTEXTO_RLS.md` como direção técnica para a prova de conceito, incluindo os seis pontos da seção 12. A hospedagem inicial na VPS existente via Easypanel permanece aprovada conforme ADR-0019; o mecanismo automatizado e restrito de deploy ainda será especificado. A aprovação não autoriza DDL/DML, migrations, criação de roles, mudanças de policies ou deploy em produção.
+
+Consulta somente leitura ao projeto Supabase `voaovwphncwbrwtcqnsc` (Winservice), PostgreSQL `17.6.1.141`, `ACTIVE_HEALTHY`, região `sa-east-1`:
+- 5 linhas em `auth.users` e 5 em `public.users`; 5/5 correspondências únicas por `users.auth_user_identifier = auth.users.id`, sem nulos/duplicidades; FK `users_auth_user_identifier_fkey` validada.
+- `auth.uid()` lê `request.jwt.claim.sub` ou `request.jwt.claims.sub`.
+- `anon` e `authenticated` sem BYPASSRLS; `service_role` e `postgres` com BYPASSRLS; ainda não existe prova de role dedicada de runtime.
+- 38/38 tabelas públicas com RLS; 0/38 com FORCE RLS; 23 policies. Permanecem policies permissivas com predicados `true`, inclusive em tabelas operacionais.
+- Policy SELECT de `users` compara `auth.uid()` a `users.identifier`; policy SELECT de `company_users` compara `auth.uid()` a `company_users.user_identifier`. Ambas precisam ser avaliadas frente ao mapeamento Auth canônico e não são consideradas corretas por presunção.
+- `company_user_roles` sem policy observada e grants amplos para anon/authenticated/service_role em `users`, `company_users` e `company_user_roles`.
+- `company_users.role_identifier` permanece no schema e não pode ser usado, conforme ADR-0018. `public.can_view_expense` ainda aparece como SECURITY DEFINER e dependência a tratar.
+- `public.authorize_integration_sync_event` também permanece SECURITY DEFINER e executável por anon/authenticated, embora integrações estejam fora do MVP; exposição deve ser isolada como risco.
+- zero migrations registradas; `supabase_migrations.schema_migrations` inexistente; zero branches e zero Edge Functions.
+
+**G0 parcial, não concluído:** falta backup restaurável, baseline SQL reconciliado, detalhes do pooler e ensaio de restauração. **G1 parcial, não concluído:** mapeamento estrutural confirmado, mas falta JWT ponta a ponta, provisionamento e prova do claim sob role não privilegiada. G2–G5 não iniciados.
+
+Nenhuma alteração foi feita no Supabase. Os resultados detalhados e limitações foram adicionados à especificação técnica e à continuidade.
