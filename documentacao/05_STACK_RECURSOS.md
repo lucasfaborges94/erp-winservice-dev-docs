@@ -7,7 +7,8 @@
 
 | Tecnologia | Papel no projeto | Estado |
 |---|---|---|
-| Supabase | Banco PostgreSQL, autenticação/serviços de backend conforme arquitetura | Fonte de verdade |
+| Supabase | Banco PostgreSQL e serviços de backend conforme arquitetura | Fonte de verdade |
+| NestJS / TypeScript | API interna do ERP, monólito modular com REST versionada | Direção aprovada pela ADR-0019; ainda não implementada |
 | n8n | Orquestração e automação de workflows | Utilizado / definido |
 | WeWeb | Aplicação administrativa web | Direção aprovada; hospedagem na VPS |
 | FlutterFlow | Aplicativo móvel técnico | Direção aprovada; offline-first |
@@ -15,7 +16,7 @@
 | Módulo Chat próprio | Atendimento omnichannel nativo no ERP | Direção futura |
 | Auvo | Integração externa opcional | Não é dependência |
 | Isa | Agente de IA para processos permitidos | Política de autonomia definida |
-| VPS + Easypanel | Hospedagem de serviços e aplicações | Ambiente existente; topologia final a documentar |
+| VPS + Easypanel | Hospedagem de serviços e aplicações, incluindo inicialmente a API ERP | Ambiente existente; API aprovada para hospedagem inicial, ainda não implantada |
 | Git / repositório documental | Governança, requisitos, ADRs e continuidade | `lucasfaborges94/erp-winservice-dev-docs` |
 | Git / repositório de aplicação | Código-fonte, migrations, testes e CI/CD | Confirmado: `lucasfaborges94/erp-winservice-app`, privado, branch `main`, integração com permissão admin; inicializado com inventário estrutural Supabase e README, ainda sem migrations |
 
@@ -66,3 +67,10 @@ A integração GitHub confirmou metadados do repositório `lucasfaborges94/erp-w
 O responsável designou o agente atual como operador exclusivo para executar alterações no Supabase. A execução continuará subordinada aos gates de segurança, revisão, preflight, backup restaurável e autorização operacional específica já registrados; a delegação não será interpretada como autorização irrestrita.
 
 O repositório de aplicação contém o inventário estrutural inicial em `supabase/baseline/2026-11-08-schema-inventory.json` e o relatório de advisors em `supabase/baseline/2026-11-08-advisors.json`. Ainda não há dump SQL restaurável nem baseline de migrations: o Supabase retornou zero migrations, a relação de histórico não existe e a integração disponível não fornece Supabase CLI/`pg_dump`.
+
+
+## 6.2 Arquitetura da API interna — ADR-0019 aprovada em 2026-11-08
+
+A API interna foi aprovada como monólito modular em TypeScript/NestJS, com REST versionada em `/api/v1`, hospedada inicialmente na VPS existente via Easypanel. O código ficará no repositório privado `lucasfaborges94/erp-winservice-app`. Supabase permanece como PostgreSQL/fonte de verdade e Supabase Auth como provedor de identidade. WeWeb e FlutterFlow consumirão a API para operações de negócio.
+
+A decisão não comprova implementação nem autoriza deploy ou alteração no Supabase. Antes de implementar endpoints de negócio, devem ser definidos e testados autenticação, empresa ativa, vínculo e papéis, contexto transacional até RLS, privilégios de banco, reconciliação das policies, contratos REST e testes negativos multiempresa. Consultar a ADR-0019 para os gates completos.
