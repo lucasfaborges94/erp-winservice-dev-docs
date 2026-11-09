@@ -79,3 +79,8 @@ A decisão não comprova implementação nem autoriza deploy ou alteração no S
 ## 6.3 Scaffold local da API — 2026-11-09
 
 O responsável reportou a geração local do scaffold em `apps/api` com NestJS CLI `12.0.12`, Node.js `v26.13.0`, npm `11.20.0`, ESM e Vitest. A instalação foi concluída pelo CLI sem erro aparente; a integração GitHub ainda não vê esses arquivos porque não há commit/push confirmado. Inicialização, build e testes ainda não foram verificados. A opção NestJS Observe foi recusada para manter a fundação enxuta.
+
+
+## 6.4 Scaffold da API publicado para revisão — 2026-11-09
+
+O responsável publicou o scaffold em `lucasfaborges94/erp-winservice-app`, branch `review/api-scaffold-2026-11-09`, commit inicial `01d00ea`. A branch contém a fundação NestJS/TypeScript em `apps/api`; permanece sem módulos ou endpoints de negócio e não foi integrada à `main`. Na revisão remota, `AGENTS.md` e `README.md` foram corrigidos para alinhar as orientações à ADR-0019. A existência do scaffold no GitHub não comprova deploy. Testes anteriores foram reportados pelo responsável; novas execuções locais serão necessárias após sincronizar os ajustes de documentação.
