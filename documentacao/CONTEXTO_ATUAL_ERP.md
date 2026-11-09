@@ -249,6 +249,6 @@ O responsável reportou a criação de `.gitignore` na raiz do repositório de a
 
 Na pasta `apps/api`, foram executados com sucesso, conforme saída compartilhada: `npm.cmd run build` (Nest build sem erros), `npm.cmd test` (1 arquivo/1 teste aprovado) e `npm.cmd run test:e2e` (1 arquivo/1 teste aprovado). O comando `npm.cmd run lint` foi iniciado e não apresentou diagnósticos na saída fornecida, mas o trecho compartilhado não inclui o código de saída; resultado final do lint permanece pendente de confirmação por `$LASTEXITCODE`.
 
-**Estado:** build, testes unitários e e2e aprovados localmente; lint aguardando confirmação do exit code; scaffold e `.gitignore` ainda não confirmados no GitHub; nenhum commit/push informado. Nenhum módulo de negócio, integração Supabase ou alteração no banco foi realizado.
+**Estado:** build, testes unitários, e2e e lint aprovados localmente conforme saídas compartilhadas; scaffold e `.gitignore` ainda não confirmados no GitHub; nenhum commit/push informado. Nenhum módulo de negócio, integração Supabase ou alteração no banco foi realizado.
 
-**Próxima ação:** confirmar o exit code do lint e revisar `git status --short`/arquivos gerados antes de versionar o scaffold.
+**Próxima ação:** revisar `git status --short`, confirmar os arquivos gerados e validar as exclusões do `.gitignore` antes de versionar o scaffold.
