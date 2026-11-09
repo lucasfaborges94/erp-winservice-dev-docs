@@ -84,3 +84,14 @@ Após autorização explícita do responsável, foi aberto [PR #1 — chore(api)
 O campo `mergeable` foi retornado como `false` na criação. A causa não foi apurada; não declarar conflito confirmado sem inspeção adicional. O corpo do PR registra os resultados de build, testes e lint compartilhados pelo responsável, bem como o escopo ainda limitado ao scaffold e os gates de segurança pendentes da ADR-0019.
 
 **Estado:** PR aberto aguardando revisão. Nenhum merge, deploy ou operação Supabase foi realizado. Próximo passo: revisar o PR e esclarecer a condição de mergeabilidade. Merge depende de aprovação específica posterior.
+
+
+## 37. Rechecagem do PR #1 — mergeabilidade confirmada — 2026-11-09
+
+Na consulta atual, o PR #1 (`chore(api): add NestJS scaffold for ERP`) permanece aberto, não draft e não merged. O GitHub retornou `mergeable: true`; o valor `false` registrado na criação era o estado inicial e não representa a condição atual. Não há indicação atual de conflito de merge.
+
+A branch `review/api-scaffold-2026-11-09` está no commit `970dc9c1658fdc007797283aec669fbc99b50d20`, 3 commits à frente e 0 atrás da `main` (`0a6f7ac84a56b092a949817345b5d278abfbfdf7)). O PR contém 19 arquivos, 5.357 adições e 0 remoções. A consulta retornou nenhuma review, nenhum comentário de conversa e nenhum check run/status associado ao commit. Não há evidência de validação automatizada no próprio PR; os testes locais anteriormente reportados permanecem evidência fornecida pelo responsável, não CI verificado nesta consulta.
+
+A inspeção do patch e da ADR-0019 confirma que o PR contém apenas scaffold NestJS/Hello World, configurações, documentação e testes de exemplo. Não implementa autenticação, tenancy, autorização, RLS, módulos/endpoints de negócio, integração Supabase ou deploy.
+
+**Estado:** PR mergeable, aberto e aguardando revisão/decisão humana. Nenhum merge foi executado. Merge depende de autorização explícita específica. Nenhuma operação Supabase ou deploy foi realizada.
