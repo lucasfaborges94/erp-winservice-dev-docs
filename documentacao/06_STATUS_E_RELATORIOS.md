@@ -386,7 +386,7 @@ O responsável determinou que o agente atual será o operador exclusivo para exe
 Projeto `voaovwphncwbrwtcqnsc` (Winservice), região `sa-east-1`, PostgreSQL `17.6.1.141`, estado `ACTIVE_HEALTHY`.
 
 Inventário estrutural do schema `public` capturado em modo somente leitura e versionado em `lucasfaborges94/erp-winservice-app/supabase/baseline/2026-11-08-schema-inventory.json`:
-- 38 tabelas e 461 colunas;
+- 310 tabelas e 461 colunas;
 - 206 constraints e 110 índices;
 - 11 funções e 18 triggers;
 - 23 policies RLS;
@@ -427,6 +427,6 @@ Nenhuma alteração foi executada no Supabase. Próxima atividade: especificar a
 
 ## Matriz RLS, grants e tenant — 2026-11-08
 
-A inspeção somente leitura das 38 tabelas de public confirmou RLS habilitado em 38/38, FORCE RLS desabilitado em 38/38, grants explícitos para anon/authenticated em 38/38 e 26 tabelas sem policies. Foram identificadas 8 tabelas com policy contendo predicado literal true (em users, somente na policy de INSERT). 21 tabelas não possuem company_identifier na fotografia, incluindo visits, work_orders, equipments, quotations e company_user_roles. Detalhes em [auditorias/MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md](auditorias/MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md).
+A inspeção somente leitura das 310 tabelas de public confirmou RLS habilitado em 38/38, FORCE RLS desabilitado em 38/38, grants explícitos para anon/authenticated em 38/38 e 26 tabelas sem policies. Foram identificadas 10 tabelas com policy contendo predicado literal true (em users, somente na policy de INSERT). 23 tabelas não possuem company_identifier na fotografia, incluindo visits, work_orders, equipments, quotations e company_user_roles. Detalhes em [auditorias/MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md](auditorias/MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md).
 
 A matriz não representa teste de sessão nem prova de exposição de dados; grants e RLS atuam em conjunto. Policies sem filtro de tenant divergem da ADR-0017. Nenhuma alteração no Supabase foi realizada.
