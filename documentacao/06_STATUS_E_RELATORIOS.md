@@ -444,3 +444,12 @@ A API interna necessária à comunicação das aplicações com os módulos do E
 Criada a proposta `documentacao/ESPECIFICACAO_TECNICA_AUTENTICACAO_CONTEXTO_RLS.md`, ainda pendente de aprovação. A recomendação é validar JWT Supabase na API e resolver o perfil ERP por `users.auth_user_identifier); selecionar/revalidar a empresa ativa no servidor; executar operações em transação PostgreSQL por role dedicada sem BYPASSRLS; definir identidade e empresa somente em contexto transaction-local; e manter RLS como enforcement no banco.
 
 A proposta não é decisão aprovada nem implementação. A compatibilidade depende de confirmar no Supabase atual a relação Auth↔ERP, roles, grants, função `auth.uid()`, pooler, ownership e policies. A fotografia estrutural de 2026-11-08 não é dump restaurável. Não houve consulta nem alteração no Supabase nesta sessão. Próximo passo: deliberação do responsável; após aprovação, G0/G1 somente leitura e prova em ambiente não produtivo.
+
+
+## 26. Aprovação técnica de autenticação e início da reconciliação G0/G1 — 2026-11-09
+
+A especificação `ESPECIFICACAO_TECNICA_AUTENTICACAO_CONTEXTO_RLS.md` foi aprovada pelo responsável como direção técnica para prova de conceito, nos seis pontos solicitados. Hospedagem inicial VPS/Easypanel permanece aprovada pela ADR-0019. Isso não autoriza alterações em produção, DDL/DML, migrations, deploy ou criação de roles.
+
+A reconciliação somente leitura no projeto Supabase Winservice confirmou 5/5 correspondências únicas entre `public.users.auth_user_identifier` e `auth.users.id`, com FK validada. `auth.uid()` lê o claim `sub`. RLS está habilitado em 38/38 tabelas públicas, FORCE RLS em 0/38, com 23 policies e policies permissivas `true` ainda presentes. Policies atuais de `users` e `company_users` precisam ser reconciliadas com o mapeamento Auth aprovado. `company_user_roles` não apresentou policy; grants amplos permanecem. `company_users.role_identifier` permanece fisicamente, mas continua fora do modelo conforme ADR-0018.
+
+Migrations registradas: zero; tabela `supabase_migrations.schema_migrations` ausente; branches e Edge Functions: zero. G0 e G1 estão parciais, não concluídos: faltam backup restaurável/baseline SQL, dados do pooler e ensaio, além de prova JWT/provisionamento em ambiente não produtivo. Nenhuma alteração no Supabase foi executada. Evidências detalhadas e limitações estão na especificação técnica e na continuidade da sessão de 2026-11-09.
