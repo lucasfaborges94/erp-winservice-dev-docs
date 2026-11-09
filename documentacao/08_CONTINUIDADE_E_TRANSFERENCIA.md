@@ -1268,3 +1268,23 @@ Continuar a preparação da especificação executável e do pacote de migration
 #### Limites
 
 Aprovação restrita à convenção de nomenclatura. Nenhum DDL, DML, migration, policy, grant, função, trigger ou dado foi alterado no Supabase.
+
+
+### Complemento da sessão — bloqueio na identificação do repositório de implementação (2026-11-08)
+
+**Estado:** retomada documental realizada; preparação executável bloqueada por falta de acesso identificado ao repositório de implementação.
+
+#### Consulta realizada
+- HEAD documental consultado: `ce96eacb272f8c6b7d323b6175760947ae309f99`.
+- Repositório GitHub acessível listado pela integração: `lucasfaborges94/erp-winservice-dev-docs`.
+- Buscas por repositórios do proprietário com os termos `erp`, `winservice` e `backend` não localizaram outro repositório de implementação.
+- ADR-0011, ADR-0017, ADR-0018, proposta física do catálogo de permissões v0.4.0, plano Parte A, contexto, status e stack foram consultados.
+
+#### Resultado e limitação
+Não foi possível auditar dependências em código, identificar o sistema de migrations da aplicação ou confirmar o baseline oficial. A busca realizada cobre somente os repositórios visíveis à integração e os termos utilizados; não prova inexistência de código em outra conta, organização ou ambiente.
+
+#### Próxima atividade
+Solicitar ao responsável a URL/nome do repositório de implementação e confirmar que a integração possui acesso. Após isso, inspecionar estrutura, branches, migrations, workflows e referências às tabelas/colunas envolvidas; confrontar com o Supabase em modo somente leitura e então fechar a especificação executável. Não executar DDL/DML nem migrations sem autorização operacional específica.
+
+#### Limites
+Nenhum código, arquivo do Supabase, schema, dado, migration, policy, grant, função ou trigger foi alterado nesta retomada. Atualizações feitas somente na documentação do repositório oficial.
