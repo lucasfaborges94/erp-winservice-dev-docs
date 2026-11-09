@@ -71,3 +71,11 @@ O operador local deve executar a captura lógica da Opção B em ambiente contro
 ## Histórico
 
 - 2026-11-09 — criação como procedimento proposto, baseado na documentação oficial atual; nenhuma operação Supabase foi executada.
+
+## 7. Classificação dos dados de teste — declaração do responsável (2026-11-09)
+
+O responsável informou que os registros atualmente existentes no banco são dados de mockup inseridos para fins de teste, mantidos intencionalmente como pistas para compreender a lógica e o funcionamento do modelo de dados em construção. Para fins de análise funcional e estrutural deste projeto, os dados de linhas podem ser considerados dados de teste conforme essa declaração.
+
+Essa classificação não comprova que os dumps estejam livres de credenciais, hashes de autenticação, tokens, chaves, configurações sensíveis ou dados pessoais eventualmente inseridos em campos de teste. Antes de compartilhar ou versionar qualquer arquivo, inspecionar e remover segredos e credenciais. O arquivo data.sql pode ser fornecido ao agente para análise privada após essa triagem; não deve ser publicado no GitHub por padrão. Se contiver apenas dados fictícios e nenhum segredo, o responsável poderá autorizar explicitamente sua inclusão em artefato privado, mas isso não é necessário para o baseline estrutural.
+
+A declaração não altera a necessidade de backup restaurável, ensaio isolado, nem os gates de segurança e autorização.
