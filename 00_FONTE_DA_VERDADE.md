@@ -1,8 +1,8 @@
 # ERP Winservice — Fonte da verdade e protocolo de trabalho
 
 **Documento:** Fonte da verdade do projeto  
-**Versão:** 1.1.0  
-**Data:** 2026-11-07  
+**Versão:** 1.2.0  
+**Data:** 2026-11-08  
 **Idioma oficial:** Português (Brasil)  
 **Repositório oficial:** https://github.com/lucasfaborges94/erp-winservice-dev-docs  
 **Branch de referência:** main
@@ -107,6 +107,22 @@ A consulta deve ser proporcional à tarefa. Além dos documentos de entrada, ler
 - Informar commit, branch ou pull request correspondente, quando existente.
 - Não declarar tarefa concluída sem critérios de aceite e evidências compatíveis.
 
+### 4.4 Barreira obrigatória antes e depois de cada resposta
+
+Para toda mensagem relacionada ao ERP Winservice, mesmo durante uma sessão já iniciada:
+
+1. Ler integralmente a mensagem mais recente do usuário e classificar sua intenção.
+2. Consultar novamente a versão atual de `00_FONTE_DA_VERDADE.md` na branch de referência.
+3. Consultar `documentacao/PROTOCOLO_DE_ATUACAO_IA_GITHUB.md` e o registro/contexto operacional mais recente.
+4. Consultar os documentos especializados e ADRs pertinentes à mensagem.
+5. Verificar commits posteriores ao último registro de continuidade quando a integração permitir.
+6. Só então responder, separando fatos documentados, implementação verificada, decisões aprovadas, propostas e lacunas.
+7. Após responder, identificar se a interação produziu informação persistente. Registrar deliberações, pontos-chave, mudanças de estado, pendências e próximos passos nos documentos apropriados.
+
+Uma consulta anterior na mesma conversa não substitui a consulta atual: o repositório pode ter mudado entre mensagens. Se o GitHub estiver inacessível, informar a falha e não tratar o histórico como fonte vigente.
+
+Nem toda mensagem exige commit. Mensagens sem informação nova ou avanço relevante não devem gerar alterações artificiais. A obrigação de consulta, entretanto, permanece.
+
 ## 5. Aprovação e autoridade humana
 
 O responsável pelo projeto mantém a autoridade final para aprovar decisões de produto, escopo, arquitetura, segurança, regras de negócio e prioridades, salvo delegação formal registrada.
@@ -143,9 +159,11 @@ Acesso ao repositório não implica autorização para acessar ambientes, banco 
 
 Antes de executar operações, confirmar o ambiente de destino, usar o menor privilégio necessário, não solicitar nem expor segredos em conversas ou documentos, exigir revisão e autorização para operações destrutivas ou irreversíveis e produzir evidência auditável das alterações relevantes.
 
-## 9. Continuidade e transferência
+## 9. Continuidade, sessões e transferência
 
-Toda sessão técnica ou de planejamento que produza avanço relevante deve terminar com um registro atualizado em [08_CONTINUIDADE_E_TRANSFERENCIA.md](documentacao/08_CONTINUIDADE_E_TRANSFERENCIA.md).
+Toda sessão técnica ou de planejamento que produza avanço relevante deve ser registrada em [08_CONTINUIDADE_E_TRANSFERENCIA.md](documentacao/08_CONTINUIDADE_E_TRANSFERENCIA.md), com registros individuais para sessões ou marcos relevantes conforme o procedimento daquele documento.
+
+Durante o avanço do projeto, registrar progressivamente os pontos-chave: aprovações, decisões, requisitos, correções, descobertas, mudanças de escopo, artefatos, testes, bloqueios e próximos passos. Não esperar o encerramento de uma conversa longa para reconstruir esses dados de memória.
 
 O registro deve permitir que outro profissional ou agente retome o trabalho sem depender do histórico da sessão anterior. Deve conter contexto suficiente, estado verificado, decisões, arquivos alterados, testes, pendências e próximo passo.
 
@@ -163,5 +181,6 @@ Mudanças neste documento devem ser revisadas pelo responsável pelo projeto. Al
 
 ## Histórico de alterações
 
+- 2026-11-08 — v1.2.0: estabelece consulta obrigatória antes de cada resposta sobre o ERP, verificação posterior e registro incremental de sessões e pontos-chave.
 - 2026-11-08 — v1.1.0: explicita o repositório como memória documental oficial e diferencia memória persistente de contexto auxiliar de ferramentas de IA.
 - 2026-11-07 — v1.0.0: criação do protocolo independente de fornecedor, conta, ferramenta ou profissional, com regras de autoridade por tipo de informação, consulta, execução, aprovação, segurança e transferência.
