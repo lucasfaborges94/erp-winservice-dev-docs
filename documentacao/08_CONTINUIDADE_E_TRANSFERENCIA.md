@@ -1246,3 +1246,25 @@ A aprovação não resolve as decisões ainda abertas na proposta e não autoriz
 Após a aprovação do modelo físico, foi inspecionado o schema atual do Supabase. Foram encontrados 1 registro em `permissions` (`customer/view`, ainda sem código estável), nenhum registro em `role_permissions` ou `user_permissions`, FKs individuais sem garantia composta de tenant, `user_permissions.allow` nullable, RLS habilitado sem policies retornadas para as três tabelas e nenhum trigger não interno. O único registro legado pertence à Winservice e permaneceu intacto. Detalhes e limitações estão na proposta física v0.3.0.
 
 Nenhuma alteração de dados ou schema foi executada. A próxima etapa é fechar os pontos técnicos pendentes e preparar a especificação executável/migration draft, sem executar no Supabase.
+
+
+### Complemento da sessão — aprovação da convenção de códigos de permissão (2026-11-08)
+
+**Estado:** convenção aprovada e registrada; migration não autorizada.
+
+O responsável aprovou a convenção semântica `entidade.ação` para os códigos estáveis (`permission_code`), em minúsculas e independente dos nomes físicos das tabelas. Exemplos ilustrativos: `customer.view`, `customer.create`, `customer.update`, `visit.view`, `visit.create` e `visit.cancel`.
+
+O registro legado observado (`entity=customer`, `field=NULL`, `action=view`) deverá ser mapeado para `customer.view`, condicionado à validação no plano de migração. A aprovação da convenção não aprova a matriz completa de permissões nem cria automaticamente todos os códigos exemplificados. Mudanças semânticas incompatíveis exigem novo código; mudanças de descrição ou de nomes físicos não devem alterar códigos estáveis.
+
+#### Artefatos atualizados
+
+- `documentacao/relatorios/PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md` — v0.4.0, seção 9.1 e histórico de alterações.
+- `documentacao/CONTEXTO_ATUAL_ERP.md` — decisão e referência operacional atualizadas.
+
+#### Próxima atividade
+
+Continuar a preparação da especificação executável e do pacote de migration: identificar o repositório/baseline oficial de migrations, validar o mapeamento `customer.view`, completar o inventário de dependências em código e workflows, resolver as decisões técnicas ainda pendentes e apresentar o pacote para revisão e autorização operacional específica.
+
+#### Limites
+
+Aprovação restrita à convenção de nomenclatura. Nenhum DDL, DML, migration, policy, grant, função, trigger ou dado foi alterado no Supabase.
