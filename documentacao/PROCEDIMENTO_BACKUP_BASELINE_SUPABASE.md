@@ -79,3 +79,12 @@ O responsável informou que os registros atualmente existentes no banco são dad
 Essa classificação não comprova que os dumps estejam livres de credenciais, hashes de autenticação, tokens, chaves, configurações sensíveis ou dados pessoais eventualmente inseridos em campos de teste. Antes de compartilhar ou versionar qualquer arquivo, inspecionar e remover segredos e credenciais. O arquivo data.sql pode ser fornecido ao agente para análise privada após essa triagem; não deve ser publicado no GitHub por padrão. Se contiver apenas dados fictícios e nenhum segredo, o responsável poderá autorizar explicitamente sua inclusão em artefato privado, mas isso não é necessário para o baseline estrutural.
 
 A declaração não altera a necessidade de backup restaurável, ensaio isolado, nem os gates de segurança e autorização.
+
+
+## 8. Nova diretriz: substituição da massa de dados de teste (2026-11-09)
+
+O responsável autorizou substituir os dados atualmente existentes por uma massa fictícia nova, criada pelo agente, e determinou que os dados atuais não sejam analisados para reconstruir regras ou fluxos anteriores. O desenho da nova massa deve seguir exclusivamente o schema, requisitos, ADRs e lógica vigente do ERP.
+
+A autorização não elimina a necessidade de backup restaurável e ensaio isolado previstos na seção 3. Antes da execução, elaborar inventário das tabelas afetadas, dependências FK, ordem de limpeza e inserção, cobertura de cenários do MVP e política para identidades/perfis do Supabase Auth. Não interpretar “todos os dados” como autorização implícita para remover usuários Auth, roles, grants, policies, funções, configurações, objetos de Storage ou outros componentes de plataforma.
+
+**Estado:** objetivo autorizado; execução ainda bloqueada pelo Gate G0 parcial e pela necessidade de fechar o escopo. Não executar DELETE/TRUNCATE nem inserir a nova massa em produção até cumprir os gates, revisar o plano e confirmar o escopo operacional. Dados atuais não serão usados como fonte de regra de negócio.
