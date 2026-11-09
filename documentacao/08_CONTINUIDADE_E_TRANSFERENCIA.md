@@ -99,3 +99,16 @@ Build, testes unitários (1/1), e2e (1/1) e lint (0 warnings/0 errors) foram exe
 Após autorização explícita do responsável, foi criado o [Pull Request #1](https://github.com/lucasfaborges94/erp-winservice-app/pull/1), título `chore(api): add NestJS scaffold for ERP`, da branch `review/api-scaffold-2026-11-09` para `main`. O GitHub confirmou PR aberto, não draft, com 3 commits, 19 arquivos alterados (5.357 adições, 0 remoções), head `970dc9c1658fdc007797283aec669fbc99b50d20` e base `0a6f7ac84a56b092a949817345b5d278abfbfdf7`. O campo retornado `mergeable` veio como `false`; a causa não foi determinada e não se deve interpretar esse campo isoladamente como conflito confirmado.
 
 A descrição do PR documenta o scaffold, as verificações locais reportadas, os limites de implementação e os gates da ADR-0019. **Nenhum merge foi realizado.** Nenhuma operação Supabase ou deploy foi executado. Próxima atividade: revisar PR #1 e esclarecer mergeabilidade; aguardar aprovação específica antes de qualquer merge.
+
+
+### Continuação — rechecagem do PR #1 e estado de mergeabilidade — 2026-11-09
+
+Na retomada da sessão, foram consultados novamente o HEAD e os documentos de entrada do repositório oficial. O HEAD de documentação era `306d792e520a716825f0b3317dba7144110e24a3` antes deste registro.
+
+O PR #1 (`chore(api): add NestJS scaffold for ERP`) foi consultado diretamente e permanece aberto, não draft e não merged. O estado atual retornado pelo GitHub é `mergeable: true`, superando o `mergeable: false` retornado na criação. A comparação da branch confirma 3 commits à frente e 0 atrás de `main`, sem mudança nos SHAs de head/base registrados anteriormente.
+
+A consulta encontrou zero reviews, zero comentários de conversa e zero check runs/statuses no commit do PR. Isso não equivale a aprovação de CI. A revisão do patch e da ADR-0019 confirma que o conteúdo permanece um scaffold NestJS/Hello World com configurações, documentação e testes de exemplo; não há autenticação, tenancy, autorização, endpoints de negócio, integração Supabase ou deploy. Os gates da seção 7 da ADR-0019 continuam obrigatórios.
+
+**Estado e limites:** nenhum merge foi executado e não foi feita alteração no repositório de aplicação. Nenhuma operação Supabase ou deploy foi realizada. O merge exige autorização específica do responsável; o fato de o PR estar mergeable não constitui autorização.
+
+**Próxima atividade:** aguardar decisão explícita do responsável sobre integrar o scaffold. Se aprovado, realizar somente o merge do PR #1, sem deploy ou alterações Supabase; depois verificar o commit de merge e atualizar o estado documental.
