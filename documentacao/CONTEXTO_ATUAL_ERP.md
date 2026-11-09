@@ -247,7 +247,7 @@ O responsável informou que executou localmente a geração do scaffold NestJS e
 
 O responsável reportou a criação de `.gitignore` na raiz do repositório de aplicação, com exclusões para `node_modules/`, `dist/`, `coverage/`, `*.tsbuildinfo`, `.env` e `.env.*`, preservando `.env.example`. A existência e o conteúdo foram informados pelo terminal local; ainda não estão versionados nem verificáveis remotamente.
 
-Na pasta `apps/api`, foram executados com sucesso, conforme saída compartilhada: `npm.cmd run build` (Nest build sem erros), `npm.cmd test` (1 arquivo/1 teste aprovado) e `npm.cmd run test:e2e` (1 arquivo/1 teste aprovado). O comando `npm.cmd run lint` foi iniciado e não apresentou diagnósticos na saída fornecida, mas o trecho compartilhado não inclui o código de saída; resultado final do lint permanece pendente de confirmação por `$LASTEXITCODE`.
+Na pasta `apps/api`, foram executados com sucesso, conforme saída compartilhada: `npm.cmd run build` (Nest build sem erros), `npm.cmd test` (1 arquivo/1 teste aprovado) e `npm.cmd run test:e2e` (1 arquivo/1 teste aprovado). O comando `npm.cmd run lint` foi concluído; a saída final do Oxlint foi `Finished in 9.1s on 6 files with 111 rules using 4 threads`, sem diagnósticos de lint reportados. O responsável confirmou que essa linha apareceu após o envio inicial dos resultados. O encerramento normal e a ausência de erros indicam execução bem-sucedida.
 
 **Estado:** build, testes unitários, e2e e lint aprovados localmente conforme saídas compartilhadas; scaffold e `.gitignore` ainda não confirmados no GitHub; nenhum commit/push informado. Nenhum módulo de negócio, integração Supabase ou alteração no banco foi realizado.
 
