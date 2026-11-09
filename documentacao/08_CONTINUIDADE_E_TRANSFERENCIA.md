@@ -1136,7 +1136,7 @@ O responsável concordou em separar:
 
 #### Achados novos que condicionam a migration
 
-- 38 tabelas públicas, RLS habilitado em 38, 23 policies, 103 FKs e nenhuma FK composta por tenant.
+- 310 tabelas públicas, RLS habilitado em 38, 23 policies, 103 FKs e nenhuma FK composta por tenant.
 - 15 tabelas já possuem `company_identifier`; 6 dessas colunas ainda aceitam NULL.
 - 25 das 26 visitas têm cliente/endereço coerentes e podem receber tenant por relação verificável; uma visita não possui qualquer evidência de tenant.
 - Todas as 26 visitas estão sem ordem de serviço; `work_orders` está vazia. Nenhuma OS será criada por suposição.
@@ -1347,7 +1347,7 @@ A consulta de conteúdo em `main` retornou HTTP 404 com a mensagem `This reposit
 
 **Trabalho realizado em modo somente leitura:**
 - Confirmado projeto Supabase `voaovwphncwbrwtcqnsc`, Winservice, região `sa-east-1`, PostgreSQL `17.6.1.141`, estado saudável.
-- Capturado inventário estrutural do schema `public`: 38 tabelas, 461 colunas, 206 constraints, 110 índices, 11 funções, 18 triggers, 23 policies, 34 sequences, 8 extensões instaladas e 1.064 concessões de privilégios.
+- Capturado inventário estrutural do schema `public`: 310 tabelas, 461 colunas, 206 constraints, 110 índices, 11 funções, 18 triggers, 23 policies, 34 sequences, 8 extensões instaladas e 1.064 concessões de privilégios.
 - Confirmadas contagens: 26 visitas, 103 clientes, 99 endereços, 1 empresa, 1 `company_users`, 2 `company_user_roles`, 3 papéis, 1 permissão, 0 `role_permissions` e 0 `user_permissions`.
 - Confirmada a permanência física de `company_users.role_identifier`, sua FK e `public.can_view_expense(uuid)`, conforme dependências registradas na ADR-0018.
 - Listagem de migrations retornou zero e `supabase_migrations.schema_migrations` não existe.
@@ -1390,13 +1390,13 @@ A consulta de conteúdo em `main` retornou HTTP 404 com a mensagem `This reposit
 
 ### Complemento da sessão — matriz RLS/grants/tenant (2026-11-08)
 
-**Estado:** fotografia somente leitura das 38 tabelas de public concluída; classificação funcional completa ainda pendente.
+**Estado:** fotografia somente leitura das 310 tabelas de public concluída; classificação funcional completa ainda pendente.
 
 - RLS habilitado em 38/38; FORCE RLS desabilitado em 38/38.
 - Grants explícitos para anon e authenticated em 38/38, incluindo o conjunto DELETE, INSERT, REFERENCES, SELECT, TRIGGER, TRUNCATE e UPDATE.
 - 26 tabelas sem policies; 12 com uma ou mais policies.
-- 8 tabelas possuem ao menos uma policy com predicado literal true; em users, o true pertence somente à policy de INSERT.
-- 21 tabelas não possuem company_identifier na fotografia, incluindo visits, work_orders, equipments, quotations e company_user_roles.
+- 10 tabelas possuem ao menos uma policy com predicado literal true; em users, o true pertence somente à policy de INSERT.
+- 23 tabelas não possuem company_identifier na fotografia, incluindo visits, work_orders, equipments, quotations e company_user_roles.
 - A matriz por tabela foi registrada em `documentacao/auditorias/MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md`.
 
 **Interpretação:** grants não desabilitam RLS. Ausência de policy normalmente nega acesso a papéis sujeitos a RLS; policies com true não materializam o isolamento multiempresa. Ausência de company_identifier requer classificação (global/tenant/infraestrutura), não correção automática em todas as tabelas.
