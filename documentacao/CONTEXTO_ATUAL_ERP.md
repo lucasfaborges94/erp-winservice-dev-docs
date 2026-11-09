@@ -200,3 +200,7 @@ Consulta somente leitura ao projeto Supabase `voaovwphncwbrwtcqnsc` (Winservice)
 **G0 parcial, não concluído:** falta backup restaurável, baseline SQL reconciliado, detalhes do pooler e ensaio de restauração. **G1 parcial, não concluído:** mapeamento estrutural confirmado, mas falta JWT ponta a ponta, provisionamento e prova do claim sob role não privilegiada. G2–G5 não iniciados.
 
 Nenhuma alteração foi feita no Supabase. Os resultados detalhados e limitações foram adicionados à especificação técnica e à continuidade.
+
+## Pesquisa do procedimento de backup e baseline — 2026-11-09
+
+Foi criado o procedimento proposto [PROCEDIMENTO_BACKUP_BASELINE_SUPABASE.md](PROCEDIMENTO_BACKUP_BASELINE_SUPABASE.md), baseado na documentação oficial atual do Supabase. A documentação confirma duas rotas distintas: dump lógico via CLI (roles/schema/data, com exclusão de schemas gerenciados como auth e storage) e restauração física para novo projeto (recurso beta, mais abrangente, inclui dados Auth, exige plano pago/backups físicos e pode gerar custo adicional). O dump lógico não é cópia integral do projeto. Dados reais do arquivo data.sql devem permanecer criptografados e fora do Git/chat. Nenhuma operação Supabase foi executada nesta etapa. G0 permanece parcial até existir baseline revisado e ensaio de restauração com escopo comprovado. Próxima ação: captura lógica local e revisão apenas dos arquivos estruturais sanitizados; avaliar clone físico separado se for necessária prova completa de Auth.
