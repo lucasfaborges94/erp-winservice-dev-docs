@@ -30,3 +30,19 @@ O responsável informou que executou em `apps/api`:
 **Limites:** execução local reportada pelo responsável; não houve acesso à máquina local, commit ou push confirmado. Nenhuma operação no Supabase foi realizada.
 
 **Próxima atividade:** revisar as versões atualizadas de AGENTS.md, README.md, package.json e package-lock.json; verificar diff e status local antes de preparar o primeiro commit. Não criar commit sem autorização explícita.
+
+### Continuação — revisão dos arquivos atualizados e lockfile parcial (2026-11-09)
+
+O responsável compartilhou a saída local dos seguintes comandos: leitura de `AGENTS.md`, `README.md`, `package.json` e as primeiras 40 linhas de `package-lock.json`.
+
+**Evidências observadas:**
+- `package.json` não apresenta mais `scripts.deploy` nem `@nestjs/mau`; mantém `"license": "UNLICENSED"`.
+- O cabeçalho do lockfile usa versão 3 e seu pacote raiz reproduz as dependências e devDependencies do manifesto apresentado. A inspeção é parcial, limitada às primeiras 40 linhas; não certifica a árvore inteira nem a ausência global de referências a Mau.
+- `AGENTS.md` ainda contém a seção “Production data: NestJS Observe”, incluindo orientação para instalar e vincular a ferramenta. Remover essa seção ou substituí-la por procedimento neutro de diagnóstico, sem prescrever Observe.
+- `README.md` continua o template padrão NestJS e inclui referências a Mau/AWS, Observe e licença MIT do framework. Substituir por guia próprio da API ERP, sem atribuir à aplicação a licença do framework.
+
+Os resultados locais reportados anteriormente continuam válidos como evidência compartilhada: build aprovado; testes unitários 1/1; e2e 1/1; lint 0 warnings/0 errors.
+
+**Limites e estado:** a inspeção depende da saída local fornecida; o assistente não acessou a máquina. O repositório remoto de aplicação ainda não contém o scaffold no HEAD consultado. Nenhum commit/push foi confirmado. Não houve operação no Supabase.
+
+**Próxima atividade:** ajustar AGENTS.md e README.md, depois conferir o lockfile completo, `git diff --check`, `git status --short` e o diff integral. Revisar todos os arquivos antes de qualquer commit; não criar commit sem autorização explícita.
