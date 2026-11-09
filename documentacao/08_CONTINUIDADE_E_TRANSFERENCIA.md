@@ -1673,3 +1673,16 @@ O responsável compartilhou a saída integral de leitura dos arquivos de apps/ap
 **Recomendação antes do primeiro commit:** retirar/reformular o conteúdo Observe de AGENTS.md e README.md; substituir o README por instruções próprias da API e do ambiente VPS/Easypanel; remover @nestjs/mau e o script deploy do package.json, regenerando package-lock.json. Depois, repetir build, testes e lint e revisar git diff/git status antes de autorizar o commit.
 
 **Estado:** nenhuma alteração local foi feita pelo assistente; nenhum commit/push do scaffold foi confirmado; nenhuma operação no Supabase foi realizada. A revisão não equivale a auditoria de vulnerabilidades de dependências nem a aprovação para criar endpoints de negócio.
+
+
+### Continuação — remoção de Mau e fechamento dos testes de .gitignore (2026-11-09)
+
+O responsável compartilhou novas evidências locais:
+
+- A tentativa de executar npm uninstall @nestjs/mau na raiz do repositório retornou “up to date”; isso não comprova alteração no workspace da API.
+- A execução seguinte, dentro de apps/api, removeu 50 pacotes. O npm reportou auditoria de 287 pacotes e zero vulnerabilidades. A saída confirma a operação do npm, mas os arquivos package.json e package-lock.json atualizados ainda precisam ser lidos para validar o estado final.
+- git check-ignore -v apps/api/coverage/placeholder confirmou a regra coverage/.
+- git check-ignore -q apps/api/.env.example retornou $LASTEXITCODE 1, comprovando que .env.example não está ignorado.
+- A saída anterior confirmou .env e .env.local ignorados; node_modules/, dist/ e *.tsbuildinfo já haviam sido confirmados em verificação anterior.
+
+**Estado:** os casos de exclusão solicitados do .gitignore estão validados. @nestjs/mau foi removido localmente pelo npm dentro de apps/api, sujeito à conferência dos arquivos. Permanecem pendentes a retirada do script deploy, adequação de AGENTS.md e README.md, revisão do package.json/package-lock.json, repetição de build/testes/lint e revisão do diff. Scaffold ainda não publicado; nenhum commit/push confirmado; nenhuma operação Supabase realizada.
