@@ -210,3 +210,12 @@ Foi criado o procedimento proposto [PROCEDIMENTO_BACKUP_BASELINE_SUPABASE.md](PR
 ## Classificação dos dados existentes — declaração do responsável (2026-11-09)
 
 O responsável esclareceu que os registros atualmente existentes no Supabase são dados de mockup inseridos para testes e mantidos como referência para compreender a lógica/modelagem em construção. Para análise do domínio, os dados de linhas podem ser tratados como dados de teste conforme essa declaração. Isso não comprova ausência de segredos, hashes, tokens ou credenciais nos dumps; tais conteúdos ainda devem ser inspecionados e removidos antes de compartilhamento. O procedimento de backup foi atualizado para permitir análise privada de data.sql após triagem, sem versioná-lo no Git por padrão. A classificação não dispensa backup restaurável nem ensaio de restauração.
+
+
+## Diretriz do responsável — substituição integral dos dados de teste (2026-11-09)
+
+O responsável determinou que os dados atualmente armazenados no Supabase não devem ser usados para reconstruir ou inferir o funcionamento anterior do ERP. A lógica vigente para o desenvolvimento será a definida na documentação, requisitos, ADRs e implementação atual em construção. O responsável autorizou a substituição dos dados existentes por uma nova massa fictícia criada pelo agente.
+
+**Escopo ainda a detalhar antes da execução:** identificar todas as tabelas e dependências afetadas; separar dados transacionais/de domínio de identidades e infraestrutura do Supabase Auth; definir quais contas/perfis de teste serão preservados ou recriados; projetar ordem transacional de limpeza e inserção; garantir consistência referencial, isolamento multiempresa e cobertura dos cenários do MVP. A expressão “todos os dados do banco” não será interpretada automaticamente como autorização para excluir usuários Auth, configurações, storage, funções, roles ou objetos de schema.
+
+**Gate operacional:** a autorização do responsável para substituir os dados está registrada, mas a execução permanece BLOQUEADA até existir backup restaurável, ensaio de restauração isolado, inventário atualizado e plano revisado de limpeza/repopulação. Não executar DDL/DML destrutivo em produção antes desses gates e de confirmação do escopo exato. Nenhuma alteração no Supabase foi realizada nesta deliberação.
