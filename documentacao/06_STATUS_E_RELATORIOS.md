@@ -437,3 +437,10 @@ A matriz não representa teste de sessão nem prova de exposição de dados; gra
 O responsável confirmou que integrações externas ficam fora do MVP operacional. Conectores (incluindo Auvo), webhooks, sincronizações, filas e infraestrutura dedicada de integração não serão implementados nem serão dependências dos fluxos do MVP. A correção dos problemas específicos dessa frente será retomada quando as integrações forem desenvolvidas.
 
 A API interna necessária à comunicação das aplicações com os módulos do ERP não foi excluída por essa deliberação; seu protocolo e sua forma de implementação continuam pendentes de decisão arquitetural. A exclusão de escopo não remove nem desativa objetos já existentes no Supabase. A RPC `authorize_integration_sync_event` identificada na auditoria continua sendo um risco técnico a isolar/avaliar quanto à exposição atual; não houve alteração no banco nesta deliberação.
+
+
+## 25. Proposta técnica de autenticação e contexto RLS — 2026-11-09
+
+Criada a proposta `documentacao/ESPECIFICACAO_TECNICA_AUTENTICACAO_CONTEXTO_RLS.md`, ainda pendente de aprovação. A recomendação é validar JWT Supabase na API e resolver o perfil ERP por `users.auth_user_identifier); selecionar/revalidar a empresa ativa no servidor; executar operações em transação PostgreSQL por role dedicada sem BYPASSRLS; definir identidade e empresa somente em contexto transaction-local; e manter RLS como enforcement no banco.
+
+A proposta não é decisão aprovada nem implementação. A compatibilidade depende de confirmar no Supabase atual a relação Auth↔ERP, roles, grants, função `auth.uid()`, pooler, ownership e policies. A fotografia estrutural de 2026-11-08 não é dump restaurável. Não houve consulta nem alteração no Supabase nesta sessão. Próximo passo: deliberação do responsável; após aprovação, G0/G1 somente leitura e prova em ambiente não produtivo.
