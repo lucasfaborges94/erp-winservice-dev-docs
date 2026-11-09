@@ -1451,3 +1451,18 @@ A auditoria anterior identificou a RPC `public.authorize_integration_sync_event(
 **Justificativa:** centraliza regras e autorização, preserva separação por domínio e permite evolução sem custo operacional prematuro de microsserviços. A escolha de NestJS é recomendação técnica, não decisão vigente.
 
 **Próximos passos condicionados à aprovação:** (1) aprovar ou ajustar a direção arquitetural; (2) elaborar ADR específica para API/backend; (3) especificar autenticação, empresa ativa, contexto RLS e acesso a banco; (4) definir contratos e fronteiras de módulos; (5) só então criar estrutura, testes e pipeline no repositório de aplicação.
+
+
+### Deliberação — aprovação da arquitetura da API interna (2026-11-08)
+
+**Estado:** APROVADA explicitamente pelo responsável.
+
+O responsável aprovou a direção arquitetural apresentada: monólito modular com API própria em TypeScript/NestJS, REST versionada em `/api/v1`, hospedada inicialmente na VPS existente por meio do Easypanel. O Supabase permanece como PostgreSQL/fonte de verdade e Supabase Auth como provedor de identidade. WeWeb e FlutterFlow consumirão a API para operações de negócio. A API ficará no repositório privado `lucasfaborges94/erp-winservice-app`; não será criado terceiro repositório. Microsserviços ficam fora do MVP.
+
+A decisão foi formalizada na ADR-0019, em estado APROVADA. Responsabilidades, módulos candidatos, escopo excluído e gates de segurança estão descritos na ficha.
+
+**Gates que permanecem obrigatórios antes da implementação de negócio:** especificar validação JWT e mapeamento de identidade; empresa ativa e vínculo; papéis exclusivamente por `company_user_roles`; contexto transacional confiável até RLS; conexão e privilégios sem uso indiscriminado de `service_role`; reconciliação das policies existentes; testes negativos multiempresa; contratos REST e sincronização offline interna. Aplicam-se também os limites da Isa da ADR-0012.
+
+**Próximas atividades:** elaborar a especificação técnica de autenticação/autorização/contexto RLS; definir contratos REST e fronteiras de módulos; reconciliar o estado real do Supabase e estabelecer migrations versionadas após backup restaurável/ensaio; então criar estrutura NestJS, testes e pipeline no repositório de aplicação.
+
+**Limites:** esta aprovação formaliza a direção arquitetural, mas não declara API implementada, não autoriza DDL/DML no Supabase, não autoriza deploy e não dispensa revisão, preflight, backup restaurável, autorização operacional específica e verificação posterior. Nenhum código ou objeto Supabase foi alterado nesta deliberação.
