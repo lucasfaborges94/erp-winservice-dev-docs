@@ -1288,3 +1288,10 @@ Solicitar ao responsável a URL/nome do repositório de implementação e confir
 
 #### Limites
 Nenhum código, arquivo do Supabase, schema, dado, migration, policy, grant, função ou trigger foi alterado nesta retomada. Atualizações feitas somente na documentação do repositório oficial.
+
+
+### Esclarecimento do responsável — não existe repositório separado de aplicação (2026-11-08)
+
+O responsável esclareceu que não existe outro repositório além de `lucasfaborges94/erp-winservice-dev-docs`. A solicitação anterior por URL de repositório de implementação não se aplica; não há código-fonte separado a fornecer ou auditar.
+
+**Próximo passo revisado:** inspecionar em modo somente leitura o histórico de migrations disponível no Supabase e o schema efetivo, incluindo funções, triggers, policies, constraints e dependências relevantes. Como não há baseline Git de migrations em repositório de aplicação, após a auditoria será necessário propor o local e o fluxo de versionamento das migrations futuras. Nenhuma alteração no Supabase está autorizada por este esclarecimento.
