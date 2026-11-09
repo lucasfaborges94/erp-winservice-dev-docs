@@ -1521,3 +1521,9 @@ A decisão foi formalizada na ADR-0019, em estado APROVADA. Responsabilidades, m
 **Limites:** nenhuma operação no Supabase foi executada. Nenhum dump foi gerado, nenhuma restauração foi testada e nenhum dado foi alterado. Arquivo data.sql contém potencialmente dados pessoais e deverá permanecer criptografado fora do Git/chat. O baseline lógico deve ser revisado e seu escopo de exclusão documentado; não deve ser chamado de backup integral do projeto.
 
 **Próxima ação:** executar localmente a captura lógica via Supabase CLI em ambiente controlado e disponibilizar somente roles.sql e schema.sql após revisão/remoção de segredos e dados pessoais. Manter data.sql privado. Depois, revisar os artefatos e planejar ensaio de restauração compatível. Se a prova exigir restauração integral do Auth, avaliar clone físico para novo projeto após estimativa e aprovação de custo.
+
+
+
+### Esclarecimento do responsável sobre dados mockup — 2026-11-09
+
+O responsável informou que os dados atualmente inseridos no Supabase são mockups de teste, mantidos deliberadamente como pistas sobre a lógica e o funcionamento do banco em construção. A análise de dados de linhas poderá, portanto, ser utilizada para compreender regras e relacionamentos, conforme essa classificação declarada. Isso não permite presumir que todo o conteúdo de um dump esteja livre de segredos, hashes de autenticação, tokens ou credenciais; a triagem continua obrigatória. O procedimento de backup foi ajustado para admitir o compartilhamento privado de data.sql após essa verificação, sem publicação no GitHub por padrão. Nenhuma alteração no Supabase foi realizada por este esclarecimento.
