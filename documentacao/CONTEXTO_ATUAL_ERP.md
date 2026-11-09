@@ -228,3 +228,10 @@ Em resposta à delimitação, o responsável confirmou: “Pode substituir tudo�
 A autorização refere-se aos dados, não à destruição indiscriminada do schema ou da plataforma. Não remover automaticamente tabelas/colunas, migrations, funções, triggers, policies, grants, roles PostgreSQL, extensões, configurações do projeto, buckets/objetos Storage ou Edge Functions; alterações estruturais exigem especificação e autorização próprias. O destino/escopo de objetos Storage deve ser inventariado e tratado separadamente se houver conteúdo armazenado.
 
 **Execução continua BLOQUEADA** até backup restaurável que cubra banco e Auth, ensaio isolado de restauração, inventário atualizado e plano revisado com ordem de exclusão/recriação e validações. Nenhuma operação foi executada no Supabase.
+
+
+## Estrutura inicial da API — 2026-11-09
+
+O responsável informou que executou localmente a geração do scaffold NestJS em `C:\Projetos\erp-winservice-app\apps\api`, usando Node.js `v26.13.0`, npm `11.20.0`, NestJS CLI `12.0.12`, módulo ESM com Vitest e sem NestJS Observe. O instalador reportou `Successfully created project api` e `Installation in progress... ☕` seguido da conclusão sem erro.
+
+**Classificação da evidência:** avanço local relatado pelo responsável; ainda não verificado no GitHub, sem commit/push informado e sem teste de inicialização ou build. A árvore remota do repositório de aplicação permanece no HEAD `0a6f7ac84a56b092a949817345b5d278abfbfdf7`, sem `apps/api`. Próxima ação: verificar `git status`, executar a API em modo desenvolvimento e confirmar resposta HTTP local; depois revisar e versionar os arquivos.
