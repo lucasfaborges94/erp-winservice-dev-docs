@@ -1417,3 +1417,14 @@ A consulta de conteúdo em `main` retornou HTTP 404 com a mensagem `This reposit
 **Recomendação apresentada, ainda não aprovada:** manter a API e os demais componentes de aplicação no repositório privado `erp-winservice-app`, inicialmente como monorepo, sem criar um terceiro repositório. A forma concreta da API (recursos nativos do Supabase/RPC/Edge Functions e eventual serviço backend dedicado) deve ser decidida antes de criar `apps/api` ou escolher framework.
 
 **Limites:** nenhuma decisão arquitetural foi aprovada nesta interação; nenhum código, migration ou objeto Supabase foi alterado.
+
+
+## Deliberação — integrações fora do MVP (2026-11-08)
+
+O responsável determinou que integrações externas não façam parte do MVP. Auvo, conectores, webhooks, sincronizações, filas e infraestrutura específica de integração não devem ser implementados nem constituir dependência dos fluxos operacionais desta entrega. Os problemas técnicos próprios dessa frente serão tratados quando o desenvolvimento das integrações for retomado.
+
+Essa exclusão não elimina automaticamente a necessidade de uma API interna para servir as aplicações e os módulos do ERP. O protocolo/API interna continua como questão arquitetural em aberto e deve ser definido separadamente. A classificação de integrações como fora do MVP também não autoriza remover objetos já existentes no Supabase.
+
+A auditoria anterior identificou a RPC `public.authorize_integration_sync_event(...)` como SECURITY DEFINER e executável por `anon`/`authenticated`, sem validação de autenticidade visível no corpo inspecionado. O conector está fora do escopo de implementação do MVP; contudo, a existência e a exposição atuais desse objeto permanecem um risco de segurança do ambiente a ser isolado/avaliado antes de qualquer disponibilização pública, sem presumir que a exclusão funcional por si só o desative. Nenhuma alteração no banco foi executada nesta deliberação.
+
+**Próxima atividade:** avançar na fundação operacional do MVP e na definição da API interna, sem implementar conectores. Manter qualquer objeto de integração já existente identificado como legado/inativo até que seu risco de exposição seja avaliado; não presumir que esteja desativado apenas por estar fora do escopo.
