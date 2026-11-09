@@ -84,3 +84,12 @@ O responsável reportou a geração local do scaffold em `apps/api` com NestJS C
 ## 6.4 Scaffold da API publicado para revisão — 2026-11-09
 
 O responsável publicou o scaffold em `lucasfaborges94/erp-winservice-app`, branch `review/api-scaffold-2026-11-09`, commit inicial `01d00ea`. A branch contém a fundação NestJS/TypeScript em `apps/api`; permanece sem módulos ou endpoints de negócio e não foi integrada à `main`. Na revisão remota, `AGENTS.md` e `README.md` foram corrigidos para alinhar as orientações à ADR-0019. A existência do scaffold no GitHub não comprova deploy. Testes anteriores foram reportados pelo responsável; novas execuções locais serão necessárias após sincronizar os ajustes de documentação.
+
+
+## 6.5 Estrutura isolada para hardening Supabase — 2026-11-09
+
+Foi criada a branch Git `work/supabase-hardening` no repositório privado de aplicação, baseada na `main` pós-merge do scaffold (`2e73ce3f2377a8403992ee5b5b46fe4657b2eb56`). O arquivo `supabase/README.md` foi atualizado nessa branch para documentar migrations, baseline, testes e regras de segurança. A branch não altera a `main`.
+
+O projeto Supabase Winservice (`voaovwphncwbrwtcqnsc`) está em `sa-east-1`, PostgreSQL 17.6.1.141; não havia branches de desenvolvimento na consulta. A cotação para criar uma branch é US$ 0,01344/hora e aguarda confirmação explícita.
+
+A criação ainda não foi executada: branches Supabase recebem migrations, mas não copiam dados de produção. Como não há migrations nem baseline restaurável documentada, a branch não seria réplica do banco atual. Primeiro deve ser estabelecida uma baseline verificável ou deve haver decisão consciente de criar um ambiente vazio. Nenhuma alteração foi feita no projeto principal.
