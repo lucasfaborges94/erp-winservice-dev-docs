@@ -61,7 +61,7 @@ O Advisor retornou 26 tabelas nessa condição. Para papéis sujeitos a RLS, aus
 
 Lista observada: `a_blank_template`, `approval_events`, `company_modules`, `company_user_roles`, `contact_channels`, `documents`, `equipments`, `integration_sync_queue`, `integration_webhooks`, `integrations`, `permissions`, `phonenumbers`, `quotations`, `role_modules`, `role_permissions`, `role_screens`, `roles`, `task_types`, `user_modules`, `user_permissions`, `user_screens`, `visit_requirements`, `visit_type_requirement`, `visit_types`, `work_order_equipment`, `work_orders`.
 
-### SEC-05 — seis funções com search_path mutável
+### SEC-05 — sete funções com search_path mutável
 
 O Advisor sinalizou `set_updated_fields`, `set_created_by`, `ensure_primary_address`, `set_created_fields`, `set_visit_address_snapshot`, `update_updated_at` e `prevent_changes`. O catálogo confirmou ausência de configuração fixa de search_path nessas funções. A função `authorize_integration_sync_event` tem configuração explícita; `can_view_expense` também tem configuração explícita.
 
