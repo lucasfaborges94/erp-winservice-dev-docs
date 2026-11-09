@@ -17,7 +17,7 @@
 | Isa | Agente de IA para processos permitidos | Política de autonomia definida |
 | VPS + Easypanel | Hospedagem de serviços e aplicações | Ambiente existente; topologia final a documentar |
 | Git / repositório documental | Governança, requisitos, ADRs e continuidade | `lucasfaborges94/erp-winservice-dev-docs` |
-| Git / repositório de aplicação | Código-fonte, migrations, testes e CI/CD | Aprovado: `lucasfaborges94/erp-winservice-app`, privado, branch `main`; criação pendente de confirmação |
+| Git / repositório de aplicação | Código-fonte, migrations, testes e CI/CD | Confirmado: `lucasfaborges94/erp-winservice-app`, privado, branch `main`, integração com permissão admin; repositório atualmente vazio |
 
 ## 2. Recursos e práticas técnicas
 
@@ -55,3 +55,7 @@
 ## 5. Segurança documental
 
 Nunca registrar neste documento senhas, tokens, chaves privadas, service-role keys, segredos de webhook ou dados pessoais sensíveis. Registrar apenas onde o segredo é gerenciado e quem é o responsável autorizado.
+
+## 6. Verificação do repositório de aplicação — 2026-11-08
+
+A integração GitHub confirmou metadados do repositório `lucasfaborges94/erp-winservice-app`: privado, branch padrão `main`, não arquivado e permissão `admin` para a integração. As APIs de conteúdo e commits confirmaram que o repositório está vazio. Nenhum código, migration ou pipeline foi criado. A estrutura inicial e a estratégia de migrations permanecem por definir; qualquer baseline deverá ser reconciliado com o estado real do Supabase antes de ser criado.
