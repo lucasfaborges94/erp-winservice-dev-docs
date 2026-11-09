@@ -154,7 +154,7 @@ A auditoria anterior identificou a RPC `public.authorize_integration_sync_event(
 
 **Decisão aprovada:** monólito modular com API própria em TypeScript/NestJS, hospedada inicialmente na VPS existente via Easypanel, mantendo o Supabase como PostgreSQL/fonte de verdade e Supabase Auth como provedor de identidade. WeWeb e FlutterFlow consumiriam a API ERP para operações de negócio. Não adotar microsserviços no MVP.
 
-**Responsabilidades propostas:**
+**Responsabilidades aprovadas pela ADR-0019:**
 - API: casos de uso, regras de negócio, validação de JWT, seleção/validação de empresa ativa, autorização por vínculo e papéis em `company_user_roles`, auditoria, idempotência e sincronização offline.
 - Supabase/PostgreSQL: persistência, constraints, integridade referencial, RLS e funções de banco estritamente necessárias.
 - Clientes: apresentação, captura de dados e armazenamento/fila local para operação offline; sem autoridade para conceder acesso ou decidir tenant.
@@ -164,7 +164,7 @@ A auditoria anterior identificou a RPC `public.authorize_integration_sync_event(
 
 **MVP:** integrações externas, webhooks, sincronizações com terceiros, filas e infraestrutura dedicada de integração permanecem fora do escopo conforme deliberação do responsável. A sincronização offline do próprio app técnico é requisito operacional e não deve ser confundida com integração externa.
 
-**Estrutura de código prevista, ainda não criada:** `apps/api` com módulos por domínio (auth, companies, users, permissions, customers, equipments, work-orders, visits, tasks e audit), além de contratos compartilhados quando necessário. Não há framework ou estrutura aprovada atualmente.
+**Estrutura de código prevista, ainda não criada:** `apps/api` com módulos por domínio (auth, companies, users, permissions, customers, equipments, work-orders, visits, tasks e audit), além de contratos compartilhados quando necessário. O framework NestJS está aprovado pela ADR-0019; a estrutura de código ainda não foi criada.
 
 **Justificativa:** centraliza regras e autorização, preserva separação por domínio e permite evolução sem custo operacional prematuro de microsserviços. A escolha de NestJS integra a direção aprovada pela ADR-0019.
 
