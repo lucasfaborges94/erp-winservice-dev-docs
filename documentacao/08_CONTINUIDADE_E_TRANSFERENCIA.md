@@ -1,8 +1,8 @@
 # Continuidade e transferência de trabalho — ERP Winservice
 
 **Documento:** Procedimento de continuidade e transferência  
-**Versão:** 1.8.0  
-**Data:** 2026-11-07  
+**Versão:** 1.9.0  
+**Data:** 2026-11-08  
 **Estado:** procedimento estabelecido; registro inicial de referência
 
 ## 1. Objetivo
@@ -13,9 +13,15 @@ Este documento define o que deve ser registrado ao encerrar uma sessão, como ou
 
 As regras gerais de autoridade e trabalho estão em [00_FONTE_DA_VERDADE.md](../00_FONTE_DA_VERDADE.md).
 
-## 2. Regra de encerramento
+## 2. Regra de registro incremental e encerramento
 
-Toda sessão que produza avanço relevante deve atualizar este documento ou criar um registro de sessão no histórico definido abaixo.
+Toda sessão que produza avanço relevante deve atualizar este documento ou criar um registro individual no histórico definido abaixo.
+
+O registro é incremental: durante a conversa, adicionar os pontos-chave assim que forem confirmados, sem esperar o encerramento. Aprovações, decisões, requisitos, correções de entendimento, descobertas técnicas, mudanças de escopo, artefatos, resultados de testes, riscos e próximos passos devem ser registrados quando se tornarem relevantes.
+
+Uma sessão pode abranger várias mensagens correlatas. Não criar um arquivo para cada mensagem; atualizar o registro da sessão em andamento. Criar um novo registro quando houver novo marco, novo objetivo ou retomada que justifique rastreabilidade independente.
+
+Antes de cada resposta sobre o ERP, consultar novamente o GitHub, a fonte da verdade, o protocolo, o contexto operacional e os documentos pertinentes. O registro de sessão não substitui essa consulta.
 
 Não registrar como concluído algo que foi apenas discutido, proposto, gerado mas não aplicado, ou aplicado sem validação.
 
@@ -127,7 +133,46 @@ documentacao/sessoes/AAAA-MM-DD-titulo-curto.md
 
 Não criar essa pasta ou arquivos sem conteúdo real a registrar.
 
-## 7. Estado inicial de continuidade — 2026-11-07
+## 7. Índice de sessões e registros de continuidade
+
+Manter os registros mais recentes primeiro. Cada entrada deve apontar para o registro detalhado, quando separado. O resumo operacional vigente fica em [CONTEXTO_ATUAL_ERP.md](CONTEXTO_ATUAL_ERP.md). Esse resumo é um índice rápido e não substitui documentos normativos, ADRs ou evidências.
+
+### Sessão — 2026-11-08 — aprovação do protocolo de consulta contínua e registro incremental
+
+**Responsável:** responsável pelo projeto  
+**Estado:** protocolo aprovado; atualização documental aplicada nesta publicação.
+
+#### Objetivo
+Estabelecer consulta obrigatória ao GitHub antes de cada resposta sobre o ERP e registro incremental de sessões e pontos-chave.
+
+#### Deliberação
+O responsável aprovou o protocolo proposto, com a exigência adicional de registrar sessões pertinentes conforme o projeto avança e pontos-chave são definidos.
+
+#### Regras incorporadas
+- Consulta à versão atual de `00_FONTE_DA_VERDADE.md` antes de cada resposta sobre o ERP, não apenas no início da conversa.
+- Consulta ao protocolo, continuidade, contexto operacional e documentos/ADRs específicos pertinentes.
+- Verificação de mudanças no HEAD remoto desde o último registro, quando disponível.
+- Registro incremental de aprovações, decisões, requisitos, correções, descobertas, artefatos, testes, riscos, pendências e próximos passos.
+- Uma sessão pode abranger várias mensagens; não criar um arquivo por mensagem.
+- Atualização do índice de sessões e do resumo operacional quando houver mudança relevante.
+- Mensagens sem conteúdo novo continuam exigindo consulta, mas não exigem commits artificiais.
+
+#### Artefatos
+- `00_FONTE_DA_VERDADE.md`
+- `documentacao/PROTOCOLO_DE_ATUACAO_IA_GITHUB.md`
+- `documentacao/08_CONTINUIDADE_E_TRANSFERENCIA.md`
+- `documentacao/07_GOVERNANCA_DOCUMENTAL.md`
+- `documentacao/00_LEIA-ME.md`
+- `documentacao/06_STATUS_E_RELATORIOS.md`
+- `documentacao/CONTEXTO_ATUAL_ERP.md` (novo)
+
+#### Limites
+Esta sessão atualiza a governança e a memória documental. Não representa alteração de código, schema, banco, migrations, políticas ou infraestrutura do ERP.
+
+#### Próxima atividade
+Retomar a próxima atividade técnica pendente indicada no contexto operacional e na continuidade, após consulta integral dos documentos e ADRs pertinentes.
+
+## 8. Estado inicial de continuidade — 2026-11-07
 
 Este é um ponto de partida documental, não uma afirmação de que todas as etapas anteriores do ERP estejam concluídas.
 
