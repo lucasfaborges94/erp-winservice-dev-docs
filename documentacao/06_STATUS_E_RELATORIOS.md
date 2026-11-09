@@ -457,3 +457,14 @@ Migrations registradas: zero; tabela `supabase_migrations.schema_migrations` aus
 ## 27. Procedimento proposto para backup e baseline restaurável — 2026-11-09
 
 A documentação oficial atual do Supabase foi consultada e o procedimento proposto foi registrado em [PROCEDIMENTO_BACKUP_BASELINE_SUPABASE.md](PROCEDIMENTO_BACKUP_BASELINE_SUPABASE.md). A CLI gera dumps separados de roles, schema e dados, mas exclui schemas gerenciados como auth/storage e schemas de extensões; portanto, não representa cópia integral do projeto nem comprova, sozinha, recuperação completa do Auth. O recurso beta Restore to a new project inclui dados Auth e roles, mas não copia Storage objects nem configurações de Auth/API, Realtime e extensões; exige plano pago/backups físicos e pode gerar custo adicional. O arquivo de dados reais deve permanecer fora do Git e da conversa. Estado: procedimento documentado, ainda não executado; G0 continua parcial. Nenhuma operação Supabase foi realizada nesta pesquisa.
+
+
+## 28. Revisão do scaffold local da API — 2026-11-09
+
+O conteúdo do scaffold local em apps/api foi revisado a partir da saída compartilhada pelo responsável. A estrutura ainda é o Hello World padrão do NestJS; não contém módulos funcionais nem endpoints de negócio. As configurações Nest/TypeScript/Vitest/Oxlint foram lidas sem bloqueio imediato identificado.
+
+Foram identificados itens a corrigir antes do primeiro commit: referências e instruções do NestJS Observe em AGENTS.md e README.md; texto padrão do README direcionado a Mau/AWS e licença MIT do framework; dependência @nestjs/mau e script deploy no package.json, incompatíveis com a hospedagem VPS/Easypanel aprovada. Recomenda-se substituir o README por documentação própria, remover/reformular as instruções Observe, retirar Mau e atualizar o lockfile.
+
+O .gitignore confirmou exclusão de .env e .env.local; a exceção .env.example e o padrão coverage/ ainda precisam de validação conclusiva. O scaffold permanece apenas local e não rastreado; o HEAD remoto do repositório de aplicação permanece 0a6f7ac84a56b092a949817345b5d278abfbfdf7. Nenhum commit/push foi confirmado. Build, testes e lint haviam sido reportados como aprovados na inspeção local anterior; devem ser repetidos após os ajustes recomendados. Nenhuma operação no Supabase foi realizada.
+
+**Próxima ação:** corrigir os arquivos indicados, atualizar package-lock.json, validar os padrões restantes do .gitignore, repetir build/testes/lint e revisar o diff antes do primeiro commit.
