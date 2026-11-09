@@ -468,3 +468,12 @@ Foram identificados itens a corrigir antes do primeiro commit: referências e in
 O .gitignore confirmou exclusão de .env e .env.local; a exceção .env.example e o padrão coverage/ ainda precisam de validação conclusiva. O scaffold permanece apenas local e não rastreado; o HEAD remoto do repositório de aplicação permanece 0a6f7ac84a56b092a949817345b5d278abfbfdf7. Nenhum commit/push foi confirmado. Build, testes e lint haviam sido reportados como aprovados na inspeção local anterior; devem ser repetidos após os ajustes recomendados. Nenhuma operação no Supabase foi realizada.
 
 **Próxima ação:** corrigir os arquivos indicados, atualizar package-lock.json, validar os padrões restantes do .gitignore, repetir build/testes/lint e revisar o diff antes do primeiro commit.
+
+
+## 29. Remoção local de Mau e validação do .gitignore — 2026-11-09
+
+O responsável executou npm uninstall @nestjs/mau dentro de apps/api. O npm reportou remoção de 50 pacotes, auditoria de 287 pacotes e zero vulnerabilidades; a confirmação final depende da leitura do package.json/package-lock.json atualizados. A execução prévia na raiz retornou “up to date” e não foi considerada evidência de alteração na API.
+
+Foram confirmados .env e .env.local ignorados, coverage/ ignorado e .env.example não ignorado (git check-ignore -q retornou código 1). As exclusões node_modules/, dist/ e *.tsbuildinfo já haviam sido confirmadas anteriormente. Portanto, os padrões do .gitignore relevantes ao scaffold estão validados nos caminhos testados.
+
+Permanecem pendentes a remoção do script deploy, adequação de AGENTS.md e README.md, conferência dos manifests/lockfile atualizados, repetição de build/testes/lint e revisão do diff final. O scaffold permanece local, sem commit/push confirmado. Nenhuma operação no Supabase foi realizada.
