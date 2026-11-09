@@ -88,3 +88,8 @@ Em 2026-11-08, foi aprovada a convenção semântica `entidade.ação` para `per
 ## 9. Última atualização
 
 Atualizado em 2026-11-08 para registrar a aprovação do repositório privado de código-fonte `erp-winservice-app`. A criação permanece pendente de confirmação; o HEAD exato deve ser verificado no GitHub a cada consulta.
+
+
+### Verificação de acesso ao repositório de aplicação — 2026-11-08
+
+O responsável compartilhou a URL `https://github.com/lucasfaborges94/erp-winservice-app`. A consulta direta de metadados pela integração GitHub retornou HTTP 404; a listagem de repositórios acessíveis para o proprietário retornou somente `erp-winservice-dev-docs`. Portanto, o repositório de aplicação **não está visível/acessível à integração nesta verificação**. Isso não permite distinguir entre repositório inexistente e repositório privado sem acesso concedido à integração. Permanecem não verificados existência, visibilidade, branch padrão e permissões. Não iniciar estruturação nem versionamento de migrations até confirmar acesso e metadados.
