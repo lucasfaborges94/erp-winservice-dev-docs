@@ -88,3 +88,12 @@ O responsável autorizou substituir os dados atualmente existentes por uma massa
 A autorização não elimina a necessidade de backup restaurável e ensaio isolado previstos na seção 3. Antes da execução, elaborar inventário das tabelas afetadas, dependências FK, ordem de limpeza e inserção, cobertura de cenários do MVP e política para identidades/perfis do Supabase Auth. Não interpretar “todos os dados” como autorização implícita para remover usuários Auth, roles, grants, policies, funções, configurações, objetos de Storage ou outros componentes de plataforma.
 
 **Estado:** objetivo autorizado; execução ainda bloqueada pelo Gate G0 parcial e pela necessidade de fechar o escopo. Não executar DELETE/TRUNCATE nem inserir a nova massa em produção até cumprir os gates, revisar o plano e confirmar o escopo operacional. Dados atuais não serão usados como fonte de regra de negócio.
+
+
+## 9. Escopo aprovado para reset total dos dados (2026-11-09)
+
+O responsável confirmou que deseja substituir tudo. O escopo de planejamento passa a incluir todos os dados, inclusive contas/identidades do Supabase Auth, perfis ERP e registros operacionais/transacionais, que serão substituídos por dados fictícios criados pelo agente. A nova massa deve recriar os usuários Auth de teste e seus mapeamentos em `users.auth_user_identifier`, além das empresas, vínculos, papéis e demais entidades requeridas pelo MVP.
+
+Esta autorização não equivale a apagar ou recriar o schema nem a remover indiscriminadamente objetos/configurações da plataforma. Tabelas, colunas, constraints, índices, funções, triggers, policies, grants, roles PostgreSQL, extensões e configurações do projeto ficam preservados, salvo mudança estrutural aprovada separadamente. Inventariar Storage e decidir explicitamente se seus objetos também entram na substituição, pois podem não estar cobertos pelo backup lógico SQL.
+
+**Bloqueio de execução:** não executar reset, DELETE, TRUNCATE, exclusão/recriação de Auth users ou seed em produção enquanto G0 não tiver backup restaurável que inclua Auth, ensaio de restauração em projeto isolado, inventário e plano revisado de execução/rollback. Esta confirmação amplia o escopo autorizado, mas não elimina os gates de segurança. Nenhuma alteração no Supabase foi realizada.
