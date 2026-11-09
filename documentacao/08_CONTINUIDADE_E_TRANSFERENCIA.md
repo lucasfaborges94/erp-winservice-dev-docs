@@ -1638,3 +1638,18 @@ O responsável criou `.gitignore` na raiz do repositório de aplicação, com pa
 **Estado:** build, testes unitários, e2e e lint aprovados conforme evidência do terminal compartilhada; scaffold e `.gitignore` permanecem locais, sem commit/push confirmado. Nenhum módulo de negócio ou integração Supabase foi implementado e nenhuma operação no banco foi realizada.
 
 **Próxima ação:** revisar o estado/arquivos do Git e validar as exclusões do `.gitignore` antes de versionar a fundação da API.
+
+
+### Continuação — inspeção local do Git e do .gitignore (2026-11-09)
+
+O responsável compartilhou a saída dos comandos executados na raiz local de `erp-winservice-app`.
+
+**Estado do Git:** `git status --short` retornou somente `?? .gitignore` e `?? apps/`. Portanto, esses dois caminhos estão presentes localmente e ainda não rastreados; não há evidência de commit/push do scaffold nesta verificação.
+
+**.gitignore:** conteúdo confirmado na raiz: `node_modules/`, `dist/`, `coverage/`, `*.tsbuildinfo`, `.env`, `.env.*` e exceção `!.env.example`. O comando `git check-ignore -v` confirmou que os padrões de `node_modules/`, `dist/` e `*.tsbuildinfo` estão efetivamente ignorando `apps/api/node_modules`, `apps/api/dist` e `apps/api/tsconfig.build.tsbuildinfo`, respectivamente. Os padrões de `coverage/` e arquivos `.env` ainda não foram testados diretamente.
+
+**Estrutura local observada:** `apps/api` contém `src/`, `test/`, `dist/`, `node_modules/`, `.gitattributes`, `.oxlintrc.json`, `.prettierrc`, `AGENTS.md`, `nest-cli.json`, `package-lock.json`, `package.json`, `README.md`, `tsconfig.build.json`, `tsconfig.build.tsbuildinfo`, `tsconfig.json`, `vitest.config.e2e.ts` e `vitest.config.ts`. Em `src/`: `app.controller.spec.ts`, `app.controller.ts`, `app.module.ts`, `app.service.ts` e `main.ts`. Em `test/`: `app.e2e-spec.ts`.
+
+**Classificação:** inspeção parcial da estrutura e validação positiva de três regras de exclusão. Os arquivos de configuração e código ainda não foram lidos/revisados; a listagem não comprova ausência de segredos ou adequação integral do scaffold. Nenhum arquivo local foi alterado nesta etapa; nenhum commit/push ou operação no Supabase foi realizado.
+
+**Próxima ação:** ler o conteúdo de `AGENTS.md`, `README.md`, `package.json`, configurações TypeScript/Nest/Vitest/Oxlint e arquivos `src/` e `test/`; validar também os padrões de `.env` e cobertura antes de preparar o primeiro commit.
