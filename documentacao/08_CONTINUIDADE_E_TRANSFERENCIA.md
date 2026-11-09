@@ -112,3 +112,22 @@ A consulta encontrou zero reviews, zero comentários de conversa e zero check ru
 **Estado e limites:** nenhum merge foi executado e não foi feita alteração no repositório de aplicação. Nenhuma operação Supabase ou deploy foi realizada. O merge exige autorização específica do responsável; o fato de o PR estar mergeable não constitui autorização.
 
 **Próxima atividade:** aguardar decisão explícita do responsável sobre integrar o scaffold. Se aprovado, realizar somente o merge do PR #1, sem deploy ou alterações Supabase; depois verificar o commit de merge e atualizar o estado documental.
+
+
+### Continuação — merge do PR #1 confirmado na main — 2026-11-09
+
+O responsável autorizou explicitamente a integração do scaffold da API. Antes da operação, o PR #1 foi consultado novamente e estava aberto, não draft, não merged e `mergeable: true`; head esperado: `970dc9c1658fdc007797283aec669fbc99b50d20`.
+
+Foi executado merge com método `merge` e `expected_head_sha` igual ao head acima. O GitHub retornou `merged: true` e criou o commit `2e73ce3f2377a8403992ee5b5b46fe4657b2eb56`.
+
+**Verificação independente após o merge:**
+- PR #1: `state=closed`, `merged=true`, `merged_at=2026-11-09T13:25:11Z`.
+- Repositório de aplicação `lucasfaborges94/erp-winservice-app`: referência `refs/heads/main` aponta para `2e73ce3f2377a8403992ee5b5b46fe4657b2eb56`.
+- Commit de merge: pais `0a6f7ac84a56b092a949817345b5d278abfbfdf7` e `970dc9c1658fdc007797283aec669fbc99b50d20`; GitHub informa assinatura verificada.
+- Conteúdo integrado: 19 arquivos, 5.357 adições, 0 remoções.
+
+O merge não executou build ou testes. Permanecem como evidência os resultados locais anteriormente reportados pelo responsável: build aprovado, testes unitários 1/1, e2e 1/1 e lint sem warnings/erros. O scaffold segue sem módulos/endpoints de negócio e sem autenticação, tenancy, autorização ou integração Supabase.
+
+**Limites:** nenhuma operação Supabase, migration ou deploy foi realizada. Os gates de segurança da seção 7 da ADR-0019 continuam bloqueando endpoints de negócio e conexão de clientes até especificação e validação. A integração remota não alterou a cópia local do responsável.
+
+**Próxima atividade:** retomar a sequência da ADR-0019 pela especificação técnica de JWT, seleção/validação de empresa ativa, papéis/permissões, contexto transacional PostgreSQL/RLS, privilégios e testes negativos multiempresa. Não executar alterações no Supabase nem deploy sem autorização operacional específica e gates documentados.
