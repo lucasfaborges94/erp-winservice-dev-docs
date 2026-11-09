@@ -54,3 +54,12 @@ O responsável sincronizou a branch `review/api-scaffold-2026-11-09` com `git pu
 O `git status --short` final mostrou somente `?? package-lock.json` e `?? package.json` na raiz. O responsável inspecionou seus conteúdos: o `package.json` contém apenas `{}`; o `package-lock.json` contém lockfile v3 com `packages: {}`. São manifests vazios, fora de `apps/api`, sem configuração de workspace ou dependências; não fazem parte do scaffold versionado. A remoção local ainda não foi executada/confirmada.
 
 **Estado:** os gates automatizados locais passaram após a sincronização das correções de documentação. Isso valida build, testes de exemplo e lint do scaffold; não valida módulos de negócio, segurança multiempresa, integração com Supabase ou deploy, que ainda não existem. A branch continua isolada para revisão e não foi integrada à main. Próximo passo: remover os dois manifests vazios não rastreados da raiz, confirmar `git status --short` limpo e então concluir a revisão da branch/decidir abertura de PR. Nenhuma operação Supabase foi realizada.
+
+
+### Remoção dos manifests vazios da raiz — 2026-11-09
+
+O responsável executou a remoção local de `package.json` e `package-lock.json` vazios que estavam fora de `apps/api`. A mensagem do terminal terminou imediatamente após `git status --short`, sem listar arquivos; isso indica working tree limpa no momento da verificação compartilhada.
+
+A branch `review/api-scaffold-2026-11-09` foi consultada no GitHub. A comparação com `main` informa 3 commits à frente, 0 atrás, e 19 arquivos adicionados, todos concentrados no scaffold em `apps/api` e configurações relacionadas. A revisão dos manifests e documentos confirma `UNLICENSED`, ausência de Mau e do script `deploy`, e documentação alinhada à ADR-0019.
+
+**Estado:** scaffold revisado e gates locais reportados como aprovados após sincronização. Nenhum endpoint de negócio, autenticação, tenancy, integração Supabase ou deploy foi implementado. Branch ainda não integrada à `main`. Próxima decisão: autorização explícita para abrir PR da branch de revisão contra `main`; não realizar merge sem aprovação específica.
