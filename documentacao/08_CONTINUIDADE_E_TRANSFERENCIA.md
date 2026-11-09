@@ -1590,3 +1590,16 @@ Executar `git status --short` na raiz do repositório; iniciar a API com `npm ru
 
 #### 9. Riscos e observações
 A instalação local não equivale a implementação versionada. Node.js v26 é uma versão de linha ímpar; monitorar compatibilidade das dependências e do ambiente de deploy, sem trocar a versão agora sem evidência de incompatibilidade.
+
+
+### Continuação — validação inicial local do scaffold NestJS (2026-11-09)
+
+O responsável executou `npm.cmd run start:dev` a partir de `apps/api` após contornar o bloqueio do PowerShell ao script `npm.ps1` usando o executável `npm.cmd`. A aplicação iniciou e o responsável confirmou acesso a `http://localhost:3000` com resposta `Hello world!`.
+
+**Evidência e classificação:** teste manual de inicialização em modo desenvolvimento e resposta HTTP padrão aprovados, conforme relato e resultado observado pelo responsável. O comando `git status --short` na raiz mostrou `?? apps/`, portanto os arquivos estão presentes localmente e ainda não versionados. Não foi apresentado resultado de build de produção nem de testes automatizados. A árvore remota do repositório `erp-winservice-app` consultada nesta sessão permanece no commit `0a6f7ac84a56b092a949817345b5d278abfbfdf7` e não contém `apps/api`.
+
+**Ambiente e escolhas:** Node.js v26.13.0; npm 11.20.0; NestJS CLI 12.0.12; ESM com Vitest; NestJS Observe não instalado. O bloqueio de execução de `npm.ps1` é contornado com `npm.cmd`; não foi alterada a Execution Policy do Windows.
+
+**Limites:** nenhum módulo de negócio foi implementado; nenhuma conexão ou operação no Supabase foi realizada; nenhum commit/push do scaffold foi confirmado.
+
+**Próxima atividade:** revisar a estrutura e os arquivos gerados, executar build e testes automatizados, corrigir eventuais problemas e então versionar o scaffold no repositório de aplicação. Manter os gates da ADR-0019 antes de endpoints de negócio.
