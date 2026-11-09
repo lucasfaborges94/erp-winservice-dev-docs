@@ -53,9 +53,9 @@ Em 2026-11-08, foi aprovada a convenção semântica `entidade.ação` para `per
 
 ## 6. Bloqueio de identificação do repositório de implementação
 
-Na consulta de 2026-11-08, a integração GitHub disponibilizou somente `lucasfaborges94/erp-winservice-dev-docs` na listagem de repositórios acessíveis. Buscas por repositórios do proprietário com os termos `erp`, `winservice` e `backend` não localizaram repositório de implementação; os resultados encontrados apontaram apenas para o repositório documental. Isso não prova que não exista código em outra conta/organização ou fora do escopo de acesso da integração.
+O responsável confirmou em 2026-11-08 que não existe outro repositório além de `lucasfaborges94/erp-winservice-dev-docs`. Portanto, não há repositório separado de código-fonte da aplicação para auditar.
 
-**Bloqueio:** não é possível auditar dependências em código, localizar migrations existentes ou confirmar o baseline oficial. Próxima ação: obter do responsável a URL/nome do repositório de implementação e confirmar acesso. Até lá, não produzir migration como se o baseline estivesse conhecido nem executar alterações no Supabase.
+**Consequência:** não há dependências de aplicação versionadas em outro repositório a inspecionar nem baseline Git de migrations a recuperar. O próximo passo é auditar, em modo somente leitura, o histórico de migrations e o schema real do Supabase; depois, definir e aprovar onde as migrations futuras serão versionadas. Não presumir um baseline inexistente nem executar alterações no Supabase sem autorização operacional específica.
 
 ## 7. Índice por assunto
 
