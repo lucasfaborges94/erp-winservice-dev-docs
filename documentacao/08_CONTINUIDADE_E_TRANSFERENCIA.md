@@ -1365,3 +1365,24 @@ A consulta de conteúdo em `main` retornou HTTP 404 com a mensagem `This reposit
 **Limites:** nenhuma alteração foi feita no Supabase. Nenhum dado de linha, credencial, token ou segredo foi versionado. Nenhuma migration, policy, função, grant, índice ou configuração foi alterada.
 
 **Próximo passo:** estabelecer um dump SQL restaurável/baseline com CLI ou ferramenta equivalente, revisar os achados de segurança e concluir a especificação executável da fundação multiempresa e do catálogo de permissões. Consultar o banco real imediatamente antes de qualquer alteração e verificar o resultado depois.
+
+
+### Complemento da sessão — triagem de segurança Supabase (2026-11-08)
+
+**Estado:** inspeção somente leitura concluída; correções não iniciadas.
+
+**Fontes consultadas:** HEAD documental `f9567597c26d7c6f4d572d6d08edb92d563b41ce`; ADR-0017; ADR-0018; modelo de autorização; auditoria de autorização de 2026-11-08; plano Parte A; proposta do catálogo de permissões; Supabase Security Advisors e catálogos PostgreSQL do projeto `voaovwphncwbrwtcqnsc`.
+
+**Achados:**
+1. `public.authorize_integration_sync_event(...)` é SECURITY DEFINER, proprietária postgres, executável por anon/authenticated. Seu corpo valida integração existente/ativa e provider Auvo, mas não mostra validação de assinatura, segredo ou identidade do chamador antes de inserir o payload em `integration_sync_queue`. Risco alto a validar; não foi chamada nem explorada.
+2. Policies permissivas com `USING (true)`/ `WITH CHECK (true)` foram observadas em tabelas operacionais, incluindo customers, addresses, customer_contacts e visits, sem filtro de vínculo/empresa. A policy ALL de companies também usa predicado true. Isso diverge da ADR-0017. Não foram feitas leituras de linhas via Data API nem testes com sessões reais.
+3. `can_view_expense` permanece SECURITY DEFINER e executável por anon/authenticated, mas está fora do MVP e reservada ao futuro Financeiro conforme ADR-0018; não reutilizar como mecanismo geral.
+4. Advisor listou 26 tabelas RLS sem policy; classificar individualmente, pois ausência de policy normalmente nega acesso a papéis sujeitos a RLS.
+5. Seis funções apresentam search_path mutável: set_updated_fields, set_created_by, ensure_primary_address, set_created_fields, set_visit_address_snapshot e update_updated_at, além de prevent_changes (sete no total conforme Advisor). Correção exige revisão individual.
+6. Proteção contra senhas vazadas está desabilitada.
+
+**Artefato:** `documentacao/auditorias/AUDITORIA_SEGURANCA_SUPABASE_2026-11-08.md`.
+
+**Limites:** somente SELECTs de catálogo e Advisor; sem DDL/DML, chamadas RPC, exploração, leitura de dados pessoais, payloads ou segredos. Nenhuma alteração no Supabase.
+
+**Próximas ações:** revisar o contrato de autenticação do webhook; classificar tabelas global/tenant/infra e definir matriz tabela × ator × operação; especificar contexto empresarial e policies conforme ADR-0017; manter dump restaurável e ensaio não produtivo como gates para correções.
