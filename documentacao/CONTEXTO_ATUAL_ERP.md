@@ -47,7 +47,11 @@ A última parte da continuidade consultada registra como próxima frente prepara
 
 Também permanecem frentes registradas no histórico de continuidade, incluindo a fundação multiempresa e dependências da ADR-0018. Revalidar tudo contra o HEAD e os documentos específicos antes de agir; esta lista é um atalho, não uma declaração de status atual.
 
-## 5. Índice por assunto
+## 5. Decisão mais recente — códigos de permissão
+
+Em 2026-11-08, foi aprovada a convenção semântica `entidade.ação` para `permission_code`, em minúsculas e independente dos nomes físicos das tabelas. O registro legado `customer/view` deverá ser mapeado para `customer.view`, sujeito à validação no plano de migração. A aprovação não define a matriz completa de permissões nem autoriza alterações no Supabase. Especificação: [proposta física do catálogo de permissões v0.4.0](relatorios/PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md).
+
+## 6. Índice por assunto
 
 | Assunto | Fonte a consultar |
 |---|---|
@@ -65,7 +69,7 @@ Também permanecem frentes registradas no histórico de continuidade, incluindo 
 | Migração multiempresa | [relatorios/PLANO_MIGRACAO_FUNDACAO_MULTIEMPRESA_PARTE_A_MVP.md](relatorios/PLANO_MIGRACAO_FUNDACAO_MULTIEMPRESA_PARTE_A_MVP.md) |
 | Catálogo de permissões | [relatorios/PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md](relatorios/PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md) |
 
-## 6. Registro incremental de sessões
+## 7. Registro incremental de sessões
 
 - Registrar aprovações, decisões, requisitos, correções, descobertas, mudanças de estado, artefatos, testes, riscos, bloqueios e próximos passos assim que forem confirmados.
 - Uma sessão pode abranger várias mensagens correlatas; atualizar seu registro em vez de criar um arquivo por mensagem.
@@ -73,6 +77,6 @@ Também permanecem frentes registradas no histórico de continuidade, incluindo 
 - Não registrar como implementado algo que foi apenas discutido, especificado ou aprovado.
 - Não gerar commits artificiais quando não houver mudança relevante.
 
-## 7. Última atualização
+## 8. Última atualização
 
-Este índice foi criado em 2026-11-08, na mesma publicação que incorporou o protocolo de consulta contínua e registro incremental. O HEAD exato deve ser verificado no GitHub a cada consulta; não presumir que o commit desta criação continua sendo o HEAD atual.
+Este índice foi atualizado em 2026-11-08 para registrar a convenção aprovada de códigos de permissão. O HEAD exato deve ser verificado no GitHub a cada consulta; não presumir que o commit desta atualização continua sendo o HEAD atual. O HEAD exato deve ser verificado no GitHub a cada consulta; não presumir que o commit desta criação continua sendo o HEAD atual.
