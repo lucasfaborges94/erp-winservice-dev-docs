@@ -1624,3 +1624,17 @@ O responsável executou `npm.cmd run start:dev` a partir de `apps/api` após con
 **Commits:** criação da paleta: `e87a99d15409c75fab0dc7a6ddb65eaff0b02c00`; atualização do índice e contexto registrada em commits subsequentes nesta sessão.
 
 **Limites:** a documentação registra uma proposta de padronização visual, não uma ADR nem aprovação definitiva de design system. Nenhum código de aplicação, CSS de produção ou componente do ERP foi alterado. A validação de contraste WCAG 2.2 permanece pendente.
+
+### Continuação da sessão — validação de build e testes do scaffold NestJS (2026-11-09)
+
+O responsável criou `.gitignore` na raiz do repositório de aplicação, com padrões para ignorar dependências, artefatos de build/cobertura, arquivos tsbuildinfo e variáveis de ambiente, preservando `.env.example`. A alteração foi relatada no terminal local e ainda não foi confirmada no GitHub.
+
+**Verificações locais reportadas:**
+- `npm.cmd run build`: concluído sem mensagens de erro.
+- `npm.cmd test`: 1 arquivo e 1 teste aprovados.
+- `npm.cmd run test:e2e`: 1 arquivo e 1 teste aprovados.
+- `npm.cmd run lint`: comando iniciado sem diagnósticos na saída apresentada; o código de saída não foi incluído, portanto aguarda confirmação.
+
+**Estado:** build, testes unitários e e2e aprovados conforme evidência do terminal compartilhada; lint pendente de confirmação objetiva; scaffold e `.gitignore` permanecem locais, sem commit/push confirmado. Nenhum módulo de negócio ou integração Supabase foi implementado e nenhuma operação no banco foi realizada.
+
+**Próxima ação:** confirmar `$LASTEXITCODE` do lint e revisar o estado/arquivos do Git antes de versionar a fundação da API.
