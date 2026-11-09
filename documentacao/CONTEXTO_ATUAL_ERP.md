@@ -235,3 +235,10 @@ A autorização refere-se aos dados, não à destruição indiscriminada do sche
 O responsável informou que executou localmente a geração do scaffold NestJS em `C:\Projetos\erp-winservice-app\apps\api`, usando Node.js `v26.13.0`, npm `11.20.0`, NestJS CLI `12.0.12`, módulo ESM com Vitest e sem NestJS Observe. O instalador reportou `Successfully created project api` e `Installation in progress... ☕` seguido da conclusão sem erro.
 
 **Classificação da evidência:** avanço local relatado pelo responsável; ainda não verificado no GitHub, sem commit/push informado e sem teste de inicialização ou build. A árvore remota do repositório de aplicação permanece no HEAD `0a6f7ac84a56b092a949817345b5d278abfbfdf7`, sem `apps/api`. Próxima ação: verificar `git status`, executar a API em modo desenvolvimento e confirmar resposta HTTP local; depois revisar e versionar os arquivos.
+
+
+## 7. Identidade visual
+
+- [IDENTIDADE_VISUAL_E_PALETA.md](IDENTIDADE_VISUAL_E_PALETA.md) registra a proposta de paleta semântica para textos, botões, fundos e cards.
+- Correção visual expressa: o título do card secundário usa `#0A223A` sobre fundo `#F8FAFC`; corpo `#263445`; informação auxiliar `#667085`.
+- Estado: proposta documental v0.1.0 registrada em 2026-11-09; validação WCAG 2.2 e adoção definitiva ainda pendentes.
