@@ -48,3 +48,19 @@ O responsável confirmou o commit `01d00ea` (`chore(api): add NestJS API scaffol
 **Pendência:** a saída local de Git mostrou dois arquivos não rastreados na raiz (`package.json` e `package-lock.json`), ausentes do commit. Sua origem e necessidade precisam ser esclarecidas antes de adicionar ou excluir. Os testes build, unitário 1/1, e2e 1/1 e lint 0 warnings/0 errors foram reportados como aprovados anteriormente; após sincronizar as correções remotas de documentação, repetir essas verificações localmente.
 
 **Estado:** branch publicada para revisão, ainda não integrada à main. Nenhuma operação Supabase ou deploy. Próximos passos: validar os arquivos corrigidos após releitura, inspecionar os manifests soltos da raiz e repetir os gates locais antes de considerar integração.
+
+
+## 34. Validação local do scaffold após sincronização — 2026-11-09
+
+O responsável atualizou a branch `review/api-scaffold-2026-11-09` por fast-forward até `970dc9c`, recebendo as versões corrigidas de `apps/api/AGENTS.md` e `apps/api/README.md`. Depois executou localmente:
+
+- build (`npm.cmd run build`): sucesso;
+- testes unitários (`npm.cmd test`): 1 arquivo/1 teste aprovado;
+- testes e2e (`npm.cmd run test:e2e`): 1 arquivo/1 teste aprovado;
+- lint (`npm.cmd run lint`): 0 warnings e 0 errors.
+
+O status final apontou somente `package.json` e `package-lock.json` não rastreados na raiz. Os conteúdos compartilhados mostram um objeto JSON vazio e um lockfile v3 com mapa `packages` vazio, respectivamente. São arquivos sem conteúdo de configuração útil e não pertencem à fundação em `apps/api`; remoção local recomendada, ainda não confirmada.
+
+**Limite da evidência:** os testes cobrem somente o scaffold/Hello World. Não há implementação nem evidência de autenticação, tenancy, autorização, RLS, integração Supabase ou deploy. A branch permanece separada da main. Nenhuma operação Supabase foi realizada.
+
+**Próximo passo:** remover os dois manifests vazios não rastreados, confirmar working tree limpa e finalizar a revisão da branch antes de qualquer PR/integração.
