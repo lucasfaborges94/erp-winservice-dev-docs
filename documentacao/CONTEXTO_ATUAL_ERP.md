@@ -51,11 +51,13 @@ Também permanecem frentes registradas no histórico de continuidade, incluindo 
 
 Em 2026-11-08, foi aprovada a convenção semântica `entidade.ação` para `permission_code`, em minúsculas e independente dos nomes físicos das tabelas. O registro legado `customer/view` deverá ser mapeado para `customer.view`, sujeito à validação no plano de migração. A aprovação não define a matriz completa de permissões nem autoriza alterações no Supabase. Especificação: [proposta física do catálogo de permissões v0.4.0](relatorios/PROPOSTA_MODELO_FISICO_CATALOGO_PERMISSOES_MVP.md).
 
-## 6. Bloqueio de identificação do repositório de implementação
+## 6. Repositórios do projeto
 
-O responsável confirmou em 2026-11-08 que não existe outro repositório além de `lucasfaborges94/erp-winservice-dev-docs`. Portanto, não há repositório separado de código-fonte da aplicação para auditar.
-
-**Consequência:** não há dependências de aplicação versionadas em outro repositório a inspecionar nem baseline Git de migrations a recuperar. O próximo passo é auditar, em modo somente leitura, o histórico de migrations e o schema real do Supabase; depois, definir e aprovar onde as migrations futuras serão versionadas. Não presumir um baseline inexistente nem executar alterações no Supabase sem autorização operacional específica.
+- Repositório documental oficial: `lucasfaborges94/erp-winservice-dev-docs`.
+- Em 2026-11-08, o responsável aprovou a criação de um repositório separado de código-fonte com o nome `lucasfaborges94/erp-winservice-app`, visibilidade privada e branch principal `main`.
+- **Estado:** criação ainda não confirmada. A integração GitHub disponível nesta sessão não expõe operação de criação de repositório; portanto, não foi criado nem verificado. Não presumir URL, existência ou permissões.
+- Após a criação pelo responsável, verificar acesso e metadados, registrar o endereço e estabelecer estrutura inicial, versionamento de migrations, testes e CI/CD.
+- Até a confirmação, permanece válido que não existe repositório de aplicação acessível/identificado e não há baseline Git de migrations para auditar.
 
 ## 7. Índice por assunto
 
@@ -85,4 +87,4 @@ O responsável confirmou em 2026-11-08 que não existe outro repositório além 
 
 ## 9. Última atualização
 
-Este índice foi atualizado em 2026-11-08 para registrar a convenção aprovada de códigos de permissão e o bloqueio de identificação do repositório de implementação. O HEAD exato deve ser verificado no GitHub a cada consulta; não presumir que o commit desta atualização continua sendo o HEAD atual. O HEAD exato deve ser verificado no GitHub a cada consulta; não presumir que o commit desta criação continua sendo o HEAD atual.
+Atualizado em 2026-11-08 para registrar a aprovação do repositório privado de código-fonte `erp-winservice-app`. A criação permanece pendente de confirmação; o HEAD exato deve ser verificado no GitHub a cada consulta.
