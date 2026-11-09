@@ -74,3 +74,8 @@ O repositório de aplicação contém o inventário estrutural inicial em `supab
 A API interna foi aprovada como monólito modular em TypeScript/NestJS, com REST versionada em `/api/v1`, hospedada inicialmente na VPS existente via Easypanel. O código ficará no repositório privado `lucasfaborges94/erp-winservice-app`. Supabase permanece como PostgreSQL/fonte de verdade e Supabase Auth como provedor de identidade. WeWeb e FlutterFlow consumirão a API para operações de negócio.
 
 A decisão não comprova implementação nem autoriza deploy ou alteração no Supabase. Antes de implementar endpoints de negócio, devem ser definidos e testados autenticação, empresa ativa, vínculo e papéis, contexto transacional até RLS, privilégios de banco, reconciliação das policies, contratos REST e testes negativos multiempresa. Consultar a ADR-0019 para os gates completos.
+
+
+## 6.3 Scaffold local da API — 2026-11-09
+
+O responsável reportou a geração local do scaffold em `apps/api` com NestJS CLI `12.0.12`, Node.js `v26.13.0`, npm `11.20.0`, ESM e Vitest. A instalação foi concluída pelo CLI sem erro aparente; a integração GitHub ainda não vê esses arquivos porque não há commit/push confirmado. Inicialização, build e testes ainda não foram verificados. A opção NestJS Observe foi recusada para manter a fundação enxuta.
