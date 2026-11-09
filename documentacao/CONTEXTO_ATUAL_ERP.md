@@ -92,3 +92,14 @@ Após autorização explícita do responsável nesta sessão, foi executado o me
 **Escopo integrado:** 19 arquivos, 5.357 adições e 0 remoções. O código continua limitado ao scaffold NestJS/Hello World, configurações, documentação e testes de exemplo. Build, testes unitários (1/1), e2e (1/1) e lint (0 warnings/0 errors) foram reportados anteriormente como executados localmente pelo responsável; não foram executados novamente pelo merge. Não há implementação de autenticação, tenancy, autorização, RLS, módulos/endpoints de negócio, integração Supabase ou deploy.
 
 **Estado e limites:** scaffold integrado à `main`. Nenhuma operação Supabase, migration ou deploy foi executada. Os gates da seção 7 da ADR-0019 continuam obrigatórios antes de endpoints de negócio ou conexão de clientes. A branch local do responsável não foi alterada por esta operação remota.
+
+
+### Estrutura isolada para hardening do Supabase — 2026-11-09
+
+Foi criada no repositório privado `lucasfaborges94/erp-winservice-app` a branch Git `work/supabase-hardening`, baseada na `main` após o merge do PR #1, commit-base `2e73ce3f2377a8403992ee5b5b46fe4657b2eb56`. A branch contém atualização de `supabase/README.md` documentando a organização prevista de migrations, baseline, testes e regras de segurança. A branch não altera a `main` nem o banco principal.
+
+O projeto Supabase de produção identificado é `Winservice` (`voaovwphncwbrwtcqnsc`), região `sa-east-1`, PostgreSQL 17.6.1.141. A consulta de branches retornou lista vazia. O custo cotado para uma branch Supabase é **US$ 0,01344 por hora**; a criação não foi executada porque requer confirmação explícita do responsável após ciência do custo.
+
+**Limitação crítica:** a ferramenta informa que branches Supabase recebem migrations do projeto principal, mas não copiam dados de produção. O inventário estrutural versionado em `supabase/baseline/` não é dump restaurável; a consulta anterior registrou zero migrations e ausência de histórico `supabase_migrations.schema_migrations`. Portanto, criar uma branch Supabase neste momento não produziria réplica do schema real. Primeiro é necessário estabelecer e validar uma baseline de migrations/restauração, ou o responsável deve decidir conscientemente criar um ambiente vazio temporário.
+
+Nenhuma tabela, policy RLS, função, trigger, dado ou configuração do projeto principal foi alterada. Nenhum dado de produção foi copiado. Nenhum deploy foi realizado.
