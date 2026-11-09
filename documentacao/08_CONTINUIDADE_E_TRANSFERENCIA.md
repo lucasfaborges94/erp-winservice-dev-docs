@@ -1386,3 +1386,21 @@ A consulta de conteúdo em `main` retornou HTTP 404 com a mensagem `This reposit
 **Limites:** somente SELECTs de catálogo e Advisor; sem DDL/DML, chamadas RPC, exploração, leitura de dados pessoais, payloads ou segredos. Nenhuma alteração no Supabase.
 
 **Próximas ações:** revisar o contrato de autenticação do webhook; classificar tabelas global/tenant/infra e definir matriz tabela × ator × operação; especificar contexto empresarial e policies conforme ADR-0017; manter dump restaurável e ensaio não produtivo como gates para correções.
+
+
+### Complemento da sessão — matriz RLS/grants/tenant (2026-11-08)
+
+**Estado:** fotografia somente leitura das 38 tabelas de public concluída; classificação funcional completa ainda pendente.
+
+- RLS habilitado em 38/38; FORCE RLS desabilitado em 38/38.
+- Grants explícitos para anon e authenticated em 38/38, incluindo o conjunto DELETE, INSERT, REFERENCES, SELECT, TRIGGER, TRUNCATE e UPDATE.
+- 26 tabelas sem policies; 12 com uma ou mais policies.
+- 8 tabelas possuem ao menos uma policy com predicado literal true; em users, o true pertence somente à policy de INSERT.
+- 21 tabelas não possuem company_identifier na fotografia, incluindo visits, work_orders, equipments, quotations e company_user_roles.
+- A matriz por tabela foi registrada em `documentacao/auditorias/MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md`.
+
+**Interpretação:** grants não desabilitam RLS. Ausência de policy normalmente nega acesso a papéis sujeitos a RLS; policies com true não materializam o isolamento multiempresa. Ausência de company_identifier requer classificação (global/tenant/infraestrutura), não correção automática em todas as tabelas.
+
+**Limites:** nenhuma linha de dados, payload ou segredo foi consultado; nenhuma policy, grant, coluna ou dado foi alterado. Não foram feitos testes com sessões reais.
+
+**Próxima atividade:** construir matriz funcional de classificação e acesso por tabela/ator/operação, vinculando-a ao plano Parte A e ADR-0017/0018. Priorizar autenticação do webhook SECURITY DEFINER. Dump restaurável e ensaio continuam gates para qualquer correção.
