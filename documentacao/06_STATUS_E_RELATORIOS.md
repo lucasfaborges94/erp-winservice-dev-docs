@@ -64,3 +64,14 @@ O status final apontou somente `package.json` e `package-lock.json` não rastrea
 **Limite da evidência:** os testes cobrem somente o scaffold/Hello World. Não há implementação nem evidência de autenticação, tenancy, autorização, RLS, integração Supabase ou deploy. A branch permanece separada da main. Nenhuma operação Supabase foi realizada.
 
 **Próximo passo:** remover os dois manifests vazios não rastreados, confirmar working tree limpa e finalizar a revisão da branch antes de qualquer PR/integração.
+
+
+## 35. Remoção dos manifests vazios e revisão final do scaffold — 2026-11-09
+
+O responsável removeu `package.json` e `package-lock.json` vazios e não rastreados da raiz do repositório de aplicação. A saída compartilhada de `git status --short` não listou alterações, indicando working tree limpa no momento da verificação.
+
+A comparação remota entre `main` e `review/api-scaffold-2026-11-09` confirmou a branch 3 commits à frente, 0 atrás, com 19 arquivos adicionados. A revisão de `apps/api/package.json`, `package-lock.json`, `README.md` e `AGENTS.md` não identificou Mau nem script `deploy`; a licença da aplicação é `UNLICENSED` e a documentação está alinhada à ADR-0019.
+
+**Verificações locais reportadas pelo responsável após sincronização:** build aprovado; testes unitários 1 arquivo/1 teste; e2e 1 arquivo/1 teste; lint 0 warnings/0 errors. O escopo permanece limitado ao scaffold/Hello World. Não há endpoints ou módulos de negócio, nem evidência de autenticação, tenancy, RLS, integração Supabase ou deploy. Nenhuma operação Supabase foi realizada.
+
+**Estado:** revisão técnica do scaffold concluída para fins de abertura de PR. A branch não foi integrada à `main`. A abertura de PR depende de autorização explícita do responsável; merge exige aprovação específica posterior.
