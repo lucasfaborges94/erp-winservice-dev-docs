@@ -1466,3 +1466,20 @@ A decisão foi formalizada na ADR-0019, em estado APROVADA. Responsabilidades, m
 **Próximas atividades:** elaborar a especificação técnica de autenticação/autorização/contexto RLS; definir contratos REST e fronteiras de módulos; reconciliar o estado real do Supabase e estabelecer migrations versionadas após backup restaurável/ensaio; então criar estrutura NestJS, testes e pipeline no repositório de aplicação.
 
 **Limites:** esta aprovação formaliza a direção arquitetural, mas não declara API implementada, não autoriza DDL/DML no Supabase, não autoriza deploy e não dispensa revisão, preflight, backup restaurável, autorização operacional específica e verificação posterior. Nenhum código ou objeto Supabase foi alterado nesta deliberação.
+
+
+### Sessão técnica — proposta de autenticação, empresa ativa e contexto RLS (2026-11-09)
+
+**Estado:** EM_ANDAMENTO — proposta documental criada; aguardando deliberação do responsável.
+
+**Fontes consultadas:** HEAD `7ea646f2ec89d930caa9b4efffa80d84042a5bd0` no início da sessão; `00_FONTE_DA_VERDADE.md`, protocolo GitHub, contexto atual, este registro, ADR-0011, ADR-0012, ADR-0017, ADR-0018, ADR-0019, modelo de autorização multiempresa, roadmap e status. A proposta foi registrada em commit posterior descrito abaixo.
+
+**Descobertas relevantes:** a fotografia Supabase de 2026-11-08 registra identificadores distintos em `users.identifier` e `users.auth_user_identifier`, divergência potencial entre `auth.uid()` e as policies observadas, policies/grants ainda não reconciliados com a ADR-0017 e ausência de baseline SQL restaurável. A fotografia não comprova o estado atual do banco.
+
+**Trabalho realizado:** criada `documentacao/ESPECIFICACAO_TECNICA_AUTENTICACAO_CONTEXTO_RLS.md` como PROPOSTA TÉCNICA PARA APROVAÇÃO. Ela descreve validação JWT, mapeamento Auth→perfil ERP, seleção e revalidação de empresa ativa, alternativa recomendada de conexão PostgreSQL por role dedicada sem BYPASSRLS, contexto transaction-local, uso de RLS, gates e testes.
+
+**Proposta técnica submetida:** conexão PostgreSQL da API dentro de uma transação por requisição; role de runtime não privilegiada e sujeita a RLS; claims Auth e empresa configurados somente localmente à transação; vínculo revalidado dentro da mesma transação; sem `service_role` no caminho normal. A compatibilidade com roles, `auth.uid()`, grants e pooler reais precisa ser provada antes de adotar.
+
+**Limites:** nenhuma aprovação técnica adicional foi presumida. Nenhum código, role, policy, função, grant, migration ou dado do Supabase foi alterado. Não foi executada consulta nova ao Supabase nesta sessão; as observações são provenientes dos relatórios versionados e devem ser reconfirmadas no Gate G0.
+
+**Próxima ação:** obter aprovação/ajustes do responsável sobre os seis pontos da seção 12 da especificação. Se aprovada, executar somente leitura G0/G1 e prova técnica em ambiente não produtivo, mantendo produção intocada.
