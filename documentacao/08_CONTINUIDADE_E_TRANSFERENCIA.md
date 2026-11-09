@@ -1404,3 +1404,16 @@ A consulta de conteúdo em `main` retornou HTTP 404 com a mensagem `This reposit
 **Limites:** nenhuma linha de dados, payload ou segredo foi consultado; nenhuma policy, grant, coluna ou dado foi alterado. Não foram feitos testes com sessões reais.
 
 **Próxima atividade:** construir matriz funcional de classificação e acesso por tabela/ator/operação, vinculando-a ao plano Parte A e ADR-0017/0018. Priorizar autenticação do webhook SECURITY DEFINER. Dump restaurável e ensaio continuam gates para qualquer correção.
+
+
+### Complemento da sessão — verificação do repositório de aplicação e decisão sobre API (2026-11-08)
+
+**Verificação remota:** o repositório documental está na branch `main`, HEAD `d4911b5671f435874b5e811a87725a927506453a`. O repositório de aplicação `lucasfaborges94/erp-winservice-app` está acessível, privado, com branch padrão `main`, e seu HEAD é `0a6f7ac84a56b092a949817345b5d278abfbfdf7`.
+
+**Correção de estado:** o contexto anterior dizia que o repositório de aplicação estava vazio. Essa informação ficou desatualizada: foram encontrados quatro commits e os artefatos `supabase/README.md`, `supabase/baseline/2026-11-08-schema-inventory.json` e `supabase/baseline/2026-11-08-advisors.json`. Os artefatos são documentação/inventário estrutural; não comprovam API, aplicação web/mobile, migrations executáveis ou dump restaurável.
+
+**Questão da API:** o índice de ADRs mantém em aberto a definição do protocolo/API interna entre módulos. A documentação consultada confirma Supabase como fonte de verdade, WeWeb como direção para a aplicação administrativa, FlutterFlow para o app técnico e a exigência de autorização complementar no backend e no RLS. Não foi localizada decisão aprovada sobre framework, runtime ou serviço de API dedicado.
+
+**Recomendação apresentada, ainda não aprovada:** manter a API e os demais componentes de aplicação no repositório privado `erp-winservice-app`, inicialmente como monorepo, sem criar um terceiro repositório. A forma concreta da API (recursos nativos do Supabase/RPC/Edge Functions e eventual serviço backend dedicado) deve ser decidida antes de criar `apps/api` ou escolher framework.
+
+**Limites:** nenhuma decisão arquitetural foi aprovada nesta interação; nenhum código, migration ou objeto Supabase foi alterado.
