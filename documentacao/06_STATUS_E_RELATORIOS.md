@@ -430,3 +430,10 @@ Nenhuma alteração foi executada no Supabase. Próxima atividade: especificar a
 A inspeção somente leitura das 310 tabelas de public confirmou RLS habilitado em 38/38, FORCE RLS desabilitado em 38/38, grants explícitos para anon/authenticated em 38/38 e 26 tabelas sem policies. Foram identificadas 10 tabelas com policy contendo predicado literal true (em users, somente na policy de INSERT). 23 tabelas não possuem company_identifier na fotografia, incluindo visits, work_orders, equipments, quotations e company_user_roles. Detalhes em [auditorias/MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md](auditorias/MATRIZ_RLS_GRANTS_TENANT_2026-11-08.md).
 
 A matriz não representa teste de sessão nem prova de exposição de dados; grants e RLS atuam em conjunto. Policies sem filtro de tenant divergem da ADR-0017. Nenhuma alteração no Supabase foi realizada.
+
+
+## 24. Deliberação de escopo — integrações fora do MVP (2026-11-08)
+
+O responsável confirmou que integrações externas ficam fora do MVP operacional. Conectores (incluindo Auvo), webhooks, sincronizações, filas e infraestrutura dedicada de integração não serão implementados nem serão dependências dos fluxos do MVP. A correção dos problemas específicos dessa frente será retomada quando as integrações forem desenvolvidas.
+
+A API interna necessária à comunicação das aplicações com os módulos do ERP não foi excluída por essa deliberação; seu protocolo e sua forma de implementação continuam pendentes de decisão arquitetural. A exclusão de escopo não remove nem desativa objetos já existentes no Supabase. A RPC `authorize_integration_sync_event` identificada na auditoria continua sendo um risco técnico a isolar/avaliar quanto à exposição atual; não houve alteração no banco nesta deliberação.
