@@ -1323,3 +1323,19 @@ O responsável compartilhou a URL `https://github.com/lucasfaborges94/erp-winser
 **Conclusão limitada:** `erp-winservice-app` não está visível/acessível à integração GitHub usada nesta sessão. O resultado não prova que o repositório inexista: pode estar privado e sem acesso concedido à integração. Não foi possível confirmar proprietário efetivo, visibilidade, branch padrão, permissões ou existência. Nenhuma alteração foi feita no repositório de aplicação ou no Supabase.
 
 **Próximo passo:** conceder à integração GitHub acesso ao repositório privado (se ele já foi criado) e solicitar nova verificação. Após acesso confirmado, validar que é privado e usa `main`, então definir a estrutura inicial e o fluxo de migrations conforme documentação aprovada.
+
+
+### Confirmação de acesso ao repositório de aplicação — 2026-11-08
+
+**Estado:** acesso confirmado; repositório privado e vazio.
+
+Após o responsável conectar a integração GitHub ao novo repositório, a consulta direta de metadados de `lucasfaborges94/erp-winservice-app` retornou sucesso. Foram confirmados: proprietário `lucasfaborges94`, visibilidade `private`, branch padrão `main`, repositório não arquivado e permissões `admin`, `maintain`, `pull`, `push` e `triage` para a integração. O tamanho informado pelo GitHub é zero.
+
+A consulta de conteúdo em `main` retornou HTTP 404 com a mensagem `This repository is empty`; a listagem de commits retornou HTTP 409 (`Git Repository is empty`). Assim, o repositório existe e está acessível, mas ainda não possui commit, arquivo ou estrutura inicial. Não foi possível inspecionar código, workflows ou migrations porque não existem conteúdos.
+
+**Próximas atividades:**
+1. Definir a estrutura inicial do repositório estritamente a partir das decisões, stack e escopo aprovados.
+2. Definir e documentar a convenção de migrations e reconciliar o estado real do Supabase antes de criar qualquer baseline.
+3. Só depois estabelecer testes, validações automatizadas e CI/CD, sem incluir segredos no Git.
+
+**Limites:** nesta verificação não foi criado arquivo nem commit no repositório de aplicação. Nenhuma alteração foi feita no Supabase, em migrations, policies, funções, triggers ou infraestrutura. A confirmação de acesso não representa autorização para DDL/DML ou implantação.
