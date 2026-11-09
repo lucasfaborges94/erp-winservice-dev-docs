@@ -1,6 +1,6 @@
 # Especificação técnica — autenticação, empresa ativa e contexto RLS
 
-**Estado:** PROPOSTA TÉCNICA PARA APROVAÇÃO — não autoriza implementação  
+**Estado:** APROVADA COMO DIREÇÃO TÉCNICA — prova de conceito condicionada aos gates; não autoriza alteração em produção  
 **Data:** 2026-11-09  
 **Arquitetura-base:** ADR-0019 (APROVADA)  
 **Decisões relacionadas:** ADR-0011, ADR-0012, ADR-0017 e ADR-0018  
@@ -235,3 +235,35 @@ Solicita-se validar:
 6. Manter todos os gates de auditoria, baseline restaurável, ensaio e autorização específica antes de alterações reais.
 
 A aprovação desta proposta não autoriza implementar nem alterar o Supabase. Se aprovada, o próximo trabalho será produzir a prova de conceito e o plano de reconciliação, começando por G0 e G1, sem alterar produção.
+
+
+## 13. Aprovação e reconciliação inicial — 2026-11-09
+
+O responsável aprovou explicitamente os seis pontos da seção 12 como direção técnica para a prova de conceito: validação de JWT Supabase e mapeamento via `users.auth_user_identifier`; empresa solicitada pelo cliente e revalidada pelo servidor; conexão PostgreSQL com role dedicada sem BYPASSRLS e sem `service_role` no caminho normal; contexto de identidade/empresa estritamente transaction-local; RLS e backend como barreiras complementares; manutenção dos gates de auditoria, baseline restaurável, ensaio e autorização operacional específica.
+
+A aprovação também confirma a continuidade da hospedagem inicial na VPS existente via Easypanel, conforme ADR-0019. A forma de acesso/deploy automatizado e restrito ainda deverá ser desenhada; nenhuma credencial pessoal deverá ser compartilhada.
+
+### Evidências G0/G1 consultadas em 2026-11-09 — somente leitura
+
+Projeto Supabase `voaovwphncwbrwtcqnsc` (Winservice), `ACTIVE_HEALTHY`, PostgreSQL `17.6.1.141`, região `sa-east-1`.
+
+- `auth.users`: 5 registros; `public.users`: 5 registros.
+- Os 5 perfis possuem `auth_user_identifier` não nulo, único e correspondente a `auth.users.id`; zero duplicidades e zero nulos.
+- A FK `users_auth_user_identifier_fkey` referencia `auth.users(id)` com constraint validada.
+- `auth.uid()` deriva a identidade de `request.jwt.claim.sub` ou `request.jwt.claims.sub`. Portanto, a prova da API deverá configurar o claim esperado pela função dentro da transação, e testar a semântica real sob a role de runtime.
+- Roles `anon` e `authenticated` não têm `BYPASSRLS`; `service_role` e `postgres` têm `BYPASSRLS`; `authenticator` pode login e não tem BYPASSRLS. A role de runtime dedicada ainda não existe/não foi demonstrada.
+- `public`: 38 tabelas com RLS habilitado e 0 com FORCE RLS; 23 policies foram observadas. Persistem policies permissivas com `USING (true)`/`WITH CHECK (true)` em tabelas como addresses, companies, customer_contacts, customers, entity_status, entity_types e visits.
+- `users` tem policy SELECT comparando `auth.uid()` com `users.identifier`, embora o mapeamento Auth canônico observado seja `users.auth_user_identifier`. Isso exige correção planejada e prova, não alteração improvisada.
+- `company_users` possui policy SELECT comparando `company_users.user_identifier` diretamente com `auth.uid()`. Como `user_identifier` referencia `users.identifier`, e não necessariamente o UUID Auth, essa policy não prova compatibilidade com o mapeamento proposto.
+- `company_user_roles` não apresentou policy na consulta. `users`, `company_users` e `company_user_roles` possuem grants amplos para `anon`, `authenticated` e `service_role`, inclusive privilégios de escrita; a combinação deve ser revista por tabela/operação.
+- `company_users.role_identifier` ainda existe fisicamente, com FK para `roles`; a ADR-0018 continua vigente: o campo não pode ser usado como fonte de papel e sua remoção depende de tratamento das dependências, incluindo `public.can_view_expense`.
+- `public.authorize_integration_sync_event(...)` e `public.can_view_expense(...)` são SECURITY DEFINER e executáveis por `anon`/`authenticated`; a primeira permanece fora do MVP, mas sua exposição é achado de segurança a isolar.
+- O catálogo de migrations retornou zero; não há tabela `supabase_migrations.schema_migrations`; não há branches Supabase e não há Edge Functions cadastradas.
+
+### Estado dos gates
+
+- **G0 — PARCIAL, NÃO CONCLUÍDO:** identidade, roles existentes, grants, RLS, policies, funções e estado de migrations foram inspecionados. Falta evidência de backup restaurável, baseline SQL reconciliado, configuração e comportamento do pooler, parâmetros de conexão disponíveis e ensaio de restauração.
+- **G1 — PARCIAL, NÃO CONCLUÍDO:** correspondência estrutural dos cinco perfis Auth→ERP e FK validada. Ainda falta provar validação real de JWT no backend, fluxo de provisionamento e comportamento do claim sob uma role não privilegiada em ambiente não produtivo.
+- **G2–G5:** não iniciados.
+
+Nenhum DDL/DML, migration, grant, role, policy, função, dado ou configuração foi alterado. Não foi executado teste de acesso de negócio, teste de JWT ponta a ponta, teste de pool ou restauração. A aprovação da especificação não libera mudanças em produção.
