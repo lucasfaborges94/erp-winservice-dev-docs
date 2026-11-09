@@ -204,3 +204,9 @@ Nenhuma alteração foi feita no Supabase. Os resultados detalhados e limitaçõ
 ## Pesquisa do procedimento de backup e baseline — 2026-11-09
 
 Foi criado o procedimento proposto [PROCEDIMENTO_BACKUP_BASELINE_SUPABASE.md](PROCEDIMENTO_BACKUP_BASELINE_SUPABASE.md), baseado na documentação oficial atual do Supabase. A documentação confirma duas rotas distintas: dump lógico via CLI (roles/schema/data, com exclusão de schemas gerenciados como auth e storage) e restauração física para novo projeto (recurso beta, mais abrangente, inclui dados Auth, exige plano pago/backups físicos e pode gerar custo adicional). O dump lógico não é cópia integral do projeto. Dados reais do arquivo data.sql devem permanecer criptografados e fora do Git/chat. Nenhuma operação Supabase foi executada nesta etapa. G0 permanece parcial até existir baseline revisado e ensaio de restauração com escopo comprovado. Próxima ação: captura lógica local e revisão apenas dos arquivos estruturais sanitizados; avaliar clone físico separado se for necessária prova completa de Auth.
+
+
+
+## Classificação dos dados existentes — declaração do responsável (2026-11-09)
+
+O responsável esclareceu que os registros atualmente existentes no Supabase são dados de mockup inseridos para testes e mantidos como referência para compreender a lógica/modelagem em construção. Para análise do domínio, os dados de linhas podem ser tratados como dados de teste conforme essa declaração. Isso não comprova ausência de segredos, hashes, tokens ou credenciais nos dumps; tais conteúdos ainda devem ser inspecionados e removidos antes de compartilhamento. O procedimento de backup foi atualizado para permitir análise privada de data.sql após triagem, sem versioná-lo no Git por padrão. A classificação não dispensa backup restaurável nem ensaio de restauração.
