@@ -169,3 +169,14 @@ A auditoria anterior identificou a RPC `public.authorize_integration_sync_event(
 **Justificativa:** centraliza regras e autorização, preserva separação por domínio e permite evolução sem custo operacional prematuro de microsserviços. A escolha de NestJS integra a direção aprovada pela ADR-0019.
 
 **Próximos passos:** especificar e testar autenticação, empresa ativa, contexto RLS e acesso ao banco; definir contratos REST e fronteiras dos módulos; reconciliar policies e baseline de migrations; só então criar estrutura, testes e pipeline no repositório de aplicação. A aprovação arquitetural não autoriza alterações no Supabase nem implantação.
+
+
+## Especificação técnica de autenticação e contexto RLS — 2026-11-09
+
+Foi criada a proposta `documentacao/ESPECIFICACAO_TECNICA_AUTENTICACAO_CONTEXTO_RLS.md`, ainda **PENDENTE DE APROVAÇÃO**. Ela detalha validação do JWT Supabase, mapeamento `auth.users.id → users.auth_user_identifier → users.identifier`, seleção/validação da empresa ativa, conexão PostgreSQL com role de runtime sem BYPASSRLS e contexto estritamente transaction-local, autorização e testes negativos.
+
+**Direção recomendada na proposta:** conexão PostgreSQL da API em transação única, role dedicada sem superuser/BYPASSRLS/ownership, contexto Auth e empresa aplicado localmente à transação, vínculo revalidado no mesmo envelope e RLS como enforcement complementar. A viabilidade depende de prova técnica dos roles/grants reais, comportamento de `auth.uid()`, pooler e policies; não é decisão aprovada nem implementação.
+
+**Achado que bloqueia implementação:** a auditoria estrutural anterior registrou divergência potencial entre `users.identifier`, `users.auth_user_identifier`, `company_users.user_identifier` e policies que comparam `auth.uid()`. A relação física e o fluxo de provisionamento devem ser confirmados no Supabase atual.
+
+**Próxima ação:** responsável revisar/aprovar ou ajustar a proposta. Após aprovação, executar G0/G1 em modo somente leitura e prova técnica não produtiva; não alterar produção nem executar migrations sem backup restaurável, ensaio, revisão e autorização operacional específica.
