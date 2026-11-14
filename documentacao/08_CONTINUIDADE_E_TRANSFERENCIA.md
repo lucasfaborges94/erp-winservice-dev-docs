@@ -170,3 +170,19 @@ Nenhuma tabela, policy RLS, função, trigger, dado ou configuração do projeto
 **Pendências G1:** prova de validação JWT Supabase na API, mapeamento Auth→ERP ponta a ponta e fluxo de provisionamento comprovado.
 
 **Próxima ação acionável:** obter backup restaurável e preparar ensaio de restauração isolado, sem tocar no projeto principal. Após evidenciar G0, implementar a prova G1 de forma isolada na API, com testes de tokens válidos/inválidos e mapeamento de identidade. Não iniciar endpoints de negócio antes dos gates.
+
+## Continuidade — PR ADR-0020 integrado e especificação técnica do atendimento proposta — 2026-11-14
+
+**Fontes consultadas nesta retomada:** repositório oficial lucasfaborges94/erp-winservice-dev-docs; protocolo GitHub; Fonte da Verdade; Leia-me; continuidade/status/roadmap; ADR-0012, ADR-0017, ADR-0019; especificação técnica de autenticação, contexto transacional e RLS. O contexto conversacional foi usado apenas como pista e conferido com as fontes oficiais.
+
+**PR #1 — ADR-0020:** revisado como alteração documental de dois arquivos (ficha ADR-0020 e índice arquitetural), com aprovação expressa prévia do responsável registrada no histórico da conversa. GitHub retornou PR aberto, não draft, mergeable, head 6bb0aed249bd63f275ef84dfc84a0498f78ce973; revisões formais/checks não foram apresentados pela consulta. O merge foi executado com expected_head_sha exatamente igual ao head verificado. Resultado: merged=true, commit 0525fe67a5113cbb8527c29ff2e434589e99ae84. Reconsulta confirmou PR fechado/merged e main apontando para o mesmo SHA; GitHub informa assinatura verificada.
+
+**Especificação proposta:** criada a branch separada spec/atendimento-saas-mvp a partir da main pós-merge (0525fe67a5113cbb8527c29ff2e434589e99ae84). Adicionado documentacao/ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md, commit de criação 9baddb8b4c032cd4ecbb09e14768ffb60f998a59, com requisitos funcionais, tenancy, onboarding, modelo de dados lógico proposto, contratos REST, n8n/WhatsApp, segurança, plano de testes e gates. O documento está marcado PROPOSTA, pendente de revisão/aprovação explícita; modelos e rotas são propostas e não descrevem schema físico existente.
+
+**Decisões em aberto registradas na especificação:** fronteira entre o MVP próprio do atendimento e a prioridade Operação/limite de integrações da ADR-0019; provedor e titularidade WhatsApp; inbox de handoff; identificação de cliente por telefone; onboarding/plano/billing; publicação e versionamento de regras; identidade máquina-a-máquina; retenção/privacidade; catálogo global versus tenant; SLOs e suporte. Nenhuma dessas decisões foi promovida a aprovada.
+
+**Gates:** a continuidade/status consultados registram G0 e G1 parciais e G2–G5 não iniciados na última revalidação de 2026-11-09. Essa situação foi reproduzida como referência datada e deve ser revalidada antes de qualquer execução técnica. A especificação adiciona gates de integração, piloto e comercialização, sem declarar gate concluído.
+
+**Limites:** nenhuma operação Supabase, alteração de workflow n8n, código, deploy, produção, testes ou execução de integração foi realizada. Não foi aberto PR da especificação nem ela foi integrada à main. A API permanece, conforme a fonte documental consultada, no scaffold sem autenticação, tenancy ou módulos de negócio.
+
+**Próximo passo:** revisão do documento e deliberação explícita do responsável sobre decisões pendentes e aceite da especificação. Até essa aprovação, manter a branch como proposta; após aprovação, atualizar seu estado por revisão documental apropriada. Implementação continua condicionada aos gates de segurança e autorizações operacionais específicas.
