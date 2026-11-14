@@ -33,6 +33,7 @@ Esta documentação é a referência persistente para planejar, especificar, des
     ├── MODELO_FUNCIONAL_OPERACIONAL_MVP.md
     ├── MODELO_LOGICO_DADOS_OPERACAO.md
     ├── BASE_CONHECIMENTO_ERP.md
+    ├── ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md
     ├── RASCUNHO.md
     └── decisoes/
         ├── ADR-TEMPLATE.md
@@ -58,6 +59,8 @@ Esta documentação é a referência persistente para planejar, especificar, des
 15. [Identidade visual e paleta semântica](IDENTIDADE_VISUAL_E_PALETA.md) — proposta de cores semânticas para textos, botões, fundos e cards; inclui regra explícita de contraste para o título do card secundário.
 16. [Rascunho](RASCUNHO.md) — ideias e propostas ainda não aprovadas.
 
+**Proposta pendente:** [Especificação técnica do MVP de atendimento SaaS](ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md) — requisitos e contratos propostos, ainda sem aprovação; não autoriza implementação ou alterações operacionais.
+
 ## Regras essenciais
 
 - Documentos oficiais registram decisões, requisitos e especificações; código, migrações, banco e testes evidenciam o estado implementado.
@@ -77,6 +80,8 @@ Esta documentação é a referência persistente para planejar, especificar, des
 Esses arquivos são fotografias técnicas daquela data, não garantia de que o ambiente continua idêntico.
 
 ## Histórico deste arquivo
+
+- 2026-11-14 — inclusão da especificação técnica proposta do MVP de atendimento SaaS no mapa documental; permanece pendente de aprovação.
 
 - 2026-11-09 — inclusão do documento de identidade visual e paleta semântica no mapa documental.
 
