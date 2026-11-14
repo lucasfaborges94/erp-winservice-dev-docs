@@ -1,7 +1,7 @@
 # Índice de decisões arquiteturais — ERP Winservice
 
-**Versão:** 0.7.0
-**Data de atualização:** 2026-11-08
+**Versão:** 0.9.0
+**Data de atualização:** 2026-11-14
 
 Este documento é o índice consolidado das decisões arquiteturais e de produto aprovadas. Cada decisão deverá possuir uma ficha individual em `documentacao/decisoes/`, identificada por um código sequencial `ADR-NNNN`.
 
@@ -52,6 +52,11 @@ As decisões abaixo constavam como aprovadas na versão anterior deste documento
 
 **Nota de rastreabilidade:** os IDs antigos `ADR-001` a `ADR-014` foram renumerados neste índice para `ADR-0001` a `ADR-0014`. A numeração nova é a referência canônica daqui em diante. O histórico Git preserva a versão anterior do índice.
 
+## 2.1. Decisões aprovadas adicionais
+
+- **ADR-0019 — Arquitetura da API interna:** monólito modular NestJS e API REST versionada, com Supabase/PostgreSQL e Auth como fundação. [Ficha](decisoes/ADR-0019-arquitetura-api-interna.md).
+- **ADR-0020 — SaaS de atendimento automatizado:** produto independente com núcleo compartilhado do ERP, isolamento multiempresa e Winservice como primeiro tenant. [Ficha](decisoes/ADR-0020-atendimento-saas-backend-compartilhado.md). A aprovação não autoriza implementação, migrações ou deploy e não altera automaticamente a prioridade do MVP operacional.
+
 ## 3. Convenções e preferências de modelagem
 
 Estas convenções constavam no baseline. Quando ainda não estiverem formalizadas em ADR individual, devem ser tratadas como diretrizes registradas, sem ampliar seu alcance por inferência.
@@ -98,6 +103,8 @@ Consultar a ficha [ADR-0011](decisoes/ADR-0011-catalogo-permissoes-global-versio
 - Política de retenção além dos backups diários.
 
 ## 7. Registro de alteração
+
+- **2026-11-14 — v0.9.0:** ADR-0020 aprovada pelo responsável, com atendimento SaaS independente na interface e núcleo NestJS/Supabase compartilhado; implementação condicionada aos gates e autorizações específicas.
 
 - **2026-11-08 — v0.8.0:** inclusão da ADR-0019, aprovada, que define a arquitetura da API interna como monólito modular TypeScript/NestJS com REST versionada.
 - **2026-11-08 — v0.7.0:** inclusão da ADR-0018, aprovada, que define `company_user_roles` como fonte única de papéis por vínculo e descarta `company_users.role_identifier` e seus dados legados.
