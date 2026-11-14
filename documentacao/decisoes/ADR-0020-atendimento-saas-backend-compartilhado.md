@@ -1,9 +1,9 @@
 # ADR-0020 — Produto SaaS de atendimento automatizado com núcleo compartilhado do ERP
 
 **Identificador:** ADR-0020  
-**Estado:** PROPOSTA  
+**Estado:** APROVADA  
 **Data da proposta:** 2026-11-14  
-**Data da aprovação/rejeição:** Não aplicável  
+**Data da aprovação/rejeição:** 2026-11-14  
 **Responsável pela decisão:** Responsável pelo projeto  
 **ADR relacionado/substituído:** Complementa ADR-0001, ADR-0002, ADR-0005, ADR-0006, ADR-0007, ADR-0009, ADR-0011, ADR-0012, ADR-0017, ADR-0018 e ADR-0019; não substitui nenhuma enquanto não aprovada.
 
@@ -11,7 +11,7 @@
 
 O ERP Winservice é planejado como SaaS multiempresa, com a Winservice como primeira empresa usuária. O ERP já possui direção aprovada de API NestJS modular no repositório `lucasfaborges94/erp-winservice-app`, Supabase/PostgreSQL como fonte de verdade e autenticação Supabase Auth. O MVP operacional do ERP prioriza Operação; a ADR-0019 exclui integrações externas do MVP. O responsável deseja utilizar antecipadamente a qualificação automatizada de leads da Winservice e, posteriormente, comercializar o atendimento como SaaS, sem reconstruí-lo.
 
-Esta ficha registra **uma alternativa proposta**, não uma alteração aprovada de prioridade, escopo, implementação ou produção.
+Esta ficha registra a arquitetura **aprovada pelo responsável em 2026-11-14**, sem autorização de implementação, alteração de prioridade do ERP, mudança operacional ou produção.
 
 ## 2. Problema ou necessidade
 
@@ -25,7 +25,7 @@ Permitir a entrega independente do produto de atendimento, com contratação opc
 | SaaS de atendimento totalmente separado, inclusive backend e banco | Autonomia técnica | Duplicação de identidade, cadastros, regras e governança |
 | Produto de atendimento independente com API NestJS e Supabase compartilhados | Lançamento incremental e reutilização de domínio | Exige contratos, isolamento tenant e governança de deploy compartilhado |
 
-## 4. Direção proposta — NÃO APROVADA
+## 4. Decisão aprovada — implementação pendente
 
 1. Oferecer o atendimento automatizado como **produto SaaS independente comercialmente e na interface**, inicialmente utilizado pela Winservice como primeiro tenant.
 2. Reutilizar a **mesma API NestJS modular** e o mesmo Supabase/PostgreSQL previstos para o ERP, sem duplicar o backend em outro repositório. Separar módulos e contratos de domínio.
@@ -71,14 +71,14 @@ O produto pode começar com um tenant real sem criar um protótipo descartável.
 
 ## 8. Implementação e validação — condicionadas a aprovação futura
 
-1. Revisar esta ADR e decidir explicitamente seu estado; resolver a relação com a prioridade de Operação da ADR-0009 e o limite de integrações da ADR-0019, sem alterar silenciosamente essas decisões.
+1. Conciliar a execução desta ADR com a prioridade de Operação da ADR-0009 e o limite de integrações da ADR-0019, sem alterar silenciosamente essas decisões.
 2. Especificar contratos entre produto de atendimento, API compartilhada, motor de regras, n8n e canal WhatsApp, incluindo tenancy, autenticação máquina-a-máquina, idempotência e tratamento de falhas.
 3. Definir esquema e onboarding por tenant, catálogo configurável, regras comerciais, base de conhecimento opcional e habilitação de produtos.
 4. Completar gates de backup restaurável, baseline de migrations, JWT, autorização e RLS antes de expor endpoints de negócio ou dados de produção.
 5. Implementar e testar em ambiente isolado com pelo menos dois tenants fictícios, inclusive testes de vazamento de contexto, ausência de documentação, falta de regras, transferência humana e autorização negativa.
 6. Implantar na Winservice somente após revisão e autorização operacional específica; validar resultados antes de comercializar para outros tenants.
 
-**Esta ADR não autoriza criação de repositórios, código, migrações, DDL/DML, workflows, mudanças de segurança, provisionamento ou deploy.**
+**A aprovação arquitetural desta ADR não autoriza, por si só, criação de repositórios, código, migrações, DDL/DML, workflows, mudanças de segurança, provisionamento ou deploy.**
 
 ## 9. Referências e evidências
 
@@ -92,7 +92,7 @@ O produto pode começar com um tenant real sem criar um protótipo descartável.
 - `documentacao/decisoes/ADR-0017-tenancy-compartilhada-autorizacao-multiempresa.md`
 - `documentacao/decisoes/ADR-0019-arquitetura-api-interna.md`
 - `documentacao/ESPECIFICACAO_TECNICA_AUTENTICACAO_CONTEXTO_RLS.md`
-- Conversa de planejamento de 2026-11-14; proposta solicitada pelo responsável, sem aprovação do conteúdo técnico.
+- Conversa de planejamento de 2026-11-14; responsável aprovou expressamente a ADR-0020 em 2026-11-14.
 
 ## 10. Revisão e substituição
 
@@ -102,4 +102,5 @@ O produto pode começar com um tenant real sem criar um protótipo descartável.
 
 ## Histórico desta ficha
 
-- 2026-11-14 — ficha criada em estado **PROPOSTA**, para revisão; nenhuma mudança operacional autorizada.
+- 2026-11-14 — ficha criada em estado **PROPOSTA**, para revisão.
+- 2026-11-14 — responsável aprovou a ADR; estado alterado para **APROVADA**. Nenhuma implementação ou mudança operacional autorizada.
