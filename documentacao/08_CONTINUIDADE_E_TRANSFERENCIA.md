@@ -240,3 +240,13 @@ O responsável esclareceu que o ERP ainda não possui servidor MCP. As perguntas
 A especificação foi ajustada para declarar que a integração inicial do MVP é via contratos REST da API NestJS; um servidor MCP é possibilidade futura, opcional, sujeito a decisão e implementação separadas, e não é pré-requisito. A seção sobre múltiplos agentes descreve o modelo futuro e separa agente, identidade técnica e workflow.
 
 **Estado:** somente a documentação da branch spec/atendimento-saas-mvp foi atualizada. Nenhum MCP foi criado; nenhum workflow, API, Supabase ou produção foi alterado. O princípio de identidade por perfil e o uso de workflows separados para piloto continuam propostas não aprovadas.
+
+## Princípio de identidade de serviço do n8n confirmado — 2026-11-14
+
+O responsável concordou com uma identidade de serviço própria para as automações perante a API REST do ERP. Trata-se de aprovação do princípio máquina-a-máquina, não de aprovação da especificação completa ou autorização para criar credenciais.
+
+A identidade do n8n é separada de usuários humanos do Supabase Auth e das chaves/contas de serviço da OpenAI. Uma credencial OpenAI autoriza chamadas à OpenAI, mas não autentica o n8n perante o ERP. A API do ERP deverá validar a identidade de serviço e aplicar os escopos e tenant autorizados; n8n não recebe acesso direto ao banco nem `service_role`.
+
+**Pendências técnicas:** emissor/formato da credencial (token opaco/API key, JWT próprio ou OAuth máquina-a-máquina), audiência, escopos por ação e tenant, segregação por ambiente, validade, rotação, revogação, e propagação do ator para auditoria/RLS. Não foi criada credencial nem alterado OpenAI, Supabase, n8n, API ou produção.
+
+A especificação foi atualizada na branch spec/atendimento-saas-mvp. Permanece PROPOSTA até aprovação explícita posterior.
