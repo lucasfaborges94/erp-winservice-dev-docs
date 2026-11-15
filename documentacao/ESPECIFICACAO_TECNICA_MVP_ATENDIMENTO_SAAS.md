@@ -33,7 +33,7 @@ A lista abaixo identifica o que ainda está pendente e o que já foi confirmado 
 4. **Identidade de cliente:** decisão confirmada: não associar automaticamente um cliente existente apenas pelo telefone. Pedir confirmação quando houver ambiguidade e encaminhar ao humano quando a identidade não puder ser confirmada; regras para números compartilhados e prevenção de duplicidade devem seguir esse princípio.
 5. **Modelo SaaS:** decidir onboarding self-service ou assistido, aprovação/verificação de empresas, planos, limites, cobrança, suspensão, suporte e retenção. Billing não integra o MVP funcional salvo aprovação específica.
 6. **Modelo de configuração:** decidir quem publica/aprova regras comerciais, versionamento, validade temporal, auditoria e rollback de uma configuração por tenant.
-7. **Autenticação máquina a máquina:** princípio aprovado: n8n terá identidade de serviço própria perante a API do ERP, distinta de identidade humana. Permanecem pendentes o mecanismo/issuer da credencial, escopos por operação/tenant, segregação por ambiente, validade, rotação e revogação; não usar credencial humana compartilhada nem `service_role` como caminho normal.
+7. **Autenticação máquina a máquina:** princípio aprovado: n8n terá identidade de serviço própria perante a API do ERP, distinta de identidade humana. Recomendação para o piloto: credencial opaca de alta entropia emitida pela API ERP, com segredo armazenado apenas em forma de hash, escopo e tenant associados no servidor, expiração obrigatória e revogação imediata. Permanecem pendentes a aprovação desse mecanismo, prazo máximo, rotina de emissão/rotação e detalhes de escopo/tenant; não usar chave Supabase, token de usuário humano nem `service_role` como caminho normal.
 8. **Retenção e privacidade:** decidir prazos para mensagens, transcrições, eventos e dados de contato; política de exclusão/anonimização e atendimento de solicitações do titular.
 9. **Catálogo de equipamentos/regiões:** decidir quais dados são globais de plataforma e quais são privados/configuráveis por tenant.
 10. **Disponibilidade e operação:** definir SLOs, limites de envio, janelas de suporte, alertas e política de fallback quando API, n8n ou provedor falharem.
@@ -46,7 +46,7 @@ Esta revisão compara a proposta com as ADRs vigentes. Os itens desta seção s�
 - **WhatsApp:** contrato/adaptador independente de provedor aprovado pelo responsável. Selecionar Meta direto ou BSP somente após confirmar número/titularidade, homologação, operação, custos e exigências de cada tenant.
 - **Handoff humano:** Chatwoot transitório aprovado pelo responsável e informado como disponível. Manter contrato de integração isolado para não acoplar o domínio de conversas ao inbox.
 - **Vinculação do cliente:** política aprovada pelo responsável: telefone sozinho não confirma identidade; pedir confirmação nos casos ambíguos e encaminhar ao humano se não for possível confirmar.
-- **Identidade n8n:** identidade de serviço própria perante a API aprovada como princípio pelo responsável. Credencial de escopo mínimo; tenant derivado/validado pela API e pelo canal cadastrado. Não reutilizar token de usuário humano, chave OpenAI ou credencial de banco. O mecanismo de emissão/validação, expiração, rotação, revogação e propagação segura do ator até RLS permanece pendente.
+- **Identidade n8n:** identidade de serviço própria perante a API aprovada como princípio pelo responsável. Para o piloto, recomenda-se uma credencial opaca de alta entropia por workflow/perfil, emitida pelo ERP API, armazenada pelo n8n como credencial, e associada no servidor ao perfil, ambiente e tenant permitido. O ERP API armazena apenas o hash verificável; mostra o segredo uma única vez; aceita-o somente por `Authorization: Bearer` sobre HTTPS; impõe expiração, escopos server-side, rate limit, rotação com sobreposição curta e revogação imediata. Tenant não vem como autoridade de payload: a API o valida pelo canal/conversa e pela identidade de serviço. No piloto Winservice, cada credencial fica vinculada somente a esse tenant; na expansão SaaS, emitir credencial distinta por tenant×perfil para reduzir impacto de vazamento. Não reutilizar token Supabase Auth, chave OpenAI ou credencial de banco. Permanecem para deliberação o prazo máximo de validade (sugestão inicial: até 90 dias), processo autorizado de emissão/rotação e política de auditoria.
 - **Regras comerciais:** publicar versões imutáveis aprovadas por usuário autorizado, com vigência e trilha; ausência, expiração ou conflito de regra deve resultar em pergunta ou handoff.
 - **Configuração inicial:** manter catálogo e regras no escopo do tenant até existir decisão e contrato para dados globais. Isso reduz dependência de catálogo compartilhado no piloto.
 - **Retenção e piloto:** definir retenção, acesso, anonimização e rotina de solicitação do titular antes de trafegar conversas reais; não usar ausência dessa decisão para bloquear protótipo com dados sintéticos.
@@ -174,6 +174,24 @@ A matriz representa capacidades de negócio, não uma implementação de MCP. O 
 Referências normativas/técnicas: [ADR-0017](decisoes/ADR-0017-tenancy-compartilhada-autorizacao-multiempresa.md) exige identidade técnica e menor privilégio; [especificação de autorização MCP](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization) aplica-se caso um servidor MCP seja futuramente adotado; [documentação n8n sobre compartilhamento](https://docs.n8n.io/workflows/sharing/) descreve acesso de editores às credenciais usadas nos workflows compartilhados.
 
 Esta seção é uma proposta de desenho e não aprova o mecanismo de credenciais, perfis finais, ferramentas MCP nem qualquer alteração de workflow.
+### 4.2. Credencial máquina-a-máquina n8n→API — recomendação para deliberação
+
+**Padrão recomendado para o piloto:** a API NestJS do ERP emite uma credencial opaca aleatória, sem semântica de usuário, vinculada a um principal de serviço e a um perfil de capacidade. O bearer secret não representa sessão humana nem é uma chave Supabase/OpenAI. Sua aceitação fica limitada à API do ERP (`audience=erp-api` na configuração do principal), por HTTPS e no header `Authorization: Bearer`; nunca em URL, query string, corpo de webhook ou logs.
+
+- Emitir um segredo aleatório de alta entropia, apresentar o valor completo uma única vez e persistir apenas hash criptográfico para validação, junto a um identificador não secreto/prefixo para localizar a credencial. Nunca permitir leitura posterior do valor original.
+- Associar no servidor o principal a `workflow/profile`, ambiente, tenant(s) permitidos, canal(is), escopos explícitos e status/validade. O cliente não pode escolher nem ampliar esses atributos em payload. No piloto, permitir apenas o tenant Winservice; para onboarding multi-tenant, preferir credencial separada por `tenant × perfil`.
+- Conceder somente os escopos da matriz 4.1. O perfil `atendimento_registrador_write` não recebe escopos de leitura nem `customer.minimal.create`; só cria qualificação/handoff para contexto validado pela API. A API verifica credencial, escopo, tenant, canal, conversa e produto em cada operação.
+- Guardar o segredo como credencial no n8n, restringir quem pode editar workflows/usar credenciais e evitar exportações com segredos. O workflow roteador não recebe a credencial de nenhum perfil; o subworkflow selecionado usa sua própria credencial.
+- Exigir expiração e permitir várias credenciais válidas por breve janela de rotação: emitir substituta, atualizar o n8n, confirmar funcionamento e revogar a anterior. Revogação deve bloquear a próxima chamada; suspeita de vazamento exige revogação imediata. Prazo máximo não está aprovado; sugestão inicial para análise é até 90 dias, com rotação antecipada quando houver incidente ou mudança de operador.
+- Registrar `principal_id`, `credential_id`, perfil, tenant, ação, resultado e correlation ID; nunca registrar token ou payload pessoal completo. Aplicar rate limits e respostas uniformes para credencial inválida, expirada, revogada ou sem escopo.
+- Não conceder acesso direto ao PostgreSQL/Supabase, não usar `service_role`/secret key, não aceitar chave de API publicável como identidade e não reaproveitar token humano do Supabase Auth.
+
+**Alternativa futura:** OAuth 2.0 Client Credentials com access tokens curtos, `audience` e escopos próprios pode ser reavaliado quando houver emissor/infra de identidade de serviço. Isso não deve ser presumido como recurso do OAuth Server Supabase para usuários nem como componente existente. O formato aqui é recomendação documental, não contrato de endpoint aprovado ou implementado.
+
+**Critérios bloqueantes antes de credenciais reais:** decidir prazo de validade e autoridade de emissão; documentar armazenamento do hash e do segredo no n8n; testar token ausente/inválido/expirado/revogado, perfil/tenant/canal/escopo incorretos, rotação e ausência de segredo em logs; completar os gates de baseline/identidade/conexão/RLS/autorização aplicáveis. Até então, não emitir credenciais nem ativar workflows.
+
+Referência técnica: [RFC 6750 — Bearer Token Usage](https://www.rfc-editor.org/rfc/rfc6750/) exige proteção TLS e recomenda restringir audiência/escopo e limitar validade de bearer tokens; [OWASP Secrets Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html) recomenda gestão e rotação controladas de segredos.
+
 ## 5. Onboarding proposto
 
 Estado de onboarding por tenant: `draft → validating → ready_for_review → active`; falha retorna a `draft` ou `needs_attention`. A ativação exige revisão conforme política que o responsável ainda deve decidir.
@@ -197,6 +215,7 @@ Reutilizar entidades existentes somente após reconciliar os nomes e semântica 
 
 | Entidade proposta | Campos/relacionamentos relevantes | Observações |
 |---|---|---|
+| `service_principals` / `service_credentials` | identidade não humana, perfil, ambiente, tenant(s)/canal(is) permitidos, escopos, audiência, estado/validade, prefixo/ID e hash da credencial | Proposta para autenticação n8n→API; armazenar somente hash do segredo; nunca armazenar/retornar token em claro |
 | `company_products` | `identifier`, `company_identifier`, `product_code`, `status`, período de vigência | Habilitação independente do ERP; compatibilizar com catálogo/módulos existente |
 | `service_channels` | tenant, tipo, provedor, referência externa, status, segredo referenciado, configuração não secreta | Segredo armazenado em cofre/secret manager; unicidade de canal/tenant |
 | `service_config_versions` | tenant, número/versão, estado, configuração validada, autor/aprovador, vigência | Publicações imutáveis; versão ativa única por escopo |
@@ -301,7 +320,7 @@ Códigos propostos: `VALIDATION_ERROR`, `UNAUTHENTICATED`, `FORBIDDEN`, `NOT_FOU
 - Identidade de máquina separada de usuário humano; credenciais de menor privilégio, secret manager, segregação por ambiente e rotação/revogação.
 - RLS e backend complementares; sem acesso direto do agente/workflow ao banco e sem `service_role` como caminho comum.
 - Webhook: validação criptográfica conforme provedor, timestamps/replay, limitação de payload, rate limit e idempotência.
-- Segredos fora de Git/exports/logs; conteúdo e dados pessoais minimizados, mascarados em telemetria e sujeitos a retenção aprovada.
+- Segredos fora de Git/exports/logs; conteúdo e dados pessoais minimizados, mascarados em telemetria e sujeitos a retenção aprovada. Credenciais de serviço devem ser identificadas por principal/perfil/tenant, armazenadas com hash no ERP e nunca exibidas após emissão.
 - Auditoria append-only para publicação de regras, mudanças de canal, handoff, ações de agente e acessos administrativos.
 - Observabilidade com correlation ID ponta a ponta; métricas agregadas e tenant-safe: eventos aceitos/duplicados, falha/retry, latência, handoffs, taxa de resposta sem regra e indisponibilidade por dependência. Não registrar conteúdo integral por padrão.
 - Limites de autonomia da ADR-0012 aplicados no backend; negação segura em identidade ambígua, configuração ausente, tenant desconhecido ou falha de autorização.
@@ -325,6 +344,7 @@ Nenhum teste foi executado como parte desta especificação. Antes de implementa
 - Usuário sem vínculo, vínculo suspenso, produto inativo, papel insuficiente e tenant arbitrário são negados.
 - Troca concorrente de empresa no pool não carrega contexto da requisição anterior; rollback/erro limpa contexto transacional.
 - Workflow/credencial de A não executa ação em B; agente não consulta outro cliente ou altera registro alheio.
+- Credencial ausente, inválida, expirada, revogada, de audiência/perfil/tenant/canal incorretos ou sem escopo é negada; rotação com duas credenciais temporariamente válidas preserva o serviço e a anterior é revogada; nenhum segredo aparece em logs ou exportações.
 - RLS, constraints e API rejeitam relacionamentos cruzados; acesso com contexto ausente é negado.
 - Segredo, token, conteúdo pessoal excessivo e dados de outro tenant não aparecem em resposta/log/erro.
 
@@ -356,7 +376,7 @@ Estado documental consultado na continuidade mais recente disponível (2026-11-0
 | G3 — Tenancy/RLS | classificação por tabela, policies/constraints e testes cross-tenant negativos | Acesso cruzado negado na API e no banco |
 | G4 — Autorização/autonomia | papéis/permissões, produto ativo, ações permitidas e limites do agente | Negação testada para ação, tenant e cliente fora do escopo |
 | G5 — Implementação da API | contratos versionados, revisão de segurança, pipeline e testes integrados | Só então considerar endpoints de negócio em ambiente isolado |
-| G6 — Integrações | provedor, webhook, máquina-a-máquina, idempotência, secrets, retry e monitoramento validados em homologação | Aprovação técnica/operacional e ativação por tenant |
+| G6 — Integrações | provedor, webhook, máquina-a-máquina, idempotência, secrets, retry e monitoramento validados em homologação; credenciais com escopo/perfil/tenant e ciclo de rotação/revogação testados | Aprovação técnica/operacional e ativação por tenant |
 | G7 — Piloto Winservice | canal de teste, regras publicadas, handoff, suporte, pausa e métricas acordadas | Autorização operacional específica antes de produção |
 | G8 — Comercialização | critérios de suporte, limites, billing, privacidade e onboarding multi-tenant aprovados | Revisão do responsável antes de abrir a novos tenants |
 
@@ -382,3 +402,5 @@ A conclusão desta especificação não fecha gates nem libera acesso a banco/pr
 - [Especificação técnica de autenticação, contexto e RLS](ESPECIFICACAO_TECNICA_AUTENTICACAO_CONTEXTO_RLS.md)
 - [Fonte da verdade e protocolo de trabalho](../00_FONTE_DA_VERDADE.md)
 - [Continuidade e transferência](08_CONTINUIDADE_E_TRANSFERENCIA.md)
+- [RFC 6750 — Bearer Token Usage](https://www.rfc-editor.org/rfc/rfc6750/)
+- [OWASP Secrets Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)
