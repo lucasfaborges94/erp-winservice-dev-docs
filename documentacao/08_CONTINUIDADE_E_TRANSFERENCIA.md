@@ -232,3 +232,11 @@ O responsável perguntou como suportar agentes MCP do ERP com perfis diferentes 
 **Estado:** texto incluído em documentacao/ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md na branch de proposta. São recomendações, não decisão aprovada. O responsável ainda não confirmou a identidade técnica de serviço nem o modelo de escopos. Nenhum servidor MCP, workflow, API, Supabase ou produção foi alterado; nenhuma credencial foi criada.
 
 **Próximo passo:** o responsável confirmar o princípio de identidades por perfil de capacidade e escolher se deseja começar com workflows separados (recomendado para piloto) ou um roteador autenticado; manter a escolha do mecanismo de token/issuer sujeita à revisão de segurança.
+
+## Correção de estado — MCP do ERP ainda não existe — 2026-11-14
+
+O responsável esclareceu que o ERP ainda não possui servidor MCP. As perguntas anteriores sobre permissões MCP foram hipotéticas e exploratórias, não descrição de uma implementação atual.
+
+A especificação foi ajustada para declarar que a integração inicial do MVP é via contratos REST da API NestJS; um servidor MCP é possibilidade futura, opcional, sujeito a decisão e implementação separadas, e não é pré-requisito. A seção sobre múltiplos agentes descreve o modelo futuro e separa agente, identidade técnica e workflow.
+
+**Estado:** somente a documentação da branch spec/atendimento-saas-mvp foi atualizada. Nenhum MCP foi criado; nenhum workflow, API, Supabase ou produção foi alterado. O princípio de identidade por perfil e o uso de workflows separados para piloto continuam propostas não aprovadas.
