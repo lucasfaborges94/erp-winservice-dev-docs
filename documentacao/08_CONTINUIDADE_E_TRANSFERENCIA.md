@@ -435,3 +435,10 @@ A partir da especificação técnica aprovada e integrada à main pelo PR #2, fo
 **Estado:** PROPOSTA, não aprovada. É somente planejamento documental; não inicia correções de credenciais, operações Supabase, workflows, código, deploy ou produção. Nenhum teste automatizado foi executado.
 
 **Próxima ação:** responsável revisar/ajustar/aprovar o plano. Antes de qualquer piloto com dados reais, resolver retenção/privacidade, handoff/fonte autoritativa e ciclo de vida das credenciais. A rotação Evolution registrada como pendente permanece ação do responsável.
+
+
+## Aprovação do plano de prontidão — 2026-11-15
+
+O responsável aprovou explicitamente o plano de prontidão. O estado do documento e do índice Leia-me foi atualizado na branch `plan/atendimento-saas-readiness`. A aprovação é da ordem e dos critérios propostos; decisões pendentes, gates e autorizações operacionais permanecem válidos.
+
+**Não realizado:** nenhum PR foi mesclado; nenhuma atividade de rotação, alteração em Supabase/n8n/Evolution/Chatwoot, código, deploy ou produção; nenhum teste automatizado. Próximo passo documental: abrir PR para integração à main e aguardar autorização específica para merge.
