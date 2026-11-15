@@ -1,7 +1,8 @@
-# Especificação técnica proposta — MVP do SaaS de atendimento automatizado
+# Especificação técnica — MVP do SaaS de atendimento automatizado
 
-**Estado:** PROPOSTA — pendente de revisão e aprovação explícita do responsável  
-**Data:** 2026-11-14  
+**Estado:** APROVADA pelo responsável em 2026-11-15 — pendente de integração à main. A aprovação documental não autoriza implementação, alterações Supabase/workflows, provisionamento, deploy ou produção.  
+**Elaboração:** 2026-11-14  
+**Aprovação explícita:** 2026-11-15  
 **Base documental:** ADR-0020 aprovada; ADR-0017 e ADR-0019; especificação de autenticação, contexto transacional e RLS  
 **Branch:** `spec/atendimento-saas-mvp`  
 **Escopo deste documento:** especificação documental. Não autoriza implementação, migrations, alterações Supabase/n8n/WhatsApp, provisionamento, deploy ou acesso a produção.
@@ -25,7 +26,7 @@ A direção arquitetural aprovada na ADR-0020 é reutilizar a API NestJS e o Sup
 
 ### 1.2 Decisões pendentes e conflitos a resolver
 
-A lista abaixo identifica o que ainda está pendente e o que já foi confirmado pelo responsável durante a revisão. As confirmações não aprovam a especificação inteira.
+A lista abaixo identifica decisões e parâmetros ainda pendentes e o que já foi confirmado pelo responsável. As confirmações individuais não substituíam aprovação integral; a aprovação explícita posterior está registrada na seção 1.6.
 
 1. **Prioridade e fronteira de produto:** a decisão de alto nível já está registrada na ADR-0020: o atendimento terá plano de entrega próprio, preservando a prioridade de Operação do ERP e sem tornar WhatsApp/n8n parte automática do MVP operacional. Fica pendente detalhar a fronteira técnica de releases, módulos e operação na API compartilhada, sem reabrir a decisão já aprovada.
 2. **Canal/provedor WhatsApp:** o responsável escolheu a Evolution API com Baileys/WhatsApp Web para o início, mantendo um adaptador de domínio para possível migração futura para a Cloud API oficial. A instalação em `evo.winservicers.com` foi confirmada pelo responsável; a raiz pública respondeu HTTP 200 e o Evolution Manager informou versão 2.3.7. Em 2026-11-15, a instância correta `51981459630` foi observada como conectada. Isso não comprova a imagem/tag implantada nem, por si só, o modo Baileys efetivamente usado. Permanecem pendentes a confirmação técnica do modo e da imagem, política de atualização, isolamento/associação de números por tenant, autenticação do webhook, retenção e recuperação da sessão e homologação. Uma migração futura para Cloud API exige nova avaliação de custos, templates, janela e requisitos Meta.
@@ -40,7 +41,7 @@ A lista abaixo identifica o que ainda está pendente e o que já foi confirmado 
 
 ### 1.3. Revisão de consistência e recomendações para deliberação
 
-Esta revisão compara a proposta com as ADRs vigentes. Os itens desta seção são recomendações para o responsável; não alteram o estado de aprovação.
+Esta revisão compara o desenho com as ADRs vigentes. As recomendações e decisões explicitamente pendentes continuam abertas; a aprovação documental não as resolve automaticamente.
 
 - **Fronteira do MVP:** considerar decidida em alto nível pela ADR-0020 (produto/roadmap próprios do atendimento; prioridade Operação do ERP preservada). Antes de implementar, detalhar como a API compartilhada isola módulos, permissões, releases e dependências externas, respeitando o limite da ADR-0019 para o MVP ERP.
 - **WhatsApp:** Evolution API com Baileys/WhatsApp Web foi escolhida para a fase inicial. Manter adaptador de domínio para possível migração futura à Cloud API oficial, sem presumir compatibilidade total. Validar reconexão, persistência/proteção da sessão, webhook e recuperação de falhas na versão e hospedagem selecionadas antes de piloto real.
@@ -76,7 +77,7 @@ O responsável confirmou expressamente as seguintes direções para esta propost
 - O handoff humano usará Chatwoot de forma transitória. O responsável informou que já está disponível; essa disponibilidade é informação do responsável, não uma verificação de ambiente feita nesta sessão.
 - Um número de telefone sozinho não autoriza associação automática a um cadastro existente. Quando a identidade estiver ambígua, solicitar confirmação ou transferir ao humano.
 
-O princípio de identidade de serviço do n8n perante a API REST do ERP e o modelo de credencial opaca foram aprovados pelo responsável para esta proposta. A credencial não será token de usuário humano do Supabase Auth, chave de API Supabase/OpenAI nem credencial de banco. Permanecem pendentes o prazo de validade, o procedimento autorizado de emissão/rotação, escopos e vínculo tenant/canal finais. O responsável também concordou com workflows separados por perfil para o piloto, cada um usando identidade/credencial própria; um roteador eventual apenas encaminha e não detém permissões amplas. A especificação inteira continua em estado PROPOSTA até aprovação explícita posterior.
+O princípio de identidade de serviço do n8n perante a API REST do ERP e o modelo de credencial opaca foram aprovados pelo responsável para esta proposta. A credencial não será token de usuário humano do Supabase Auth, chave de API Supabase/OpenAI nem credencial de banco. Permanecem pendentes o prazo de validade, o procedimento autorizado de emissão/rotação, escopos e vínculo tenant/canal finais. O responsável também concordou com workflows separados por perfil para o piloto, cada um usando identidade/credencial própria; um roteador eventual apenas encaminha e não detém permissões amplas. Naquela data, a especificação inteira ainda estava em estado PROPOSTA; a aprovação explícita posterior está registrada na seção 1.6.
 
 ### 1.5. Verificação operacional — 2026-11-15 (evidência, sem nova aprovação)
 
@@ -85,6 +86,12 @@ O princípio de identidade de serviço do n8n perante a API REST do ERP e o mode
 - O responsável iniciou um teste de entrada; a prévia `Oii` apareceu no inbox correto, sob o contato salvo como `Amor`, com horário atualizado. A conversa não foi aberta. Isso confirma uma entrega de entrada Evolution→Chatwoot no momento do teste, não o comportamento completo de falhas, autenticação, reconexão ou segurança.
 - A verificação pelo Manager não identificou de forma independente o modo Baileys nem a imagem do container.
 - Uma captura do Easypanel compartilhada em 2026-11-14 mostrava `AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES=true` e a chave administrativa visível. Nenhuma configuração foi alterada; o responsável pretende rotacionar a chave ao final da conversa. O valor não deve ser registrado.
+
+### 1.6. Aprovação explícita do responsável — 2026-11-15
+
+O responsável aprovou explicitamente a especificação técnica integral. A aprovação valida este documento como especificação de produto/arquitetura, preservando as decisões e parâmetros listados como pendentes. Até a integração do documento à main, a versão aprovada permanece nesta branch de revisão.
+
+A aprovação não encerra gates G0–G8 nem autoriza implementação, migrations, mudanças em Supabase, workflows, credenciais, Evolution/Chatwoot, deploy ou produção. Cada operação continua sujeita às aprovações e evidências específicas previstas neste documento.
 
 ## 2. Escopo funcional
 
@@ -404,7 +411,7 @@ Estado documental consultado na continuidade mais recente disponível (2026-11-0
 
 **Estado atual de G6:** integração Evolution/Chatwoot foi verificada parcialmente por inspeção de configuração e um smoke test de entrada. G6 continua **NÃO CONCLUÍDO**: permanecem pendentes autenticidade do webhook, replay/idempotência, rotação/revogação, limites, retries, monitoramento, reconexão, ordenação, duplicidade e homologação dos perfis de serviço.
 
-A conclusão desta especificação não fecha gates nem libera acesso a banco/produção. Aprovação do documento, se concedida, também não autoriza execução operacional sem autorização específica.
+A aprovação desta especificação não fecha gates nem libera acesso a banco/produção. Execução operacional continua dependendo de autorização específica e evidências exigidas.
 
 ## 13. Critério de aceite deste documento
 
@@ -412,7 +419,7 @@ A conclusão desta especificação não fecha gates nem libera acesso a banco/pr
 - Decisões pendentes e conflito de roadmap estão destacados.
 - Modelo de dados e endpoints estão marcados como propostas, sem afirmar existência física.
 - Requisitos de tenancy, segurança, testes e gates são rastreáveis às ADRs vigentes.
-- Documento revisado e aprovado explicitamente pelo responsável antes de ser tratado como especificação normativa.
+- Documento revisado e aprovado explicitamente pelo responsável em 2026-11-15; a integração à main permanece pendente.
 - Nenhum conteúdo desta branch muda estado de ADR, roadmap, banco, workflows, código ou produção.
 
 ## 14. Referências
