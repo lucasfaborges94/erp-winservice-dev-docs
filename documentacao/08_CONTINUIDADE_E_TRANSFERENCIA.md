@@ -384,6 +384,8 @@ Após autorização do responsável para criar workflows de consulta na pasta pe
 
 **PR #1 / ADR-0020:** o GitHub retorna `state=closed`, `merged=true`, head esperado `6bb0aed249bd63f275ef84dfc84a0498f78ce973`, base `ef94715cd03d7d385daffb3df9dc061bbc9f8eae` e merge commit `0525fe67a5113cbb8527c29ff2e434589e99ae84`. O merge já estava concluído; não foi repetido. Não há reviews/checks associados no snapshot consultado; a aprovação arquitetural está registrada na ADR e no histórico de decisão, não como GitHub review.
 
+**Revisão do diff da PR:** somente `documentacao/02_DECISOES_ARQUITETURA.md` e `documentacao/decisoes/ADR-0020-atendimento-saas-backend-compartilhado.md` (115 adições, 2 remoções); nenhuma alteração de código, Supabase, workflows ou produção. O head retornado pelo GitHub coincide com o SHA esperado da proposta. A integração documental está segura e já foi efetivada no commit de merge acima.
+
 **Verificações somente leitura em 2026-11-15:**
 - No Evolution Manager, a instância correta `51981459630` aparece conectada; a versão indicada pela interface é 2.3.7. A chamada autenticada de 2026-11-14 para `winservice_principal` consultou outra instância e retornou `close`; ela não representa o canal correto.
 - A instância correta tem integração Chatwoot habilitada e campos de conexão preenchidos. O webhook de eventos está ligado, o envio Base64 está ligado e os eventos visíveis aparecem selecionados. Segredos não foram lidos nem registrados.
