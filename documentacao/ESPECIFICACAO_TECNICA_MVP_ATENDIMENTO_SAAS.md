@@ -23,7 +23,7 @@ A direção arquitetural aprovada na ADR-0020 é reutilizar a API NestJS e o Sup
 
 ### 1.2 Decisões pendentes e conflitos a resolver
 
-Os itens abaixo são propostas para decisão; nenhum é considerado aprovado por estar descrito aqui.
+A lista abaixo identifica o que ainda está pendente e o que já foi confirmado pelo responsável durante a revisão. As confirmações não aprovam a especificação inteira.
 
 1. **Prioridade e fronteira de produto:** a decisão de alto nível já está registrada na ADR-0020: o atendimento terá plano de entrega próprio, preservando a prioridade de Operação do ERP e sem tornar WhatsApp/n8n parte automática do MVP operacional. Fica pendente detalhar a fronteira técnica de releases, módulos e operação na API compartilhada, sem reabrir a decisão já aprovada.
 2. **Canal/provedor WhatsApp:** o responsável aprovou um contrato/adaptador independente de provedor. A escolha entre Meta WhatsApp Cloud API e provedor intermediário permanece pendente; definir titularidade/número por tenant, templates, janela de atendimento, custos e ambiente de homologação.
