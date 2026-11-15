@@ -52,9 +52,9 @@ Esta revisão compara a proposta com as ADRs vigentes. Os itens desta seção s�
 - **Retenção e piloto:** definir retenção, acesso, anonimização e rotina de solicitação do titular antes de trafegar conversas reais; não usar ausência dessa decisão para bloquear protótipo com dados sintéticos.
 - **Billing, planos e auto-onboarding:** manter fora do escopo inicial; resolver antes de comercialização multi-tenant, sem bloquear especificação do fluxo assistido para o piloto Winservice.
 
-**Pontos ainda pendentes antes de fechar os contratos de integração:** fornecedor/canal específico, detalhes de integração do Chatwoot e detalhes da identidade máquina-a-máquina (emissor/formato da credencial, escopos e vínculo tenant). A política de confirmação de identidade e o princípio de identidade técnica estão decididos. Retenção e privacidade precisam estar definidas antes de piloto com dados reais. Billing e SLO comercial podem ficar para a etapa de comercialização.
+**Pontos ainda pendentes antes de fechar os contratos de integração:** fornecedor/canal específico, detalhes de integração do Chatwoot e detalhes finais da identidade máquina-a-máquina (prazo máximo de validade, autoridade e procedimento de emissão/rotação, escopos exatos e vínculo tenant/canal). O modelo opaco de credencial está aprovado para a proposta. A política de confirmação de identidade e o princípio de identidade técnica estão decididos. Retenção e privacidade precisam estar definidas antes de piloto com dados reais. Billing e SLO comercial podem ficar para a etapa de comercialização.
 
-### Identidade técnica do agente — princípio aprovado; credencial pendente
+### Identidade técnica do agente — princípio e modelo de credencial opaca aprovados para a proposta; detalhes pendentes
 
 Proposta de desenho para deliberação: separar autenticação humana de autenticação máquina-a-máquina.
 
@@ -64,7 +64,7 @@ Proposta de desenho para deliberação: separar autenticação humana de autenti
 - Não confundir token de usuário com a chave secreta do projeto Supabase. A secret key / service_role é chave de aplicação com acesso elevado e bypass de RLS, não uma identidade de agente; não deve ser distribuída ao n8n neste desenho.
 - A API precisa aplicar o escopo do serviço e a autorização por tenant antes de abrir a transação de banco; o acesso ao PostgreSQL continua sujeito à role de runtime sem BYPASSRLS e ao contexto transaction-local definidos nos gates existentes.
 
-Portanto, não usar token de usuário humano do Supabase Auth para o n8n. A identidade técnica separada foi aprovada como princípio; a escolha concreta entre token opaco/API key rotacionável, JWT de serviço ou provedor OAuth máquina-a-máquina continua pendente de revisão de segurança. A chave de serviço da OpenAI mostrada pelo responsável autentica o n8n perante a OpenAI, não perante a API do ERP.
+Portanto, não usar token de usuário humano do Supabase Auth para o n8n. A identidade técnica separada e o modelo de credencial opaca de alta entropia foram aprovados para esta proposta. Permanecem pendentes validade máxima, processo de emissão/rotação, granularidade exata dos escopos e vínculo tenant/canal, sujeitos à revisão de segurança. A chave de serviço da OpenAI mostrada pelo responsável autentica o n8n perante a OpenAI, não perante a API do ERP.
 
 Referência técnica consultada em 2026-11-14: [Supabase API keys](https://supabase.com/docs/guides/getting-started/api-keys) distingue a chave de aplicação da identidade Auth do usuário e informa que a chave secreta mapeia à role service_role com bypass RLS; [Supabase Auth OAuth 2.1](https://supabase.com/docs/guides/auth/oauth-server) descreve fluxo Authorization Code com PKCE, autenticação e consentimento do usuário, não devendo ser presumido como client credentials para execução unattended.
 
@@ -76,7 +76,7 @@ O responsável confirmou expressamente as seguintes direções para esta propost
 - O handoff humano usará Chatwoot de forma transitória. O responsável informou que já está disponível; essa disponibilidade é informação do responsável, não uma verificação de ambiente feita nesta sessão.
 - Um número de telefone sozinho não autoriza associação automática a um cadastro existente. Quando a identidade estiver ambígua, solicitar confirmação ou transferir ao humano.
 
-O princípio de identidade de serviço do n8n perante a API REST do ERP foi aprovado pelo responsável. O token/credencial não será um token de usuário humano do Supabase Auth nem uma chave da API OpenAI; seu emissor, formato, escopos, vínculo tenant e ciclo de vida continuam pendentes. O responsável também concordou com workflows separados por perfil para o piloto, cada um usando identidade/credencial própria; um roteador eventual apenas encaminha e não detém permissões amplas. A especificação inteira continua em estado PROPOSTA até aprovação explícita posterior.
+O princípio de identidade de serviço do n8n perante a API REST do ERP e o modelo de credencial opaca foram aprovados pelo responsável para esta proposta. A credencial não será token de usuário humano do Supabase Auth, chave de API Supabase/OpenAI nem credencial de banco. Permanecem pendentes o prazo de validade, o procedimento autorizado de emissão/rotação, escopos e vínculo tenant/canal finais. O responsável também concordou com workflows separados por perfil para o piloto, cada um usando identidade/credencial própria; um roteador eventual apenas encaminha e não detém permissões amplas. A especificação inteira continua em estado PROPOSTA até aprovação explícita posterior.
 
 ## 2. Escopo funcional
 
@@ -186,7 +186,7 @@ Esta seção é uma proposta de desenho e não aprova o mecanismo de credenciais
 - Registrar `principal_id`, `credential_id`, perfil, tenant, ação, resultado e correlation ID; nunca registrar token ou payload pessoal completo. Aplicar rate limits e respostas uniformes para credencial inválida, expirada, revogada ou sem escopo.
 - Não conceder acesso direto ao PostgreSQL/Supabase, não usar `service_role`/secret key, não aceitar chave de API publicável como identidade e não reaproveitar token humano do Supabase Auth.
 
-**Alternativa futura:** OAuth 2.0 Client Credentials com access tokens curtos, `audience` e escopos próprios pode ser reavaliado quando houver emissor/infra de identidade de serviço. Isso não deve ser presumido como recurso do OAuth Server Supabase para usuários nem como componente existente. O formato aqui é recomendação documental, não contrato de endpoint aprovado ou implementado.
+**Alternativa futura:** OAuth 2.0 Client Credentials com access tokens curtos, `audience` e escopos próprios pode ser reavaliado quando houver emissor/infra de identidade de serviço. Isso não deve ser presumido como recurso do OAuth Server Supabase para usuários nem como componente existente. Este desenho arquitetural está aprovado para a proposta, mas não constitui contrato de endpoint aprovado ou implementado.
 
 **Critérios bloqueantes antes de credenciais reais:** decidir prazo de validade e autoridade de emissão; documentar armazenamento do hash e do segredo no n8n; testar token ausente/inválido/expirado/revogado, perfil/tenant/canal/escopo incorretos, rotação e ausência de segredo em logs; completar os gates de baseline/identidade/conexão/RLS/autorização aplicáveis. Até então, não emitir credenciais nem ativar workflows.
 
