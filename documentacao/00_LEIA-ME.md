@@ -59,7 +59,7 @@ Esta documentação é a referência persistente para planejar, especificar, des
 15. [Identidade visual e paleta semântica](IDENTIDADE_VISUAL_E_PALETA.md) — proposta de cores semânticas para textos, botões, fundos e cards; inclui regra explícita de contraste para o título do card secundário.
 16. [Rascunho](RASCUNHO.md) — ideias e propostas ainda não aprovadas.
 
-**Proposta pendente:** [Especificação técnica do MVP de atendimento SaaS](ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md) — requisitos e contratos propostos, ainda sem aprovação; não autoriza implementação ou alterações operacionais.
+**Especificação aprovada, integração pendente:** [Especificação técnica do MVP de atendimento SaaS](ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md) — aprovada pelo responsável em 2026-11-15; aguarda integração à main. Não autoriza implementação ou alterações operacionais.
 
 ## Regras essenciais
 
@@ -69,7 +69,7 @@ Esta documentação é a referência persistente para planejar, especificar, des
 - Não inventar decisões, requisitos, evidências, aprovações ou datas.
 - Consultar ADRs individuais pertinentes; o índice não substitui suas fichas.
 - Ao concluir trabalho relevante, atualizar os documentos afetados e o registro de continuidade.
-- Não incluir segredos, credenciais ou dados pessoais desnecessários.
+- Não incluir segredos, credenciais ou dados pessoais desnecessários. Exposições e estado de rotação são acompanhados em [Registro de credenciais a rotacionar](REGISTRO_CREDENCIAIS_A_ROTACIONAR.md), sem armazenar valores secretos.
 - Manter documentação em formatos portáveis e independente de fornecedor.
 
 ## Fontes de baseline já existentes
@@ -80,6 +80,8 @@ Esta documentação é a referência persistente para planejar, especificar, des
 Esses arquivos são fotografias técnicas daquela data, não garantia de que o ambiente continua idêntico.
 
 ## Histórico deste arquivo
+
+- 2026-11-15 — registro da aprovação da especificação técnica e link para o controle de rotação de credenciais.
 
 - 2026-11-14 — inclusão da especificação técnica proposta do MVP de atendimento SaaS no mapa documental; permanece pendente de aprovação.
 
