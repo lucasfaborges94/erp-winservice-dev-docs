@@ -263,3 +263,11 @@ Ambos são tenant-scoped; não podem trocar tenant por payload, fazer busca glob
 **Estado:** matriz registrada como proposta em documentacao/ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md. A identidade de serviço n8n está aprovada como princípio, mas os perfis, escopos exatos, formato/issuer e ciclo de vida das credenciais ainda não. Não há credenciais, endpoints, workflows ou mudanças de banco criados.
 
 **Próximo passo:** responsável revisar e ajustar os dois perfis, sobretudo se o perfil write-only pode criar cadastro mínimo de cliente e quais escritas/mensagens são permitidas. Após fechar a matriz, decidir mecanismo da credencial e então submeter a especificação completa à aprovação explícita.
+
+## Decisão do perfil write-only sobre cadastro de cliente — 2026-11-14
+
+O responsável escolheu a opção 1: no piloto inicial, o perfil `atendimento_registrador_write` **não pode criar cadastro de cliente**, inclusive cadastro mínimo. Esse perfil pode criar apenas qualificação e handoff para a conversa cujo contexto foi validado pelo servidor, conforme a matriz proposta na especificação.
+
+Esta decisão resolve a pergunta pendente ao final da seção “Matriz inicial de permissões por agente preparada”. A criação de cadastro pelo perfil write-only exigirá nova deliberação e revisão documental. A decisão é registrada como requisito desta proposta e não aprova a especificação técnica completa.
+
+**Estado e limites:** a especificação continua PROPOSTA e pendente de aprovação explícita. Nenhuma implementação, credencial, workflow, alteração Supabase, código, deploy ou operação de produção foi realizada.
