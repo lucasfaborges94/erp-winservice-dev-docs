@@ -76,7 +76,7 @@ O responsável confirmou expressamente as seguintes direções para esta propost
 - O handoff humano usará Chatwoot de forma transitória. O responsável informou que já está disponível; essa disponibilidade é informação do responsável, não uma verificação de ambiente feita nesta sessão.
 - Um número de telefone sozinho não autoriza associação automática a um cadastro existente. Quando a identidade estiver ambígua, solicitar confirmação ou transferir ao humano.
 
-O princípio de identidade de serviço do n8n perante a API REST do ERP foi aprovado pelo responsável. O token/credencial não será um token de usuário humano do Supabase Auth nem uma chave da API OpenAI; seu emissor, formato, escopos, vínculo tenant e ciclo de vida continuam pendentes. A especificação inteira continua em estado PROPOSTA até aprovação explícita posterior.
+O princípio de identidade de serviço do n8n perante a API REST do ERP foi aprovado pelo responsável. O token/credencial não será um token de usuário humano do Supabase Auth nem uma chave da API OpenAI; seu emissor, formato, escopos, vínculo tenant e ciclo de vida continuam pendentes.  O responsável também concordou com workflows separados por perfil para o piloto, cada um usando identidade/credencial própria; um roteador eventual apenas encaminha e não detém permissões amplas. A especificação inteira continua em estado PROPOSTA até aprovação explícita posterior.
 
 ## 2. Escopo funcional
 
@@ -143,7 +143,7 @@ O princípio de identidade de serviço do n8n perante a API REST do ERP foi apro
 Os conceitos abaixo são distintos; o número de workflows não define, por si só, o número de identidades.
 
 - **Agente:** papel lógico com objetivo, limites de autonomia e conjunto de capacidades; deve aparecer como ator identificável na auditoria.
-- **Identidade de serviço:** principal técnico apresentado pelo n8n à API REST. Deve mapear a um perfil de autorização explícito, com escopo mínimo e tenant permitido. Se um servidor MCP for aprovado futuramente, sua identidade/token também deve ser delimitado ao recurso MCP. Recomenda-se uma identidade por perfil de capacidade (por exemplo, consulta e escrita; criação limitada), não necessariamente uma identidade por workflow.
+- **Identidade de serviço:** principal técnico apresentado pelo n8n à API REST. Deve mapear a um perfil de autorização explícito, com escopo mínimo e tenant permitido. Para o piloto, a proposta confirmada pelo responsável é usar identidade/credencial própria por perfil de capacidade, separando os perfis com privilégios diferentes. Se um servidor MCP for aprovado futuramente, sua identidade/token também deverá ser delimitada ao recurso MCP.
 - **Workflow:** implementação/orquestração no n8n. Um workflow de propósito fixo usa credencial correspondente ao perfil do agente. Vários workflows podem compartilhar uma identidade somente se tiverem a mesma fronteira de confiança e exatamente o mesmo conjunto de permissões; separar credenciais quando os privilégios diferirem.
 - **API REST (caminho inicial):** valida credencial, validade e escopos e autoriza cada operação no servidor. Se um servidor MCP for criado no futuro, ele também deverá validar credencial/audiência/escopos e encaminhar ao backend apenas contexto de ator verificado. A disponibilidade de ferramenta no prompt ou workflow nunca concede permissão.
 
@@ -165,7 +165,7 @@ A matriz representa capacidades de negócio, não uma implementação de MCP. O 
 
 “Somente escrita” deve ser definido por operações concretas, não por um privilégio amplo `write`. Se uma operação precisar consultar contexto para validar a gravação, conceder apenas a leitura mínima daquele contexto ou fazer a validação dentro da própria operação autorizada. IDs fornecidos pelo modelo não bastam para selecionar tenant/cliente/conversa.
 
-**Roteamento n8n:** para o primeiro piloto, a opção mais simples de auditar é separar workflows por perfil de agente, cada qual com credencial própria. Um workflow roteador também é possível se o principal recebido for autenticado/derivado de fonte confiável, a seleção for validada no servidor e cada subworkflow use a credencial do perfil de destino. Nunca confiar em um campo `agent_id` vindo de mensagem, modelo ou payload não autenticado; não dar ao roteador uma credencial global com a união de todas as permissões.
+**Estratégia n8n acordada para a proposta do piloto:** separar workflows por perfil de agente e usar uma identidade/credencial própria em cada workflow. Um roteador pode encaminhar a mensagem, mas não terá credencial ampla; o subworkflow do perfil de destino fará a chamada com sua credencial própria. A seleção de perfil deve vir de configuração confiável e ser validada no servidor. Nunca confiar em `agent_id` vindo de mensagem, modelo ou payload não autenticado; não dar ao roteador uma credencial global com a união de todas as permissões.
 
 **Separação de tokens se MCP vier a ser adotado:** o token MCP deve ter audiência daquele servidor; não deve ser encaminhado como credencial para uma API upstream. O MCP usaria credencial/contexto próprio do backend ou mecanismo de delegação aprovado, preservando o ator para auditoria. No MVP REST atual, n8n chama a API diretamente com a identidade de serviço definida para esse caminho.
 
