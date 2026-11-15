@@ -25,7 +25,7 @@ A direção arquitetural aprovada na ADR-0020 é reutilizar a API NestJS e o Sup
 
 Os itens abaixo são propostas para decisão; nenhum é considerado aprovado por estar descrito aqui.
 
-1. **Prioridade e fronteira de produto:** ADR-0019 exclui integrações externas do MVP do ERP; ADR-0020 prevê WhatsApp/n8n para o produto de atendimento. Confirmar que este MVP tem roadmap e ativação próprios e não altera a prioridade Operação do ERP. A especificação assume essa separação para discussão, sem alterar as ADRs.
+1. **Prioridade e fronteira de produto:** a decisão de alto nível já está registrada na ADR-0020: o atendimento terá plano de entrega próprio, preservando a prioridade de Operação do ERP e sem tornar WhatsApp/n8n parte automática do MVP operacional. Fica pendente detalhar a fronteira técnica de releases, módulos e operação na API compartilhada, sem reabrir a decisão já aprovada.
 2. **Canal/provedor WhatsApp:** decidir Meta WhatsApp Cloud API diretamente ou provedor intermediário; definir titularidade/número por tenant, templates, janela de atendimento, custos e ambiente de homologação.
 3. **Inbox humana:** decidir produto de operação do handoff (Chatwoot transitório conforme ADR-0007, console próprio ou outro). Definir fonte autoritativa para status e mensagens durante a transferência.
 4. **Identidade de cliente:** decidir quando um telefone pode ser associado automaticamente a um cliente existente, tratamento de números compartilhados, homônimos, confirmação de identidade e criação de duplicados.
@@ -35,6 +35,22 @@ Os itens abaixo são propostas para decisão; nenhum é considerado aprovado por
 8. **Retenção e privacidade:** decidir prazos para mensagens, transcrições, eventos e dados de contato; política de exclusão/anonimização e atendimento de solicitações do titular.
 9. **Catálogo de equipamentos/regiões:** decidir quais dados são globais de plataforma e quais são privados/configuráveis por tenant.
 10. **Disponibilidade e operação:** definir SLOs, limites de envio, janelas de suporte, alertas e política de fallback quando API, n8n ou provedor falharem.
+
+### 1.3. Revisão de consistência e recomendações para deliberação
+
+Esta revisão compara a proposta com as ADRs vigentes. Os itens desta seção são recomendações para o responsável; não alteram o estado de aprovação.
+
+- **Fronteira do MVP:** considerar decidida em alto nível pela ADR-0020 (produto/roadmap próprios do atendimento; prioridade Operação do ERP preservada). Antes de implementar, detalhar como a API compartilhada isola módulos, permissões, releases e dependências externas, respeitando o limite da ADR-0019 para o MVP ERP.
+- **WhatsApp:** manter contrato/adaptador independente de provedor. Selecionar Meta direto ou BSP somente após confirmar número/titularidade, homologação, operação, custos e exigências de cada tenant.
+- **Handoff humano:** avaliar o Chatwoot como inbox transitório, conforme ADR-0007, se a instalação e operação estiverem disponíveis; abstrair o contrato para que a decisão de inbox não acople o domínio de conversas.
+- **Vinculação do cliente:** não associar automaticamente um cliente existente apenas pelo telefone. Recomenda-se pedir confirmação quando houver qualquer ambiguidade e encaminhar ao humano quando a identidade não puder ser confirmada.
+- **Identidade n8n:** usar identidade técnica distinta por ambiente, com escopo mínimo e tenant derivado/validado pela API e pelo canal cadastrado; nunca aceitar tenant de entrada como prova de acesso.
+- **Regras comerciais:** publicar versões imutáveis aprovadas por usuário autorizado, com vigência e trilha; ausência, expiração ou conflito de regra deve resultar em pergunta ou handoff.
+- **Configuração inicial:** manter catálogo e regras no escopo do tenant até existir decisão e contrato para dados globais. Isso reduz dependência de catálogo compartilhado no piloto.
+- **Retenção e piloto:** definir retenção, acesso, anonimização e rotina de solicitação do titular antes de trafegar conversas reais; não usar ausência dessa decisão para bloquear protótipo com dados sintéticos.
+- **Billing, planos e auto-onboarding:** manter fora do escopo inicial; resolver antes de comercialização multi-tenant, sem bloquear especificação do fluxo assistido para o piloto Winservice.
+
+**Pontos que realmente precisam de decisão antes de fechar os contratos de integração:** provedor/canal, inbox de handoff, política de confirmação de identidade e identidade máquina-a-máquina. Retenção e privacidade precisam estar decididas antes de piloto com dados reais. Billing e SLO comercial podem ficar para a etapa de comercialização.
 
 ## 2. Escopo funcional
 
