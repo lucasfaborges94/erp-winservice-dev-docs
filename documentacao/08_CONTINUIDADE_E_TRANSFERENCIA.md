@@ -250,3 +250,16 @@ A identidade do n8n é separada de usuários humanos do Supabase Auth e das chav
 **Pendências técnicas:** emissor/formato da credencial (token opaco/API key, JWT próprio ou OAuth máquina-a-máquina), audiência, escopos por ação e tenant, segregação por ambiente, validade, rotação, revogação, e propagação do ator para auditoria/RLS. Não foi criada credencial nem alterado OpenAI, Supabase, n8n, API ou produção.
 
 A especificação foi atualizada na branch spec/atendimento-saas-mvp. Permanece PROPOSTA até aprovação explícita posterior.
+
+## Matriz inicial de permissões por agente preparada — PROPOSTA — 2026-11-14
+
+A pedido de continuidade, a especificação recebeu uma matriz concreta, ainda não aprovada, para dois perfis ilustrativos alinhados ao exemplo do responsável:
+
+- `atendimento_qualificador_rw`: lê apenas contexto da conversa atual, regras publicadas do tenant e cadastro do cliente já vinculado/confirmado; cria qualificação/handoff e, se permitido pela regra funcional, cadastro mínimo do cliente.
+- `atendimento_registrador_write`: sem ferramentas de leitura ampla; cria qualificação/handoff apenas para a conversa validada pelo servidor; eventual criação mínima de cliente precisa de habilitação explícita.
+
+Ambos são tenant-scoped; não podem trocar tenant por payload, fazer busca global, alterar registros alheios, excluir ou acessar domínio ERP genérico. Os escopos apresentados são simbólicos e ainda não contratos implementados. REST da API NestJS continua sendo o caminho inicial; MCP não existe e não é pré-requisito.
+
+**Estado:** matriz registrada como proposta em documentacao/ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md. A identidade de serviço n8n está aprovada como princípio, mas os perfis, escopos exatos, formato/issuer e ciclo de vida das credenciais ainda não. Não há credenciais, endpoints, workflows ou mudanças de banco criados.
+
+**Próximo passo:** responsável revisar e ajustar os dois perfis, sobretudo se o perfil write-only pode criar cadastro mínimo de cliente e quais escritas/mensagens são permitidas. Após fechar a matriz, decidir mecanismo da credencial e então submeter a especificação completa à aprovação explícita.
