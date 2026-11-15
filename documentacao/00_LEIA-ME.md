@@ -66,7 +66,7 @@ Esta documentação é a referência persistente para planejar, especificar, des
 - Não inventar decisões, requisitos, evidências, aprovações ou datas.
 - Consultar ADRs individuais pertinentes; o índice não substitui suas fichas.
 - Ao concluir trabalho relevante, atualizar os documentos afetados e o registro de continuidade.
-- Não incluir segredos, credenciais ou dados pessoais desnecessários.
+- Não incluir segredos, credenciais ou dados pessoais desnecessários. Exposições e estado de rotação são acompanhados em [Registro de credenciais a rotacionar](REGISTRO_CREDENCIAIS_A_ROTACIONAR.md), sem armazenar valores secretos.
 - Manter documentação em formatos portáveis e independente de fornecedor.
 
 ## Fontes de baseline já existentes
@@ -77,6 +77,8 @@ Esta documentação é a referência persistente para planejar, especificar, des
 Esses arquivos são fotografias técnicas daquela data, não garantia de que o ambiente continua idêntico.
 
 ## Histórico deste arquivo
+
+- 2026-11-15 — inclusão do registro de credenciais a rotacionar, sem armazenamento de valores secretos.
 
 - 2026-11-09 — inclusão do documento de identidade visual e paleta semântica no mapa documental.
 
