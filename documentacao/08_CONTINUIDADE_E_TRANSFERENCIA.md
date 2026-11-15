@@ -351,3 +351,16 @@ O responsável informou que a Evolution API já está instalada no domínio [evo
 
 
 **Evidência técnica adicional — 2026-11-14:** consulta pública GET a https://evo.winservicers.com/ retornou HTTP 200; a resposta JSON foi filtrada para status 200, mensagem “Welcome to the Evolution API, it is working!” e versão 2.3.7. A requisição foi somente leitura. Não foram consultados endpoints administrativos, instâncias, chaves, tokens ou configurações.
+
+
+## Inspeção n8n da integração Evolution API — 2026-11-14
+
+Após autorização do responsável para usar o n8n em consultas à API, foi feita inspeção somente leitura do contexto, da credencial e do workflow de conexão.
+
+**Evidências:** o n8n lista uma credencial acessível chamada “Evolution API” (tipo evolutionApi), mas a workflow ativa “Testa conexao Evolution Api” não tem credenciais associadas aos seus nós. O nó Set dessa workflow contém uma chave API literal; o valor foi omitido deste registro e não deve ser repetido. O grafo também referencia um destino chamado “HTTP Request” ausente na lista de nós. A execução histórica mais recente consultada falhou com “Destination node not found”; o contexto reportava 24 execuções falhas dessa workflow. Portanto, ela não fornece uma consulta funcional à instância.
+
+**Resultado:** não executei workflow nem fiz nova chamada autenticada. A API continua confirmada publicamente em HTTP 200, versão anunciada 2.3.7. Essa leitura da raiz não confirma instâncias ou conexão Baileys.
+
+**Segurança e limite de autorização:** a credencial salva não é usada pelo verificador existente, e há um token literal na workflow. Recomenda-se revogar/rotacionar esse token e remover seu uso literal, adotando a credencial n8n. A autorização do responsável permite consultas; não autoriza modificar ou criar workflows. Nenhuma alteração no n8n foi feita.
+
+**Próximo passo:** obter autorização explícita para corrigir a workflow de verificação (somente chamadas GET usando a credencial salva) ou para criar uma workflow temporária de consulta. Depois, consultar estado da instância e indicadores não sensíveis de conexão Baileys, sem listar QR codes, tokens ou dados pessoais.
