@@ -98,6 +98,8 @@ A aprovação não encerra gates G0–G8 nem autoriza implementação, migration
 
 ### 2.1 Incluído no MVP
 
+- Catálogos locais de UF, municípios e bairros com chaves estrangeiras, regiões personalizadas por empresa e regras de inclusão/exclusão. A primeira carga de bairros cobre o RS. A correspondência geográfica auxilia as regras, mas não bloqueia o cadastro de endereços de clientes.
+- Catálogo compartilhado de famílias e tipos de equipamento, seleção de famílias atendidas por empresa e exclusão explícita de tipos. Novos itens globais exigem adoção explícita antes de entrar no escopo de uma empresa.
 - Receber evento/mensagem de WhatsApp e associá-lo ao tenant pelo canal previamente cadastrado, validado e ativo.
 - Validar assinatura/autenticidade do webhook do provedor e deduplicar eventos.
 - Abrir ou continuar conversa com estado explícito e trilha de auditoria.
@@ -219,9 +221,9 @@ A mesma skill de qualificação será usada por empresas diferentes. O conteúdo
 - **Carga inicial Winservice.** Lava e seca, lavadora de roupas, secadora de roupas, lava-louças, micro-ondas, forno elétrico, geladeira, freezer e purificador de água. O purificador começa em ativação. A lista negativa começa vazia. “Secadora de varal” é um exemplo de exclusão pontual. A [carga inicial da Winservice](https://github.com/lucasfaborges94/winservice-assistencia-tecnica/blob/main/02_COMERCIAL/ATENDIMENTO/CATALOGO_EQUIPAMENTOS.json) só deve ser publicada para a Winservice.
 - **Qualificação e próxima etapa.** Bairro e cidade são obrigatórios e separados. Para a Winservice, se vier só o bairro e houver correspondência inequívoca na fonte oficial de Porto Alegre (RS), perguntar se é em Porto Alegre antes de registrar a cidade. Sem correspondência, em caso de ambiguidade ou se o cliente negar a sugestão, perguntar explicitamente a cidade. Confirmar a cobertura comercial separadamente. Emitir JSON validado, com contexto da empresa e revisões das regras. Só uma qualificação confirmada encaminha a saída para `condicoes_servico`, que consulta as condições vigentes da mesma empresa.
 
-### 4.4. Cadastros geográficos locais e regras por região — decisão registrada em 2026-11-15
+### 4.4. Cadastros geográficos locais e regras por região — requisito obrigatório do MVP
 
-O MVP deverá consultar os cadastros geográficos armazenados no Supabase, sem depender de chamadas em tempo real a APIs de terceiros ou buscas na internet para resolver UF, município e bairro. Os cadastros terão chaves estrangeiras de município para UF e de bairro para município. Os dados armazenados incluem código oficial, nome, nomes alternativos quando disponíveis, estado de vigência e metadados de origem e versão.
+Requisito obrigatório do MVP: consultar os cadastros geográficos locais no Supabase, sem depender de chamadas em tempo real a APIs de terceiros ou buscas na internet para resolver UF, município e bairro. O esquema cobre UF, município, bairro, regiões compostas por empresa e inclusões/exclusões por relação. A primeira carga de bairros será do RS. Os cadastros terão chaves estrangeiras de município para UF e de bairro para município. Os dados armazenados incluem código oficial, nome, nomes alternativos quando disponíveis, estado de vigência e metadados de origem e versão.
 
 - **UF e municípios:** usar códigos oficiais estáveis e manter a relação município–UF no banco.
 - **Bairros:** usar como ponto de partida os bairros mapeados pelo IBGE no Censo 2022, com origem, ano e versão registrados. A cobertura não deve ser tratada como universal, pois a instituição legal de bairros depende do município. Permitir cadastrar aliases ou localidades internas validadas pela empresa quando o bairro informado não estiver na carga.
@@ -233,9 +235,9 @@ O MVP deverá consultar os cadastros geográficos armazenados no Supabase, sem d
 
 O IBGE disponibiliza malhas e arquivos geoespaciais de bairros do Censo 2022. Como a legislação de bairros é municipal e nem todos os municípios instituem bairros, a carga deve guardar procedência e permitir complementação validada, sem presumir uma lista nacional completa. As fontes oficiais são consultadas ao preparar e atualizar a carga, não a cada conversa. O catálogo não é requisito para cadastrar endereços de clientes. A tabela `addresses` continua armazenando esses endereços. Bairro, município e UF informados podem ser salvos mesmo sem correspondência catalogada. Uma referência aos cadastros geográficos, se adicionada, deve ser opcional e anulável. Ausência ou ambiguidade pode deixar a classificação de cobertura pendente, mas não bloqueia a gravação do endereço.
 
-### 4.5. Catálogo de equipamentos e conhecimento compartilhado — proposta para o MVP
+### 4.5. Catálogo de equipamentos e conhecimento compartilhado — requisito parcial aprovado para o MVP
 
-A proposta é manter catálogos globais de **famílias** e **tipos de equipamento**, previamente populados e reutilizáveis. Cada empresa compõe seu catálogo por relacionamentos com esses registros globais e pode cadastrar itens próprios sem alterar os registros globais. A estrutura e os exemplos abaixo permanecem como proposta até aprovação explícita.
+O MVP deverá oferecer catálogos globais previamente populados de **famílias** e **tipos de equipamento**, reutilizáveis entre empresas, além de relações e registros personalizados por empresa. O requisito aprovado é permitir que uma empresa selecione uma família como atendida e exclua tipos específicos, com adoção explícita de novos tipos globais. Marcas, modelos e a estrutura detalhada de descrições/características permanecem propostas a detalhar.
 
 - **Hierarquia:** uma família contém tipos. Exemplos: Geladeira → Duplex; Geladeira → Side by Side; Lavadora de roupas → Front load; Lavadora de roupas → Top load; Secadora de roupas → Tambor chão; Secadora de roupas → Tambor parede; Secadora de roupas → Varal.
 - **Seleção por empresa:** a participação no catálogo da empresa é uma relação, não uma cópia editável da definição global. A empresa pode incluir ou excluir uma opção global de sua oferta por relacionamento. Exclusões prevalecem sobre inclusões e a interface sinaliza contradições. Itens personalizados pertencem à empresa e não alteram o catálogo compartilhado. Para o escopo de atendimento, a empresa pode marcar uma família como atendida e registrar exclusões específicas de tipos dessa família. Tipos globais criados depois não devem passar a ser atendidos silenciosamente: sua inclusão exige adoção explícita pela empresa. A interface deve mostrar a expansão da família e destacar os tipos excluídos.
@@ -244,7 +246,9 @@ A proposta é manter catálogos globais de **famílias** e **tipos de equipament
 - **Conhecimento da empresa:** dados globais oferecem uma base comum. A empresa pode acrescentar aliases, descrições e características locais via relacionamentos ou registros próprios, sem editar o conteúdo global. A forma de resolver sobreposições entre descrição global e complementação da empresa será definida na modelagem.
 - **Uso no atendimento:** consultar a taxonomia e as descrições para classificar a linguagem do cliente. A elegibilidade para atendimento continua determinada pelas relações e regras da empresa, incluindo exclusões, disponibilidade, região e condições comerciais. Reconhecer um item no catálogo global não significa que a empresa o atenda.
 - **Uso pela equipe:** as mesmas famílias, tipos, características e descrições podem apoiar guias de atendimento humano, com fonte e versão rastreáveis. A publicação de uma versão global pode ser adotada por empresa, mas não deve ativar automaticamente equipamentos na oferta dela.
-- **Aceite proposto:** demonstrar que empresas diferentes podem adotar seleções diferentes da mesma família global; adicionar itens personalizados sem afetar outros tenants; aplicar exclusão da empresa com precedência; distinguir variantes de geladeira por características; e preservar a classificação quando o cliente informar apenas o nome popular ou um alias.
+- **Aceite obrigatório de família e tipos:** demonstrar duas empresas usando o mesmo catálogo global, uma atendendo uma família e excluindo um tipo, outra com seleção diferente; provar que novos tipos globais não são habilitados implicitamente e que itens personalizados ficam isolados por empresa.
+- **Aceite obrigatório de regiões:** demonstrar a primeira carga do RS, relações UF→município→bairro, regiões compostas por empresa, precedência de exclusões e sinalização de conflitos. Demonstrar que endereços de clientes são graváveis mesmo com bairro não catalogado.
+- **Aceite ainda proposto de conhecimento:** distinguir variantes por características, preservar aliases e descrições locais e globais sem confundir a oferta elegível.
 
 ## 5. Onboarding proposto
 
