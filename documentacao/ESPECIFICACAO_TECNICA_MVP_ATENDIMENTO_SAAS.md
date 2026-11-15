@@ -304,6 +304,16 @@ Códigos propostos: `VALIDATION_ERROR`, `UNAUTHENTICATED`, `FORBIDDEN`, `NOT_FOU
 
 ## 9. Integração n8n e WhatsApp proposta
 
+### 9.1. Evolution API — decisão de provedor e requisitos de integração
+
+A Evolution API foi escolhida pelo responsável como camada de integração WhatsApp do MVP. Isso escolhe o produto provedor, mas não define hospedagem, versão nem o transporte WhatsApp usado por ele. A documentação oficial descreve modos Baileys (baseado no WhatsApp Web, com limitações possíveis frente às APIs oficiais) e WhatsApp Cloud API da Meta. Para operação comercial, recomenda-se avaliar Cloud API primeiro; a escolha final depende de custos, número/titularidade, requisitos de templates e janela de atendimento, política Meta e homologação.
+
+A documentação da Evolution configura webhooks por instância com seleção explícita de eventos, ou globalmente. Para limitar mistura entre tenants, a proposta inicial é webhook por instância/canal e lista mínima de eventos necessária ao fluxo (por exemplo, mensagem recebida, atualização de mensagem, envio e estado da conexão), validada contra a versão escolhida. A API ERP deve mapear a instância cadastrada ao tenant/canal; nome de instância ou `company_identifier` recebido no payload não autoriza acesso.
+
+Credenciais Evolution (chave administrativa da API e token por instância, conforme modo/versão) são distintas da identidade de serviço n8n→ERP. Devem ficar em armazenamento seguro, com escopo e rotação próprios, sem exposição ao modelo, em payloads/logs ou exports de workflow. A chamada externa recebida deve passar por autenticação de webhook suportada pela versão escolhida ou camada protetora adicional; validar autenticidade, replay, formato, tamanho e idempotência antes de persistir/processar. O mecanismo exato de assinatura/autenticação do webhook deve ser confirmado na homologação.
+
+A Evolution possui integração nativa com Chatwoot, mas essa opção não está selecionada aqui: o Chatwoot permanece inbox transitório para handoff conforme a decisão já registrada. Antes de integrar, definir qual sistema mantém o histórico/status autoritativo para evitar duplicação ou conflito.
+
 1. O provedor entrega webhook à API ou a uma entrada técnica controlada. A API valida assinatura, canal ativo, tenant, tamanho, timestamp/replay e idempotência antes de aceitar o evento.
 2. A API registra evento e conversa com estado consistente. n8n recebe apenas um evento normalizado e tenant-scoped, via credencial de serviço limitada.
 3. n8n coordena etapas declarativas: normalizar mensagem, chamar ferramentas permitidas da API, encaminhar texto ao modelo, validar resposta contra regras e enviar mensagem pelo conector autorizado.
@@ -319,7 +329,7 @@ Códigos propostos: `VALIDATION_ERROR`, `UNAUTHENTICATED`, `FORBIDDEN`, `NOT_FOU
 - JWT de usuário validado pelo backend; autorização por vínculo, papel/permissão, empresa ativa e módulo/produto.
 - Identidade de máquina separada de usuário humano; credenciais de menor privilégio, secret manager, segregação por ambiente e rotação/revogação.
 - RLS e backend complementares; sem acesso direto do agente/workflow ao banco e sem `service_role` como caminho comum.
-- Webhook: validação criptográfica conforme provedor, timestamps/replay, limitação de payload, rate limit e idempotência.
+- Webhook Evolution: validar autenticidade com o mecanismo da versão homologada ou camada adicional; mapear instância/canal registrado ao tenant, aplicar replay protection, limitação de payload, rate limit e idempotência. Chave global e tokens por instância Evolution são credenciais externas, distintas da identidade n8n→API.
 - Segredos fora de Git/exports/logs; conteúdo e dados pessoais minimizados, mascarados em telemetria e sujeitos a retenção aprovada. Credenciais de serviço devem ser identificadas por principal/perfil/tenant, armazenadas com hash no ERP e nunca exibidas após emissão.
 - Auditoria append-only para publicação de regras, mudanças de canal, handoff, ações de agente e acessos administrativos.
 - Observabilidade com correlation ID ponta a ponta; métricas agregadas e tenant-safe: eventos aceitos/duplicados, falha/retry, latência, handoffs, taxa de resposta sem regra e indisponibilidade por dependência. Não registrar conteúdo integral por padrão.
