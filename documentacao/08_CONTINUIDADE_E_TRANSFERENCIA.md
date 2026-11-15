@@ -335,3 +335,16 @@ Consulta Hostinger somente leitura: VPS KVM 2 em execução, 2 vCPU, 8 GB RAM e 
 A tentativa somente leitura de listar projetos/containers via endpoint Docker Manager falhou com retorno “installed operating system does not support Docker Manager”; portanto não foi possível verificar os workloads atuais por esse conector. O servidor informa Ubuntu 24.04 com Easypanel, mas isso não substitui inventário dos serviços existentes.
 
 **Próximo passo sobre hospedagem:** antes de co-localizar Evolution com ERP/n8n/Chatwoot, revisar pelo Easypanel ou monitoramento disponível o uso por projeto, limites de memória/CPU, persistência de sessão e backup. Se não houver evidência suficiente, manter a Evolution em serviço/host isolado. Nenhuma mudança de infraestrutura foi feita.
+
+
+## Verificação informada da instalação Evolution API — 2026-11-14
+
+O responsável informou que a Evolution API já está instalada no domínio [evo.winservicers.com](https://evo.winservicers.com). Essa informação atualiza a pendência anterior de hospedagem: a instalação foi reportada, mas não foi confirmada tecnicamente nesta sessão.
+
+**Verificações somente leitura:** a tentativa de abrir o domínio pelo conector de navegação retornou erro interno sem resposta HTTP, o que não permite concluir se o serviço está disponível ou indisponível. A aba de navegador aberta em evolution-leads-roi.huvyyz.easypanel.host exibiu o sistema Winservice Leads & ROI, não a API Evolution; não foi tratada como evidência da instalação da API.
+
+**Estado documental:** Evolution API com Baileys continua a escolha inicial aprovada para a proposta; Chatwoot transitório e workflows/credenciais separados por perfil também permanecem registrados. Devem ser confirmados em homologação a URL/API e versão implantadas, se Baileys está ativo, armazenamento persistente e protegido da sessão, reconexão, autenticação/autenticidade do webhook, mapeamento canal→tenant e procedimento de revogação. O nome do domínio e a informação de instalação não implicam autorização para alterar serviço.
+
+**Limites:** não houve login administrativo, leitura de segredos, configuração, criação de instância, pareamento QR, alteração de n8n/Supabase/código, deploy ou ação de produção. A especificação inteira permanece PROPOSTA; decisão sobre o provedor/modo já está registrada para sua elaboração.
+
+**Próximo passo:** realizar inspeção não invasiva da página/versão e, em ambiente de homologação, fechar checklist de Baileys e webhooks antes de integrar qualquer workflow. Nenhuma credencial deve ser compartilhada em conversa.
