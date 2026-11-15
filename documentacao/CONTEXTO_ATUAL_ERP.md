@@ -10,6 +10,9 @@ Modelo opaco de credencial de serviço aprovado para a proposta: token de alta e
 
 Atualização em 2026-11-14: o responsável informou que a Evolution API já está instalada em https://evo.winservicers.com. A consulta pública GET à raiz confirmou HTTP 200, mensagem de serviço ativo e versão 2.3.7. Isso confirma o serviço e versão expostos; não confirma modo Baileys ativo, persistência da sessão, segurança do webhook ou detalhes de hospedagem. Uma ferramenta de navegação anterior falhou sem resposta HTTP, mas uma verificação HTTP direta posterior foi bem-sucedida. A aba Easypanel aberta como evolution-leads-roi... mostrou o app Winservice Leads & ROI, não a Evolution API. Não foi feita alteração.
 
+
+Atualização n8n — 2026-11-14: a conexão tem uma credencial salva chamada Evolution API (tipo evolutionApi). O workflow ativo “Testa conexao Evolution Api” não usa essa credencial; seu nó Set contém uma chave API literal. A execução recente consultada falhou antes da chamada externa com “Destination node not found”; o contexto da instância reportou 24 falhas. Nenhum workflow foi executado ou modificado nesta verificação. Não repetir nem versionar o valor literal; recomendação de segurança: revogá-lo/rotacioná-lo e usar a credencial n8n. Usar essa credencial para a consulta exige uma workflow que a referencie; a autorização atual cobre consultas, não alterações de workflow.
+
 ---
 
 
