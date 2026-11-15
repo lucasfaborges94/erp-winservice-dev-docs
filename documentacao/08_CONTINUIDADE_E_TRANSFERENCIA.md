@@ -271,3 +271,13 @@ O responsável escolheu a opção 1: no piloto inicial, o perfil `atendimento_re
 Esta decisão resolve a pergunta pendente ao final da seção “Matriz inicial de permissões por agente preparada”. A criação de cadastro pelo perfil write-only exigirá nova deliberação e revisão documental. A decisão é registrada como requisito desta proposta e não aprova a especificação técnica completa.
 
 **Estado e limites:** a especificação continua PROPOSTA e pendente de aprovação explícita. Nenhuma implementação, credencial, workflow, alteração Supabase, código, deploy ou operação de produção foi realizada.
+
+## Estratégia de workflows n8n por perfil confirmada para a proposta do piloto — 2026-11-14
+
+O responsável concordou em iniciar o piloto com workflows separados por perfil de permissão e identidade/credencial própria para cada workflow. Um roteador poderá encaminhar mensagens, desde que não possua credencial ampla; o subworkflow de destino usa a credencial do seu perfil. A seleção do perfil deve derivar de configuração confiável e a API REST deve validar cada operação.
+
+Esta é uma decisão de arquitetura para a proposta do piloto, alinhada à identidade de serviço n8n já confirmada. Não significa uma credencial por cada workflow futuro quando capacidades e fronteiras de confiança forem iguais; para os perfis diferentes previstos no piloto, as credenciais devem ser segregadas. O MCP do ERP não existe e não participa do fluxo atual.
+
+**Pendências:** emissor/formato da credencial, audiência, escopos exatos, vínculo tenant/canal, validade, rotação, revogação e propagação do ator até auditoria/RLS continuam sujeitos à revisão de segurança. A especificação completa permanece PROPOSTA e ainda precisa de aprovação explícita.
+
+**Limites:** nenhum workflow, credencial, API, Supabase, código ou ambiente de produção foi alterado.
