@@ -377,3 +377,27 @@ Após autorização do responsável para criar workflows de consulta na pasta pe
 **Verificação do workflow antigo:** “Testa conexao Evolution Api” continua ativo e não foi modificado. A definição contém destino de conexão ausente; a execução histórica falhou com `Destination node not found`. A credencial salva “Evolution API” não estava vinculada a esse workflow; havia uma chave literal num nó Set. O valor foi omitido. Recomenda-se revogar/rotacionar essa chave e migrar o workflow antigo para o gerenciador de credenciais antes de qualquer uso. A ferramenta oficial e a documentação do Evolution mostram que fetchInstances pode retornar credenciais de instância; por isso, a consulta foi limitada ao endpoint de estado.
 
 **Próximo passo:** desconectar/fechar é o estado atual; para validar Baileys será necessário verificar o modo de integração por uma fonte segura de configuração ou por teste controlado que não persista tokens/dados na execução. A especificação continua PROPOSTA. Não houve alteração no workflow antigo, Supabase, código ou produção.
+
+## Verificação do fluxo Evolution API → Chatwoot e atualização da especificação — 2026-11-15
+
+**Contexto consultado:** Fonte da Verdade, protocolo de atuação GitHub, Leia-me, Charter, roadmap, escopo, stack, status, governança, contexto, continuidade, ADR-0012, ADR-0017, ADR-0019, ADR-0020 e especificação técnica de autenticação/contexto/RLS. PR #1 de documentação consultado diretamente. O HEAD de `main` verificado é o merge commit `0525fe67a5113cbb8527c29ff2e434589e99ae84`; PR #1 está fechado e merged. A branch `spec/atendimento-saas-mvp` já existia e continha a especificação PROPOSTA, portanto foi preservada e atualizada sem reescrever seu histórico.
+
+**PR #1 / ADR-0020:** o GitHub retorna `state=closed`, `merged=true`, head esperado `6bb0aed249bd63f275ef84dfc84a0498f78ce973`, base `ef94715cd03d7d385daffb3df9dc061bbc9f8eae` e merge commit `0525fe67a5113cbb8527c29ff2e434589e99ae84`. O merge já estava concluído; não foi repetido. Não há reviews/checks associados no snapshot consultado; a aprovação arquitetural está registrada na ADR e no histórico de decisão, não como GitHub review.
+
+**Verificações somente leitura em 2026-11-15:**
+- No Evolution Manager, a instância correta `51981459630` aparece conectada; a versão indicada pela interface é 2.3.7. A chamada autenticada de 2026-11-14 para `winservice_principal` consultou outra instância e retornou `close`; ela não representa o canal correto.
+- A instância correta tem integração Chatwoot habilitada e campos de conexão preenchidos. O webhook de eventos está ligado, o envio Base64 está ligado e os eventos visíveis aparecem selecionados. Segredos não foram lidos nem registrados.
+- No Chatwoot, o inbox correspondente é um Canal da API e sua URL de webhook aponta para a rota `/chatwoot/webhook/51981459630` no domínio da Evolution. O segredo do webhook estava preenchido e foi mantido oculto.
+- O responsável iniciou um teste de entrada do número pessoal; a prévia `Oii` apareceu atualizada no inbox correto sob o contato salvo como `Amor`. A conversa não foi aberta. O responsável confirmou que o fluxo já funciona. Isso comprova uma entrega de entrada naquele momento, não autenticação, resiliência, segurança ou funcionamento sob falha.
+- O Evolution Manager não permite concluir sozinho se o modo Baileys está efetivamente ativo nem identificar o digest/tag da imagem.
+- A tela do n8n nativo no Evolution não mostrou sessões; isso não atesta ausência de workflows n8n independentes.
+
+**Nota de segurança:** a captura do Easypanel compartilhada em 2026-11-14 expunha visualmente a chave administrativa e mostrava `AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES=true`. Nenhuma configuração ou chave foi alterada; o responsável pretende rotacionar a chave após o término desta conversa. O valor não foi persistido. A issue upstream [#2677](https://github.com/evolution-foundation/evolution-api/issues/2677) relata que na versão 2.3.7 `GET /instance/fetchInstances` pode continuar retornando o campo `token` mesmo com a opção de exposição desativada. O endpoint não foi chamado nesta verificação; não confiar nessa opção como proteção até verificar uma versão corrigida.
+
+**Artefato atualizado:** `documentacao/ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md` na branch `spec/atendimento-saas-mvp`. Foram incorporados o status real da instância, a integração Chatwoot observada, o smoke test de entrada e a pendência de segurança. A especificação permanece **PROPOSTA**, sem aprovação integral.
+
+**Limites:** atualização documental apenas. Nenhuma alteração no Supabase, workflows n8n, código, Evolution, Chatwoot, configuração, credenciais ou produção. Não foi usado `fetchInstances`; nenhum QR code, conteúdo da conversa, token ou segredo foi aberto/registrado. Nenhum teste automatizado foi executado.
+
+**Pendências:** revisar esta especificação e aprová-la explicitamente antes de tratá-la como normativa; resolver retenção/privacidade, validade/emissão/rotação de credenciais, escopos finais, fonte autoritativa e contrato de handoff; validar Baileys, imagem, webhook, retries, idempotência, rotação/revogação e limites em homologação. A rotação da chave administrativa permanece ação do responsável após esta conversa.
+
+**Próxima ação:** concluir verificação dos links/arquivos da branch e entregar a especificação para revisão, mantendo-a separada da `main`. Nenhuma implementação ou deploy está autorizado por esta especificação.
