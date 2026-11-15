@@ -22,4 +22,4 @@
 ## Histórico
 
 - 2026-11-15 — criação do registro após constatações de 2026-11-14. As duas ocorrências Evolution permanecem separadas; nenhum valor secreto foi copiado para este arquivo.
-- 2026-11-15 — responsável confirmou a rotação de CRED-2026-11-14-01; consumidores e invalidação da chave anterior aguardam validação. Responsável esclareceu que CRED-2026-11-14-02 pertence a uma instância desconectada, preservada somente como histórico e fora da produção.
+- 2026-11-15 — responsável confirmou a rotação de CRED-2026-11-14-01; a consulta read-only da instância 51981459630 no n8n retornou 401 Authorization failed, confirmando que a credencial guardada no n8n ainda precisa ser atualizada. Invalidação global da chave anterior e demais consumidores aguardam validação. Responsável esclareceu que CRED-2026-11-14-02 pertence a uma instância desconectada, preservada somente como histórico e fora da produção.
