@@ -44,13 +44,27 @@ Esta revisão compara a proposta com as ADRs vigentes. Os itens desta seção s�
 - **WhatsApp:** contrato/adaptador independente de provedor aprovado pelo responsável. Selecionar Meta direto ou BSP somente após confirmar número/titularidade, homologação, operação, custos e exigências de cada tenant.
 - **Handoff humano:** Chatwoot transitório aprovado pelo responsável e informado como disponível. Manter contrato de integração isolado para não acoplar o domínio de conversas ao inbox.
 - **Vinculação do cliente:** política aprovada pelo responsável: telefone sozinho não confirma identidade; pedir confirmação nos casos ambíguos e encaminhar ao humano se não for possível confirmar.
-- **Identidade n8n:** usar identidade técnica distinta por ambiente, com escopo mínimo e tenant derivado/validado pela API e pelo canal cadastrado; nunca aceitar tenant de entrada como prova de acesso.
+- **Identidade n8n:** proposta de identidade técnica distinta por ambiente, autenticada perante a API NestJS com credencial/token de serviço de escopo mínimo e tenant derivado/validado pela API e pelo canal cadastrado. Não reutilizar token de usuário humano nem entregar credencial de acesso ao banco ao workflow. A forma de emissão, validação, expiração, rotação, revogação e propagação segura do ator até RLS continua pendente de decisão técnica.
 - **Regras comerciais:** publicar versões imutáveis aprovadas por usuário autorizado, com vigência e trilha; ausência, expiração ou conflito de regra deve resultar em pergunta ou handoff.
 - **Configuração inicial:** manter catálogo e regras no escopo do tenant até existir decisão e contrato para dados globais. Isso reduz dependência de catálogo compartilhado no piloto.
 - **Retenção e piloto:** definir retenção, acesso, anonimização e rotina de solicitação do titular antes de trafegar conversas reais; não usar ausência dessa decisão para bloquear protótipo com dados sintéticos.
 - **Billing, planos e auto-onboarding:** manter fora do escopo inicial; resolver antes de comercialização multi-tenant, sem bloquear especificação do fluxo assistido para o piloto Winservice.
 
 **Pontos ainda pendentes antes de fechar os contratos de integração:** fornecedor/canal específico, detalhes de integração do Chatwoot e identidade máquina-a-máquina. A política de confirmação de identidade está decidida. Retenção e privacidade precisam estar definidas antes de piloto com dados reais. Billing e SLO comercial podem ficar para a etapa de comercialização.
+
+### Esclarecimento técnico pendente — token para o agente
+
+Proposta de desenho para deliberação: separar autenticação humana de autenticação máquina-a-máquina.
+
+- Usuários humanos do console usam seus próprios JWTs do Supabase Auth e são autorizados por identidade, vínculo, empresa ativa e permissões.
+- n8n é um serviço não humano que chama a API NestJS. Recomenda-se uma identidade técnica de serviço e credencial/token emitido ou validado para esse propósito, com audiência da API, escopos mínimos, expiração, rotação, revogação e tenant/canal vinculados no servidor. O token autentica o serviço/agente; não concede acesso direto ao banco.
+- Não usar access token de uma pessoa da equipe como credencial permanente do n8n. O JWT Supabase representa uma identidade de usuário; tratá-lo como máquina pode confundir trilha de auditoria, associação Auth→usuário ERP e autorização humana. Uma conta Auth dedicada ao agente só deve ser considerada se for explicitamente modelada como identidade não humana e houver regras próprias de vínculo, escopo, ciclo de vida e RLS.
+- Não confundir token de usuário com a chave secreta do projeto Supabase. A secret key / service_role é chave de aplicação com acesso elevado e bypass de RLS, não uma identidade de agente; não deve ser distribuída ao n8n neste desenho.
+- A API precisa aplicar o escopo do serviço e a autorização por tenant antes de abrir a transação de banco; o acesso ao PostgreSQL continua sujeito à role de runtime sem BYPASSRLS e ao contexto transaction-local definidos nos gates existentes.
+
+Portanto, a recomendação atual é **não emitir ao n8n um token de usuário humano do Supabase Auth**. Uma credencial de serviço que resulte em token de acesso à API é o desenho proposto; a escolha concreta entre token opaco/API key rotacionável, JWT de serviço ou provedor OAuth máquina-a-máquina exige revisão de segurança e não está aprovada.
+
+Referência técnica consultada em 2026-11-14: [Supabase API keys](https://supabase.com/docs/guides/getting-started/api-keys) distingue a chave de aplicação da identidade Auth do usuário e informa que a chave secreta mapeia à role service_role com bypass RLS; [Supabase Auth OAuth 2.1](https://supabase.com/docs/guides/auth/oauth-server) descreve fluxo Authorization Code com PKCE, autenticação e consentimento do usuário, não devendo ser presumido como client credentials para execução unattended.
 
 ### 1.4. Deliberações do responsável — 2026-11-14
 
@@ -76,7 +90,7 @@ A autenticação técnica do n8n/agente permanece pendente. O responsável pergu
 - Informar ao cliente quando a configuração não cobre sua pergunta; não inventar preço, cobertura, prazo, garantia ou disponibilidade.
 - Permitir solicitação e execução de transferência humana; pausar automação conforme estado de handoff.
 - Registrar mensagens e transições, com proveniência (cliente, agente, humano, sistema), horário, correlação e tenant.
-- Permitir consulta operacional de fila/status e retomada humana, conforme solução de inbox ainda a decidir.
+- Permitir consulta operacional de fila/status e retomada humana pela integração transitória com Chatwoot; definir sincronização, fonte autoritativa e comportamento durante indisponibilidade.
 - Encerrar/reabrir atendimento segundo política documentada e conservar vínculo com o histórico.
 
 ### 2.2 Fora do MVP
