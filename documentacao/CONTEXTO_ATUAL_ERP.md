@@ -148,3 +148,11 @@ A continuidade e o contexto na main registraram o PR #2 aberto e limpo em snapsh
 ## Estado após merge do PR #2 — 2026-11-15
 
 A especificação técnica aprovada está na main. A aprovação é documental e não conclui gates G0–G8 nem autoriza implementação ou mudanças em Supabase, n8n, credenciais, Evolution/Chatwoot, código, deploy ou produção. Permanecem decisões de retenção/privacidade, credencial de serviço, autoridade do histórico/handoff e homologação das integrações. O registro de credenciais continua em REGISTRO_CREDENCIAIS_A_ROTACIONAR.md, sem valores secretos. Nenhum teste automatizado foi executado.
+
+## Atividade atual — plano proposto de prontidão do Atendimento SaaS — 2026-11-15
+
+- Especificação aprovada e integrada à main pelo PR #2 (merge commit 1700b68eeb7b9a20d060a65ab5a8789b8744fd3b).
+- Foi criada a branch de revisão plan/atendimento-saas-readiness, baseada na main 66aaf6062842a6fecf3e85908d909e07fa5bf27f, com o documento [PLANO_PRONTIDAO_IMPLEMENTACAO_ATENDIMENTO.md](PLANO_PRONTIDAO_IMPLEMENTACAO_ATENDIMENTO.md).
+- O plano permanece PROPOSTA; organiza sequência, dependências e evidências dos gates. Não constitui autorização operacional.
+- Nenhum teste automatizado, alteração em Supabase, n8n, credenciais, Evolution/Chatwoot, código, deploy ou produção foi feito.
+- Próximo passo: revisão do plano. Decisões de retenção/privacidade, fonte autoritativa/handoff e ciclo de vida de credenciais continuam bloqueando conversas reais. G0/G1 devem ser revalidados em escopo autorizado antes de implementação.
