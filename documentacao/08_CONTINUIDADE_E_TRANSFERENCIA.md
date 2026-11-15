@@ -419,3 +419,10 @@ O registro de credenciais a rotacionar está em [REGISTRO_CREDENCIAIS_A_ROTACION
 ## Atualização da continuidade em main — 2026-11-15
 
 Após a sincronização inicial, a continuidade oficial em `main` recebeu um registro do PR #2, com snapshot no head `ebc8f5469c2f8a8bd41de112b5da9c1fb50819bd` e base `81fe108b28cfb8c90034f3fc5c393ed762337d9a`; naquele momento o GitHub informava `mergeable=true` e `mergeable_state=clean`. A atualização de contexto em `main` repetiu esse estado como resumo operacional. A branch foi sincronizada com a `main` pelo merge commit `aa83feea2df87b0c18a75c64b76fe930608423c7`, cuja base inclui os dois commits documentais recentes. A API do GitHub confirmou o PR #2 aberto, não merged, `mergeable=true` e `mergeable_state=clean` no head `aa83feea2df87b0c18a75c64b76fe930608423c7` e base `24133d919ac0ede32ccc63dd378d4ba23a713f48`.
+
+
+## Merge do PR #2 — especificação aprovada integrada à main — 2026-11-15
+
+Após autorização explícita do responsável, o PR #2 foi revalidado como aberto, não draft, não merged, `mergeable=true`, `mergeable_state=clean`; head esperado `25099014fae6610191cd0ea09a9d53370481da9e`, base `24133d919ac0ede32ccc63dd378d4ba23a713f48`. O merge foi executado com método merge e `expected_head_sha` igual ao head verificado. O GitHub retornou `merged=true`, commit `1700b68eeb7b9a20d060a65ab5a8789b8744fd3b`.
+
+A verificação pós-merge confirmou PR #2 fechado/merged e a referência `main` apontando para o mesmo commit. O diff integrado contém quatro arquivos documentais: Leia-me, continuidade, contexto atual e a especificação técnica aprovada. A especificação permanece documental; aprovação não libera implementação nem encerra gates. Nenhum teste automatizado, alteração Supabase, workflow, código, credencial, deploy ou produção foi realizado.
