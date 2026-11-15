@@ -309,3 +309,13 @@ O responsável aprovou o modelo opaco recomendado para autenticar os workflows n
 Na passada final da especificação, foram alinhados trechos históricos que ainda descreviam como pendente a escolha entre API key opaca, JWT ou OAuth. O texto agora registra como aprovada para a proposta a credencial opaca emitida pela API do ERP, armazenada como hash, com escopo server-side, expiração, rotação e revogação. O prazo, a autoridade/procedimento de emissão, os escopos exatos e o vínculo tenant/canal permanecem pendentes.
 
 **Estado seguinte:** pacote documental consistente para revisão do responsável. A especificação inteira continua PROPOSTA e só se torna normativa com aprovação explícita do documento completo. Nenhum código, credencial, workflow, banco ou produção foi alterado.
+
+## Provedor WhatsApp Evolution API escolhido — 2026-11-14
+
+O responsável escolheu a Evolution API como camada de integração WhatsApp do MVP. A especificação foi atualizada para refletir o provedor, preservar adaptador de domínio desacoplado e detalhar webhooks por instância/canal, seleção mínima de eventos, autenticação, idempotência e separação entre credenciais Evolution e identidade n8n→API.
+
+**Referência oficial consultada:** o repositório/documentação da Evolution API informa suporte a Baileys baseado em WhatsApp Web e à WhatsApp Cloud API oficial da Meta; descreve webhooks globais ou por instância e seleção de eventos. Para o MVP com operação comercial, a especificação recomenda avaliar Cloud API primeiro, mas a modalidade final não foi escolhida pelo responsável.
+
+**Ainda pendente:** Baileys versus Cloud API, hospedagem da Evolution, versão, titularidade/número e associação por tenant, requisitos de templates/janela/custos, configuração exata de eventos, verificação de autenticidade do webhook para a versão escolhida e autoridade do histórico/status entre Evolution e Chatwoot.
+
+**Estado e limites:** Evolution API escolhida como provedor documental; nenhum serviço foi conectado, provisionado ou configurado. Nenhum número, credencial, workflow, webhook, Supabase, código, deploy ou produção foi alterado. A especificação completa permanece PROPOSTA; sua aprovação ainda é necessária antes de tratá-la como normativa, sem substituir gates e autorizações operacionais.
