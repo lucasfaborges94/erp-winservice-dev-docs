@@ -364,3 +364,16 @@ Após autorização do responsável para usar o n8n em consultas à API, foi fei
 **Segurança e limite de autorização:** a credencial salva não é usada pelo verificador existente, e há um token literal na workflow. Recomenda-se revogar/rotacionar esse token e remover seu uso literal, adotando a credencial n8n. A autorização do responsável permite consultas; não autoriza modificar ou criar workflows. Nenhuma alteração no n8n foi feita.
 
 **Próximo passo:** obter autorização explícita para corrigir a workflow de verificação (somente chamadas GET usando a credencial salva) ou para criar uma workflow temporária de consulta. Depois, consultar estado da instância e indicadores não sensíveis de conexão Baileys, sem listar QR codes, tokens ou dados pessoais.
+
+
+## Consulta autenticada de estado da instância Evolution pelo n8n — 2026-11-14
+
+Após autorização do responsável para criar workflows de consulta na pasta pessoal do n8n, foi criado [Codex | Evolution — consulta de estado (somente leitura)](https://workflows.winservicers.com/workflow/XUpP8XNYsmCS5UHo), na pasta evolution. É manual, permanece inativo e tem apenas um Manual Trigger e uma chamada HTTP GET autenticada com a credencial salva “Evolution API”. O endpoint consultado foi /instance/connectionState/winservice_principal.
+
+**Resultado verificado:** execução manual 9941900 terminou com sucesso. A resposta da API identificou a instância winservice_principal e `state: close`. A raiz pública continua respondendo HTTP 200 e anunciando versão 2.3.7. Portanto, endpoint e credencial funcionam; a instância não estava conectada ao WhatsApp durante a consulta. Esse estado não confirma qual integração/modo está configurado.
+
+**Escopo:** consulta somente leitura, sem ativação do workflow, pareamento QR, envio/leitura de mensagens, alteração de instância, chamada a `fetchInstances` ou acesso a tokens/telefones.
+
+**Verificação do workflow antigo:** “Testa conexao Evolution Api” continua ativo e não foi modificado. A definição contém destino de conexão ausente; a execução histórica falhou com `Destination node not found`. A credencial salva “Evolution API” não estava vinculada a esse workflow; havia uma chave literal num nó Set. O valor foi omitido. Recomenda-se revogar/rotacionar essa chave e migrar o workflow antigo para o gerenciador de credenciais antes de qualquer uso. A ferramenta oficial e a documentação do Evolution mostram que fetchInstances pode retornar credenciais de instância; por isso, a consulta foi limitada ao endpoint de estado.
+
+**Próximo passo:** desconectar/fechar é o estado atual; para validar Baileys será necessário verificar o modo de integração por uma fonte segura de configuração ou por teste controlado que não persista tokens/dados na execução. A especificação continua PROPOSTA. Não houve alteração no workflow antigo, Supabase, código ou produção.
