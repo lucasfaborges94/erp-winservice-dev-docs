@@ -327,3 +327,11 @@ O responsável escolheu utilizar Evolution API com Baileys/WhatsApp Web inicialm
 **Ainda pendente:** hospedagem e versão da Evolution, titularidade/associação do número por tenant, requisitos de webhook e segurança da sessão, homologação e decisão operacional sobre eventual migração para Cloud API. Nada foi provisionado, conectado ou pareado.
 
 **Estado e limites:** a escolha de Baileys é uma decisão de arquitetura para esta proposta; não aprova o documento completo nem autoriza ativação. Nenhuma credencial, workflow, webhook, Supabase, código, deploy ou produção foi alterado.
+
+## Avaliação somente leitura do VPS para futura hospedagem da Evolution API — 2026-11-14
+
+Consulta Hostinger somente leitura: VPS KVM 2 em execução, 2 vCPU, 8 GB RAM e disco de 100 GB. Métricas de 2026-11-07 a 2026-11-14 (328 amostras): CPU média 4,28%, máximo 20,3%; RAM média ~3,15 GB, máximo ~3,83 GB; uso de disco médio ~13,95 GB, máximo ~17,03 GB. Esses agregados sugerem folga, mas não demonstram capacidade para hospedar Evolution com segurança sem conhecer distribuição por serviço, limites, armazenamento de sessão, backups e picos.
+
+A tentativa somente leitura de listar projetos/containers via endpoint Docker Manager falhou com retorno “installed operating system does not support Docker Manager”; portanto não foi possível verificar os workloads atuais por esse conector. O servidor informa Ubuntu 24.04 com Easypanel, mas isso não substitui inventário dos serviços existentes.
+
+**Próximo passo sobre hospedagem:** antes de co-localizar Evolution com ERP/n8n/Chatwoot, revisar pelo Easypanel ou monitoramento disponível o uso por projeto, limites de memória/CPU, persistência de sessão e backup. Se não houver evidência suficiente, manter a Evolution em serviço/host isolado. Nenhuma mudança de infraestrutura foi feita.
