@@ -13,6 +13,8 @@ Atualização em 2026-11-14: o responsável informou que a Evolution API já est
 
 Atualização n8n — 2026-11-14: a conexão tem uma credencial salva chamada Evolution API (tipo evolutionApi). O workflow ativo “Testa conexao Evolution Api” não usa essa credencial; seu nó Set contém uma chave API literal. A execução recente consultada falhou antes da chamada externa com “Destination node not found”; o contexto da instância reportou 24 falhas. Nenhum workflow foi executado ou modificado nesta verificação. Não repetir nem versionar o valor literal; recomendação de segurança: revogá-lo/rotacioná-lo e usar a credencial n8n. Usar essa credencial para a consulta exige uma workflow que a referencie; a autorização atual cobre consultas, não alterações de workflow.
 
+
+Atualização n8n — 2026-11-14: foi criado na pasta evolution do projeto pessoal um workflow manual e inativo, ligado à credencial n8n Evolution API. A consulta GET de estado retornou `close` para `winservice_principal`: API alcançável/autenticada, instância não conectada. O workflow existente de verificação permanece sem alteração; está ativo, falha por destino ausente e contém chave literal em nó Set. Recomendada rotação dessa chave e remoção do literal. Não foram listados QR codes, tokens, números ou mensagens.
 ---
 
 
