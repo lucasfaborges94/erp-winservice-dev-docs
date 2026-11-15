@@ -192,3 +192,10 @@ O registro esclarece que a lista não reduz o risco: ambas permanecem pendentes 
 **Verificação/limites desta continuação:** revisão de documentação e metadados do GitHub somente. Nenhum teste automatizado, alteração de workflow, Supabase, código, Evolution/Chatwoot, credencial, deploy ou produção foi executado.
 
 **Próximo passo:** revisão humana do documento integral. Se aprovado explicitamente, registrar o estado aprovado no artefato normativo e preparar PR da branch; a aprovação documental não autoriza implementação, alterações operacionais ou deploy.
+
+
+## Aprovação explícita da especificação técnica do atendimento — 2026-11-15
+
+O responsável aprovou explicitamente a especificação técnica integral do MVP do SaaS de atendimento. O documento foi atualizado para estado **APROVADA** na branch isolada `spec/atendimento-saas-mvp`, commit `613c62fc9f54c81d1208dce70f793457709c56e4`. Permanecem pendentes sua integração documental à `main` e as decisões/gates de implementação descritos no próprio documento.
+
+A aprovação é do documento. Ela não encerra os gates G0–G8 nem autoriza implementação, alteração Supabase/workflows/credenciais, provisionamento, deploy ou produção. Próximo passo documental: preparar PR para integrar a especificação, revisar o diff/mergeabilidade e aguardar autorização específica para merge.
