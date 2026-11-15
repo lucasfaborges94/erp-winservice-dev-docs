@@ -76,7 +76,7 @@ O responsável confirmou expressamente as seguintes direções para esta propost
 - O handoff humano usará Chatwoot de forma transitória. O responsável informou que já está disponível; essa disponibilidade é informação do responsável, não uma verificação de ambiente feita nesta sessão.
 - Um número de telefone sozinho não autoriza associação automática a um cadastro existente. Quando a identidade estiver ambígua, solicitar confirmação ou transferir ao humano.
 
-O princípio de identidade de serviço do n8n perante a API REST do ERP foi aprovado pelo responsável. O token/credencial não será um token de usuário humano do Supabase Auth nem uma chave da API OpenAI; seu emissor, formato, escopos, vínculo tenant e ciclo de vida continuam pendentes.  O responsável também concordou com workflows separados por perfil para o piloto, cada um usando identidade/credencial própria; um roteador eventual apenas encaminha e não detém permissões amplas. A especificação inteira continua em estado PROPOSTA até aprovação explícita posterior.
+O princípio de identidade de serviço do n8n perante a API REST do ERP foi aprovado pelo responsável. O token/credencial não será um token de usuário humano do Supabase Auth nem uma chave da API OpenAI; seu emissor, formato, escopos, vínculo tenant e ciclo de vida continuam pendentes. O responsável também concordou com workflows separados por perfil para o piloto, cada um usando identidade/credencial própria; um roteador eventual apenas encaminha e não detém permissões amplas. A especificação inteira continua em estado PROPOSTA até aprovação explícita posterior.
 
 ## 2. Escopo funcional
 
