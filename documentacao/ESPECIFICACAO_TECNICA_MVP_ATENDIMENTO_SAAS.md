@@ -28,7 +28,7 @@ A direção arquitetural aprovada na ADR-0020 é reutilizar a API NestJS e o Sup
 A lista abaixo identifica o que ainda está pendente e o que já foi confirmado pelo responsável durante a revisão. As confirmações não aprovam a especificação inteira.
 
 1. **Prioridade e fronteira de produto:** a decisão de alto nível já está registrada na ADR-0020: o atendimento terá plano de entrega próprio, preservando a prioridade de Operação do ERP e sem tornar WhatsApp/n8n parte automática do MVP operacional. Fica pendente detalhar a fronteira técnica de releases, módulos e operação na API compartilhada, sem reabrir a decisão já aprovada.
-2. **Canal/provedor WhatsApp:** o responsável aprovou um contrato/adaptador independente de provedor. A escolha entre Meta WhatsApp Cloud API e provedor intermediário permanece pendente; definir titularidade/número por tenant, templates, janela de atendimento, custos e ambiente de homologação.
+2. **Canal/provedor WhatsApp:** o responsável escolheu a Evolution API como camada de integração do MVP, mantendo o domínio protegido por adaptador para reduzir acoplamento. A escolha do modo de conexão dentro da Evolution permanece pendente: WhatsApp Cloud API oficial da Meta ou Baileys/WhatsApp Web. Também definir hospedagem/versão, titularidade e associação do número por tenant, requisitos de templates/janela, custos, segurança de webhook e ambiente de homologação.
 3. **Inbox humana:** decisão confirmada: Chatwoot transitório, já disponível segundo informação do responsável, conforme ADR-0007. Permanecem pendentes os detalhes do contrato de integração e a autoridade para status/mensagens durante a transferência.
 4. **Identidade de cliente:** decisão confirmada: não associar automaticamente um cliente existente apenas pelo telefone. Pedir confirmação quando houver ambiguidade e encaminhar ao humano quando a identidade não puder ser confirmada; regras para números compartilhados e prevenção de duplicidade devem seguir esse princípio.
 5. **Modelo SaaS:** decidir onboarding self-service ou assistido, aprovação/verificação de empresas, planos, limites, cobrança, suspensão, suporte e retenção. Billing não integra o MVP funcional salvo aprovação específica.
@@ -43,7 +43,7 @@ A lista abaixo identifica o que ainda está pendente e o que já foi confirmado 
 Esta revisão compara a proposta com as ADRs vigentes. Os itens desta seção são recomendações para o responsável; não alteram o estado de aprovação.
 
 - **Fronteira do MVP:** considerar decidida em alto nível pela ADR-0020 (produto/roadmap próprios do atendimento; prioridade Operação do ERP preservada). Antes de implementar, detalhar como a API compartilhada isola módulos, permissões, releases e dependências externas, respeitando o limite da ADR-0019 para o MVP ERP.
-- **WhatsApp:** contrato/adaptador independente de provedor aprovado pelo responsável. Selecionar Meta direto ou BSP somente após confirmar número/titularidade, homologação, operação, custos e exigências de cada tenant.
+- **WhatsApp:** Evolution API escolhida como integração inicial, atrás do adaptador do domínio. A documentação oficial informa que oferece conexão por Baileys/WhatsApp Web e por WhatsApp Cloud API oficial; para produção, recomenda-se avaliar primeiro a Cloud API, confirmando requisitos Meta, titularidade do número, custos e homologação. A decisão do modo e da hospedagem permanece pendente.
 - **Handoff humano:** Chatwoot transitório aprovado pelo responsável e informado como disponível. Manter contrato de integração isolado para não acoplar o domínio de conversas ao inbox.
 - **Vinculação do cliente:** política aprovada pelo responsável: telefone sozinho não confirma identidade; pedir confirmação nos casos ambíguos e encaminhar ao humano se não for possível confirmar.
 - **Identidade n8n:** identidade de serviço própria perante a API aprovada pelo responsável. O modelo opaco de alta entropia por workflow/perfil, emitido pela ERP API, armazenado como hash e vinculado no servidor a perfil/ambiente/tenant permitido, com expiração, escopos server-side, rotação e revogação, foi aprovado para a proposta. O segredo deve ser mostrado uma única vez e aceito apenas por `Authorization: Bearer` sobre HTTPS. Tenant não vem como autoridade de payload: a API o valida pelo canal/conversa e pela identidade de serviço. No piloto Winservice, cada credencial fica vinculada somente a esse tenant; na expansão SaaS, emitir credencial distinta por tenant×perfil para reduzir impacto de vazamento. Não reutilizar token Supabase Auth, chave OpenAI ou credencial de banco. Permanecem pendentes prazo máximo de validade (90 dias é somente sugestão), processo autorizado de emissão/rotação e política de auditoria.
@@ -72,7 +72,7 @@ Referência técnica consultada em 2026-11-14: [Supabase API keys](https://supab
 
 O responsável confirmou expressamente as seguintes direções para esta proposta:
 
-- O adaptador/contrato de WhatsApp deve ser independente do fornecedor; a escolha do provedor concreto continua em aberto.
+- O responsável escolheu Evolution API como camada de integração WhatsApp do MVP. O contrato/adaptador de domínio continua isolado do fornecedor; o modo de conexão Evolution (Cloud API oficial ou Baileys), hospedagem/versão, número/titularidade e homologação continuam pendentes.
 - O handoff humano usará Chatwoot de forma transitória. O responsável informou que já está disponível; essa disponibilidade é informação do responsável, não uma verificação de ambiente feita nesta sessão.
 - Um número de telefone sozinho não autoriza associação automática a um cadastro existente. Quando a identidade estiver ambígua, solicitar confirmação ou transferir ao humano.
 
@@ -217,7 +217,7 @@ Reutilizar entidades existentes somente após reconciliar os nomes e semântica 
 |---|---|---|
 | `service_principals` / `service_credentials` | identidade não humana, perfil, ambiente, tenant(s)/canal(is) permitidos, escopos, audiência, estado/validade, prefixo/ID e hash da credencial | Proposta para autenticação n8n→API; armazenar somente hash do segredo; nunca armazenar/retornar token em claro |
 | `company_products` | `identifier`, `company_identifier`, `product_code`, `status`, período de vigência | Habilitação independente do ERP; compatibilizar com catálogo/módulos existente |
-| `service_channels` | tenant, tipo, provedor, referência externa, status, segredo referenciado, configuração não secreta | Segredo armazenado em cofre/secret manager; unicidade de canal/tenant |
+| `service_channels` | tenant, tipo, provedor (`evolution_api`), modo de conexão, versão/instância, referência externa, status, segredo referenciado, configuração não secreta | Configuração e credenciais por tenant/canal; segredos em cofre/secret manager; validar modelo de instância após escolher Cloud API ou Baileys |
 | `service_config_versions` | tenant, número/versão, estado, configuração validada, autor/aprovador, vigência | Publicações imutáveis; versão ativa única por escopo |
 | `service_rules` | tenant, tipo, conteúdo estruturado, validade, versão, estado | Preferir regras determinísticas a texto livre para cobertura, região e condições |
 | `service_conversations` | tenant, canal, contato/cliente opcional, estado, atribuição, timestamps, chave externa | Índices compostos tenant+identifier; não presumir cliente identificado |
@@ -404,3 +404,5 @@ A conclusão desta especificação não fecha gates nem libera acesso a banco/pr
 - [Continuidade e transferência](08_CONTINUIDADE_E_TRANSFERENCIA.md)
 - [RFC 6750 — Bearer Token Usage](https://www.rfc-editor.org/rfc/rfc6750/)
 - [OWASP Secrets Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)
+- [Evolution API — repositório oficial e modos de conexão](https://github.com/evolution-foundation/evolution-api)
+- [Evolution API — configuração oficial de webhooks](https://github.com/evolution-foundation/evolution-docs/blob/main/docs/02-Configuration/Webhooks.md)
