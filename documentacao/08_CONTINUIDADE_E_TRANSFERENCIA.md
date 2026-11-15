@@ -281,3 +281,15 @@ Esta é uma decisão de arquitetura para a proposta do piloto, alinhada à ident
 **Pendências:** emissor/formato da credencial, audiência, escopos exatos, vínculo tenant/canal, validade, rotação, revogação e propagação do ator até auditoria/RLS continuam sujeitos à revisão de segurança. A especificação completa permanece PROPOSTA e ainda precisa de aprovação explícita.
 
 **Limites:** nenhum workflow, credencial, API, Supabase, código ou ambiente de produção foi alterado.
+
+## Aceleração documental — recomendação de credencial n8n→API — 2026-11-14
+
+A pedido do responsável para acelerar o trabalho, a especificação na branch `spec/atendimento-saas-mvp` foi detalhada sem alterar a `main`, código ou sistemas operacionais. Foram consultados o protocolo/fonte da verdade do repositório e referências técnicas primárias (RFC 6750 e OWASP Secrets Management Cheat Sheet).
+
+**Recomendação incluída, ainda não aprovada:** API NestJS emite credencial opaca aleatória de alta entropia por workflow/perfil; segredo exibido uma vez, hash persistido, audience restrita à API ERP, escopos/perfil/ambiente/tenant/canal associados do lado do servidor; chamadas HTTPS com Bearer no header; expiração obrigatória; rotação com janela curta e revogação imediata. O piloto limita identidade ao tenant Winservice; expansão multi-tenant deve preferir credenciais separadas por tenant×perfil. O limite inicial de até 90 dias foi escrito apenas como sugestão para revisão, não como decisão. OAuth 2.0 Client Credentials com tokens curtos permanece alternativa futura caso a plataforma comporte um emissor apropriado; não foi presumido recurso atual do Supabase.
+
+A proposta acrescenta modelo lógico de identidade/credencial, casos negativos de teste e evidência de rotação/revogação ao Gate G6. O perfil write-only continua sem criação de cadastro mínimo. A estratégia de workflows separados por perfil e credenciais próprias está confirmada para o piloto, sem implementação.
+
+**Pendências de deliberação:** aceitar/ajustar o formato opaco recomendado, prazo máximo de validade e autoridade/procedimento de emissão; definir retenção e privacidade antes de dados reais; revisar e aprovar explicitamente a especificação completa. G0/G1 permanecem parciais na última evidência datada de 2026-11-09 e devem ser revalidados antes de execução técnica.
+
+**Limites:** nenhuma chave Supabase/API/OpenAI, credencial n8n, workflow, migration, alteração de banco, código, deploy ou acesso de produção foi criado ou modificado.
