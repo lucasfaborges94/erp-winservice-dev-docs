@@ -1,3 +1,13 @@
+### Estado mais recente — proposta do SaaS de atendimento (2026-11-14)
+
+A ADR-0020 aprovada permanece na `main` (`0525fe67a5113cbb8527c29ff2e434589e99ae84`). A especificação de atendimento segue isolada na branch `spec/atendimento-saas-mvp`, em estado PROPOSTA e pendente de aprovação explícita.
+
+Deliberações registradas para a proposta: adaptador WhatsApp independente do fornecedor; Chatwoot transitório informado como disponível; telefone sozinho não identifica cliente; identidade de serviço própria n8n→API; piloto com workflows e credenciais separados por perfil; perfil write-only sem criação de cadastro de cliente.
+
+Recomendação de credencial ainda pendente de aprovação: token opaco de alta entropia emitido pela API ERP, armazenamento do hash, escopos/perfil/tenant vinculados no servidor, expiração obrigatória, rotação e revogação imediata. Sugestão de validade máxima de até 90 dias permanece apenas para deliberação. Nenhum token, chave Supabase, workflow, alteração de código/banco ou deploy foi criado/realizado. O ERP ainda não possui MCP; REST é o caminho inicial proposto. Gates G0/G1 continuam parciais segundo evidência de 2026-11-09 e precisam de revalidação.
+
+---
+
 
 
 ### Revisão dos arquivos do scaffold após remoção de Mau — 2026-11-09
