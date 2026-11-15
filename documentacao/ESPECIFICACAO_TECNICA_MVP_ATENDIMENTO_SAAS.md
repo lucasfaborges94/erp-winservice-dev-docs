@@ -147,13 +147,21 @@ Os conceitos abaixo são distintos; o número de workflows não define, por si s
 - **Workflow:** implementação/orquestração no n8n. Um workflow de propósito fixo usa credencial correspondente ao perfil do agente. Vários workflows podem compartilhar uma identidade somente se tiverem a mesma fronteira de confiança e exatamente o mesmo conjunto de permissões; separar credenciais quando os privilégios diferirem.
 - **API REST (caminho inicial):** valida credencial, validade e escopos e autoriza cada operação no servidor. Se um servidor MCP for criado no futuro, ele também deverá validar credencial/audiência/escopos e encaminhar ao backend apenas contexto de ator verificado. A disponibilidade de ferramenta no prompt ou workflow nunca concede permissão.
 
-**Exemplo de perfis, sujeito a decisão:**
+**Matriz inicial de perfis baseada no exemplo do responsável — PROPOSTA, pendente de revisão:**
 
-| Perfil | Capacidades possíveis | Limites |
-|---|---|---|
-| Consulta | `conversation:read`, `customer:read`, `service_rules:read` | Sem mutações; sempre tenant-scoped |
-| Escrita restrita | `qualification:create`, `handoff:create` ou outras mutações explicitamente enumeradas | Sem leitura ampla; só grava na conversa autorizada recebida pelo contexto do servidor |
-| Leitura e escrita | Conjunto de leitura e mutações estritamente necessário à função | Sem exclusão; sem acesso genérico ao ERP ou a outros tenants |
+| Perfil proposto | Leituras autorizadas | Escritas autorizadas | Restrições |
+|---|---|---|---|
+| `atendimento_qualificador_rw` | Contexto da conversa atual; regras publicadas do próprio tenant; cadastro do cliente somente quando já estiver vinculado/confirmado na conversa | Criar qualificação e handoff da conversa atual; criar cadastro mínimo do cliente quando necessário e permitido pela regra funcional | Sem buscas globais, leitura de outra conversa/tenant, alteração de registros alheios, exclusão ou acesso genérico ao ERP |
+| `atendimento_registrador_write` | Nenhuma ferramenta de leitura ampla | Criar qualificação e handoff apenas para a conversa cujo contexto foi validado pelo servidor; eventual criação mínima de cliente somente se for explicitamente habilitada | Não recebe consultas/listagens; não escolhe tenant/cliente/conversa por ID do modelo; nenhuma alteração ou exclusão |
+
+- O perfil com leitura/escrita recebe apenas os dados mínimos da conversa e cliente atual; a busca inicial por telefone, quando necessária, deve ser uma operação específica, tenant-scoped e sem listar cadastros.
+- O perfil write-only não consulta o banco por ferramentas. O workflow pode encaminhar um contexto mínimo da mensagem recebida; a API valida canal, tenant, conversa e permissões antes de gravar.
+- Se a gravação depender de estado atual, a API deve encapsular a validação e a escrita numa operação autorizada; não ampliar o perfil com uma permissão genérica de leitura.
+- Exemplos de escopos simbólicos: `conversation.current.read`, `service_profile.published.read`, `customer.current.read`, `qualification.current.create`, `handoff.current.create`, `customer.minimal.create`. Nomes e granularidade são ilustrativos, não contratos implementados.
+- Negar por padrão qualquer ação não listada: alteração/remoção de cliente, ordens/visitas, leitura de conversas antigas, busca entre clientes ou troca de tenant.
+- Cada chamada recebe tenant/canal da credencial ou de contexto confiável validado pela API; IDs ou `agent_id` enviados pelo modelo/payload nunca concedem autorização.
+
+A matriz representa capacidades de negócio, não uma implementação de MCP. O caminho atual proposto é REST; se MCP for criado futuramente, cada ferramenta deve mapear para as mesmas operações e verificações no servidor.
 
 “Somente escrita” deve ser definido por operações concretas, não por um privilégio amplo `write`. Se uma operação precisar consultar contexto para validar a gravação, conceder apenas a leitura mínima daquele contexto ou fazer a validação dentro da própria operação autorizada. IDs fornecidos pelo modelo não bastam para selecionar tenant/cliente/conversa.
 
