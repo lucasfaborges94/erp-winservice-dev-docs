@@ -171,38 +171,251 @@ Nenhuma tabela, policy RLS, função, trigger, dado ou configuração do projeto
 
 **Próxima ação acionável:** obter backup restaurável e preparar ensaio de restauração isolado, sem tocar no projeto principal. Após evidenciar G0, implementar a prova G1 de forma isolada na API, com testes de tokens válidos/inválidos e mapeamento de identidade. Não iniciar endpoints de negócio antes dos gates.
 
+## Continuidade — PR ADR-0020 integrado e especificação técnica do atendimento proposta — 2026-11-14
 
-## Continuação — registro de credenciais Evolution para rotação — 2026-11-15
+**Fontes consultadas nesta retomada:** repositório oficial lucasfaborges94/erp-winservice-dev-docs; protocolo GitHub; Fonte da Verdade; Leia-me; continuidade/status/roadmap; ADR-0012, ADR-0017, ADR-0019; especificação técnica de autenticação, contexto transacional e RLS. O contexto conversacional foi usado apenas como pista e conferido com as fontes oficiais.
 
-O responsável solicitou manter um arquivo com credenciais que precisem ser rotacionadas ao final das conversas. Foi criado [REGISTRO_CREDENCIAIS_A_ROTACIONAR.md](REGISTRO_CREDENCIAIS_A_ROTACIONAR.md) na `main`, com metadados de duas constatações sobre a Evolution API feitas em 2026-11-14: (1) chave global visível nas variáveis de ambiente do Easypanel; (2) chave literal encontrada no nó Set do workflow n8n “Testa conexao Evolution Api”. Os valores foram omitidos. Ainda não foi confirmado se são a mesma credencial, por isso estão registrados separadamente.
+**PR #1 — ADR-0020:** revisado como alteração documental de dois arquivos (ficha ADR-0020 e índice arquitetural), com aprovação expressa prévia do responsável registrada no histórico da conversa. GitHub retornou PR aberto, não draft, mergeable, head 6bb0aed249bd63f275ef84dfc84a0498f78ce973; revisões formais/checks não foram apresentados pela consulta. O merge foi executado com expected_head_sha exatamente igual ao head verificado. Resultado: merged=true, commit 0525fe67a5113cbb8527c29ff2e434589e99ae84. Reconsulta confirmou PR fechado/merged e main apontando para o mesmo SHA; GitHub informa assinatura verificada.
 
-O registro esclarece que a lista não reduz o risco: ambas permanecem pendentes e devem ser tratadas como comprometidas até rotação/revogação, invalidação comprovada da credencial antiga e atualização dos consumidores. A rotação da chave Evolution foi previamente indicada pelo responsável para depois desta conversa.
+**Especificação proposta:** criada a branch separada spec/atendimento-saas-mvp a partir da main pós-merge (0525fe67a5113cbb8527c29ff2e434589e99ae84). Adicionado documentacao/ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md, commit de criação 9baddb8b4c032cd4ecbb09e14768ffb60f998a59, com requisitos funcionais, tenancy, onboarding, modelo de dados lógico proposto, contratos REST, n8n/WhatsApp, segurança, plano de testes e gates. O documento está marcado PROPOSTA, pendente de revisão/aprovação explícita; modelos e rotas são propostas e não descrevem schema físico existente.
 
-**Limites desta sessão:** nenhuma chave foi rotacionada, revogada, copiada para documentação ou alterada no n8n/Easypanel. Não houve alteração em Supabase, workflows, código, deploy ou produção. O arquivo contém somente metadados não secretos e ações pendentes.
+**Decisões em aberto registradas na especificação:** fronteira entre o MVP próprio do atendimento e a prioridade Operação/limite de integrações da ADR-0019; provedor e titularidade WhatsApp; inbox de handoff; identificação de cliente por telefone; onboarding/plano/billing; publicação e versionamento de regras; identidade máquina-a-máquina; retenção/privacidade; catálogo global versus tenant; SLOs e suporte. Nenhuma dessas decisões foi promovida a aprovada.
+
+**Gates:** a continuidade/status consultados registram G0 e G1 parciais e G2–G5 não iniciados na última revalidação de 2026-11-09. Essa situação foi reproduzida como referência datada e deve ser revalidada antes de qualquer execução técnica. A especificação adiciona gates de integração, piloto e comercialização, sem declarar gate concluído.
+
+**Limites:** nenhuma operação Supabase, alteração de workflow n8n, código, deploy, produção, testes ou execução de integração foi realizada. Não foi aberto PR da especificação nem ela foi integrada à main. A API permanece, conforme a fonte documental consultada, no scaffold sem autenticação, tenancy ou módulos de negócio.
+
+**Próximo passo:** revisão do documento e deliberação explícita do responsável sobre decisões pendentes e aceite da especificação. Até essa aprovação, manter a branch como proposta; após aprovação, atualizar seu estado por revisão documental apropriada. Implementação continua condicionada aos gates de segurança e autorizações operacionais específicas.
+
+## Revisão inicial da especificação SaaS de atendimento — 2026-11-14
+
+Foi feita revisão de consistência da especificação na branch spec/atendimento-saas-mvp contra a ADR-0020 aprovada e as ADRs-0017/0019.
+
+**Correção documental:** a ADR-0020 já decide em alto nível que o atendimento terá plano de entrega próprio, preservando a prioridade do MVP Operação e sem incorporar automaticamente WhatsApp/n8n ao MVP operacional. A especificação foi corrigida: o item deixa de pedir nova confirmação dessa decisão e mantém pendente apenas o detalhamento das fronteiras de módulos, releases e operação da API compartilhada.
+
+**Recomendações registradas como não aprovadas:** contrato de WhatsApp independente do provedor; avaliar Chatwoot transitório para handoff se disponibilidade operacional for confirmada; não associar cliente só por telefone sem confirmação; identidade n8n mínima e separada por ambiente; publicar regras por versões imutáveis; iniciar com catálogos tenant-scoped; definir retenção antes de dados reais; deixar billing/auto-onboarding fora do piloto inicial.
+
+**Decisões necessárias para fechar contratos de integração:** provedor/canal WhatsApp, inbox humano, política de confirmação de identidade e identidade máquina-a-máquina. Retenção e privacidade precisam ser definidas antes do piloto com dados reais. Billing e SLO comercial podem aguardar a etapa de comercialização.
+
+**Estado:** especificação permanece PROPOSTA. Nenhuma decisão foi aprovada ou assumida pelo responsável; não houve implementação, operação em Supabase/n8n/WhatsApp, testes, deploy ou alteração de produção.
+
+**Próximo passo:** obter deliberação explícita sobre os quatro pontos de integração e sobre retenção/privacidade para piloto; então revisar a especificação e submetê-la à aprovação explícita sem confundir aprovação documental com autorização operacional.
+
+## Deliberações sobre canal/handoff/identidade e esclarecimento de token do agente — 2026-11-14
+
+O responsável confirmou: (1) adaptador WhatsApp independente do provedor; o fornecedor específico continua pendente; (2) Chatwoot como inbox transitório e informou que já está disponível; (3) telefone sozinho não basta para associar cliente, pedindo confirmação em caso ambíguo ou transferindo ao humano.
+
+A especificação na branch spec/atendimento-saas-mvp foi atualizada com essas deliberações, sem aprovar a especificação completa. A disponibilidade do Chatwoot é uma informação do responsável, não uma verificação técnica do ambiente nesta sessão.
+
+**Pergunta pendente do responsável:** se o agente/n8n deve ser identificado por token de usuário emitido pelo Supabase Auth.
+
+**Esclarecimento técnico consultado em documentação oficial Supabase (2026-11-14):** o access token Supabase Auth identifica um usuário Auth e usa a role authenticated; a API key identifica o componente/aplicação, e a secret key/service_role concede acesso elevado com bypass RLS. O OAuth 2.1 Server do Supabase documenta Authorization Code com PKCE e autenticação/aprovação do usuário. Logo, não tratar um token humano como credencial de serviço unattended nem confundir chave secret/service_role com identidade do agente.
+
+**Recomendação registrada como PROPOSTA:** n8n autentica-se na API NestJS como identidade técnica de serviço; token/credencial com audiência da API, escopo mínimo, expiração, rotação e revogação; o servidor resolve tenant pelo canal e permissões configuradas. A API aplica o contexto de banco/RLS sob a role de runtime aprovada. Conta dedicada no Supabase Auth só deve ser considerada se for deliberadamente modelada como principal não humano, sem impersonar colaborador, e com associação/autorização/RLS próprias.
+
+**Ainda não decidido:** se a credencial será token opaco/API key rotacionável, JWT de serviço ou provedor OAuth máquina-a-máquina; identidade e escopo tenant-scoped; propagação segura do ator até RLS. Nenhuma credencial foi criada, Supabase alterado ou workflow modificado.
+
+Referências oficiais: https://supabase.com/docs/guides/getting-started/api-keys ; https://supabase.com/docs/guides/auth/users ; https://supabase.com/docs/guides/auth/oauth-server .
+
+**Próximo passo:** responsável confirmar se aceita o princípio recomendado (identidade técnica n8n perante a API, sem token de usuário humano e sem acesso direto ao banco). Depois definir formato/issuer e detalhes de claims, rotação e escopo durante revisão de segurança; isso não autoriza implementação nem alteração operacional.
+
+## Modelo de múltiplos agentes, identidades e workflows — proposta — 2026-11-14
+
+O responsável perguntou como suportar agentes MCP do ERP com perfis diferentes (ex.: leitura/escrita versus escrita restrita), e se cada identidade de serviço representa agente ou workflow, ou se um workflow roteia para agentes distintos.
+
+**Desenho proposto registrado na especificação:** agente é um principal lógico/capability profile; identidade de serviço autentica o processo e mapeia ao perfil e tenant; workflow n8n é unidade de execução/orquestração, não autoridade por si só; MCP/API valida token e autoriza ação/ferramenta e recurso. Recomenda-se identidade por perfil de capacidade e credenciais separadas para perfis com privilégios diferentes. Para o piloto, workflows distintos por perfil são o caminho mais simples de auditar; roteador compartilhado é possível apenas com origem/principal validados e subworkflows com credenciais separadas. Não confiar em agent_id enviado pelo prompt/payload e não compartilhar credencial global com união de escopos.
+
+“Escrita” deve representar mutações enumeradas (por exemplo, criar qualificação ou handoff), não write genérico. Operações devem validar o objeto/tenant no servidor; leitura contextual mínima pode ser necessária e deve ser explicitamente limitada.
+
+**MCP:** documentação oficial consultada informa que o servidor protegido valida tokens emitidos para seu recurso, aplica scopes e rejeita tokens destinados a outro recurso; tokens não devem ser retransmitidos a uma API upstream como credenciais. Referência: https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization . A documentação n8n informa que editores de workflows compartilhados podem usar credenciais presentes nos workflows: https://docs.n8n.io/workflows/sharing/ .
+
+**Estado:** texto incluído em documentacao/ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md na branch de proposta. São recomendações, não decisão aprovada. O responsável ainda não confirmou a identidade técnica de serviço nem o modelo de escopos. Nenhum servidor MCP, workflow, API, Supabase ou produção foi alterado; nenhuma credencial foi criada.
+
+**Próximo passo:** o responsável confirmar o princípio de identidades por perfil de capacidade e escolher se deseja começar com workflows separados (recomendado para piloto) ou um roteador autenticado; manter a escolha do mecanismo de token/issuer sujeita à revisão de segurança.
+
+## Correção de estado — MCP do ERP ainda não existe — 2026-11-14
+
+O responsável esclareceu que o ERP ainda não possui servidor MCP. As perguntas anteriores sobre permissões MCP foram hipotéticas e exploratórias, não descrição de uma implementação atual.
+
+A especificação foi ajustada para declarar que a integração inicial do MVP é via contratos REST da API NestJS; um servidor MCP é possibilidade futura, opcional, sujeito a decisão e implementação separadas, e não é pré-requisito. A seção sobre múltiplos agentes descreve o modelo futuro e separa agente, identidade técnica e workflow.
+
+**Estado:** somente a documentação da branch spec/atendimento-saas-mvp foi atualizada. Nenhum MCP foi criado; nenhum workflow, API, Supabase ou produção foi alterado. O princípio de identidade por perfil e o uso de workflows separados para piloto continuam propostas não aprovadas.
+
+## Princípio de identidade de serviço do n8n confirmado — 2026-11-14
+
+O responsável concordou com uma identidade de serviço própria para as automações perante a API REST do ERP. Trata-se de aprovação do princípio máquina-a-máquina, não de aprovação da especificação completa ou autorização para criar credenciais.
+
+A identidade do n8n é separada de usuários humanos do Supabase Auth e das chaves/contas de serviço da OpenAI. Uma credencial OpenAI autoriza chamadas à OpenAI, mas não autentica o n8n perante o ERP. A API do ERP deverá validar a identidade de serviço e aplicar os escopos e tenant autorizados; n8n não recebe acesso direto ao banco nem `service_role`.
+
+**Pendências técnicas:** emissor/formato da credencial (token opaco/API key, JWT próprio ou OAuth máquina-a-máquina), audiência, escopos por ação e tenant, segregação por ambiente, validade, rotação, revogação, e propagação do ator para auditoria/RLS. Não foi criada credencial nem alterado OpenAI, Supabase, n8n, API ou produção.
+
+A especificação foi atualizada na branch spec/atendimento-saas-mvp. Permanece PROPOSTA até aprovação explícita posterior.
+
+## Matriz inicial de permissões por agente preparada — PROPOSTA — 2026-11-14
+
+A pedido de continuidade, a especificação recebeu uma matriz concreta, ainda não aprovada, para dois perfis ilustrativos alinhados ao exemplo do responsável:
+
+- `atendimento_qualificador_rw`: lê apenas contexto da conversa atual, regras publicadas do tenant e cadastro do cliente já vinculado/confirmado; cria qualificação/handoff e, se permitido pela regra funcional, cadastro mínimo do cliente.
+- `atendimento_registrador_write`: sem ferramentas de leitura ampla; cria qualificação/handoff apenas para a conversa validada pelo servidor; eventual criação mínima de cliente precisa de habilitação explícita.
+
+Ambos são tenant-scoped; não podem trocar tenant por payload, fazer busca global, alterar registros alheios, excluir ou acessar domínio ERP genérico. Os escopos apresentados são simbólicos e ainda não contratos implementados. REST da API NestJS continua sendo o caminho inicial; MCP não existe e não é pré-requisito.
+
+**Estado:** matriz registrada como proposta em documentacao/ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md. A identidade de serviço n8n está aprovada como princípio, mas os perfis, escopos exatos, formato/issuer e ciclo de vida das credenciais ainda não. Não há credenciais, endpoints, workflows ou mudanças de banco criados.
+
+**Próximo passo:** responsável revisar e ajustar os dois perfis, sobretudo se o perfil write-only pode criar cadastro mínimo de cliente e quais escritas/mensagens são permitidas. Após fechar a matriz, decidir mecanismo da credencial e então submeter a especificação completa à aprovação explícita.
+
+## Decisão do perfil write-only sobre cadastro de cliente — 2026-11-14
+
+O responsável escolheu a opção 1: no piloto inicial, o perfil `atendimento_registrador_write` **não pode criar cadastro de cliente**, inclusive cadastro mínimo. Esse perfil pode criar apenas qualificação e handoff para a conversa cujo contexto foi validado pelo servidor, conforme a matriz proposta na especificação.
+
+Esta decisão resolve a pergunta pendente ao final da seção “Matriz inicial de permissões por agente preparada”. A criação de cadastro pelo perfil write-only exigirá nova deliberação e revisão documental. A decisão é registrada como requisito desta proposta e não aprova a especificação técnica completa.
+
+**Estado e limites:** a especificação continua PROPOSTA e pendente de aprovação explícita. Nenhuma implementação, credencial, workflow, alteração Supabase, código, deploy ou operação de produção foi realizada.
+
+## Estratégia de workflows n8n por perfil confirmada para a proposta do piloto — 2026-11-14
+
+O responsável concordou em iniciar o piloto com workflows separados por perfil de permissão e identidade/credencial própria para cada workflow. Um roteador poderá encaminhar mensagens, desde que não possua credencial ampla; o subworkflow de destino usa a credencial do seu perfil. A seleção do perfil deve derivar de configuração confiável e a API REST deve validar cada operação.
+
+Esta é uma decisão de arquitetura para a proposta do piloto, alinhada à identidade de serviço n8n já confirmada. Não significa uma credencial por cada workflow futuro quando capacidades e fronteiras de confiança forem iguais; para os perfis diferentes previstos no piloto, as credenciais devem ser segregadas. O MCP do ERP não existe e não participa do fluxo atual.
+
+**Pendências:** emissor/formato da credencial, audiência, escopos exatos, vínculo tenant/canal, validade, rotação, revogação e propagação do ator até auditoria/RLS continuam sujeitos à revisão de segurança. A especificação completa permanece PROPOSTA e ainda precisa de aprovação explícita.
+
+**Limites:** nenhum workflow, credencial, API, Supabase, código ou ambiente de produção foi alterado.
+
+## Aceleração documental — recomendação de credencial n8n→API — 2026-11-14
+
+A pedido do responsável para acelerar o trabalho, a especificação na branch `spec/atendimento-saas-mvp` foi detalhada sem alterar a `main`, código ou sistemas operacionais. Foram consultados o protocolo/fonte da verdade do repositório e referências técnicas primárias (RFC 6750 e OWASP Secrets Management Cheat Sheet).
+
+**Recomendação incluída, ainda não aprovada:** API NestJS emite credencial opaca aleatória de alta entropia por workflow/perfil; segredo exibido uma vez, hash persistido, audience restrita à API ERP, escopos/perfil/ambiente/tenant/canal associados do lado do servidor; chamadas HTTPS com Bearer no header; expiração obrigatória; rotação com janela curta e revogação imediata. O piloto limita identidade ao tenant Winservice; expansão multi-tenant deve preferir credenciais separadas por tenant×perfil. O limite inicial de até 90 dias foi escrito apenas como sugestão para revisão, não como decisão. OAuth 2.0 Client Credentials com tokens curtos permanece alternativa futura caso a plataforma comporte um emissor apropriado; não foi presumido recurso atual do Supabase.
+
+A proposta acrescenta modelo lógico de identidade/credencial, casos negativos de teste e evidência de rotação/revogação ao Gate G6. O perfil write-only continua sem criação de cadastro mínimo. A estratégia de workflows separados por perfil e credenciais próprias está confirmada para o piloto, sem implementação.
+
+**Pendências de deliberação:** aceitar/ajustar o formato opaco recomendado, prazo máximo de validade e autoridade/procedimento de emissão; definir retenção e privacidade antes de dados reais; revisar e aprovar explicitamente a especificação completa. G0/G1 permanecem parciais na última evidência datada de 2026-11-09 e devem ser revalidados antes de execução técnica.
+
+**Limites:** nenhuma chave Supabase/API/OpenAI, credencial n8n, workflow, migration, alteração de banco, código, deploy ou acesso de produção foi criado ou modificado.
+
+## Modelo opaco de credencial de serviço aprovado para a proposta — 2026-11-14
+
+O responsável aprovou o modelo opaco recomendado para autenticar os workflows n8n perante a API ERP: segredo aleatório de alta entropia emitido pela API, guardado no ERP somente como hash, associado no servidor ao perfil/escopos e tenant permitidos, com expiração obrigatória, rotação e revogação imediata. O segredo seria exibido uma única vez e enviado por HTTPS no header Bearer. Não é chave Supabase, token de usuário Supabase Auth ou chave OpenAI.
+
+**Escopo da aprovação:** aprovação desta direção de arquitetura para inclusão na proposta. Não aprova a especificação técnica completa nem autoriza emissão de credencial/implementação.
+
+**Pontos ainda pendentes:** prazo máximo de validade (até 90 dias permanece sugestão, não aprovado); autoridade e fluxo administrativo de emissão/rotação; escopos exatos e granularidade final de tenant/canal; auditoria e secrets manager. OAuth 2.0 Client Credentials continua alternativa futura, caso o emissor correspondente venha a ser especificado, sem ser requisito do piloto.
+
+**Estado e limites:** a especificação continua PROPOSTA. Nenhuma credencial, workflow, alteração Supabase, código, migration, deploy ou operação de produção foi realizada.
+
+## Revisão final de consistência da decisão de credencial — 2026-11-14
+
+Na passada final da especificação, foram alinhados trechos históricos que ainda descreviam como pendente a escolha entre API key opaca, JWT ou OAuth. O texto agora registra como aprovada para a proposta a credencial opaca emitida pela API do ERP, armazenada como hash, com escopo server-side, expiração, rotação e revogação. O prazo, a autoridade/procedimento de emissão, os escopos exatos e o vínculo tenant/canal permanecem pendentes.
+
+**Estado seguinte:** pacote documental consistente para revisão do responsável. A especificação inteira continua PROPOSTA e só se torna normativa com aprovação explícita do documento completo. Nenhum código, credencial, workflow, banco ou produção foi alterado.
+
+## Provedor WhatsApp Evolution API escolhido — 2026-11-14
+
+O responsável escolheu a Evolution API como camada de integração WhatsApp do MVP. A especificação foi atualizada para refletir o provedor, preservar adaptador de domínio desacoplado e detalhar webhooks por instância/canal, seleção mínima de eventos, autenticação, idempotência e separação entre credenciais Evolution e identidade n8n→API.
+
+**Referência oficial consultada:** o repositório/documentação da Evolution API informa suporte a Baileys baseado em WhatsApp Web e à WhatsApp Cloud API oficial da Meta; descreve webhooks globais ou por instância e seleção de eventos. Para o MVP com operação comercial, a especificação recomenda avaliar Cloud API primeiro, mas a modalidade final não foi escolhida pelo responsável.
+
+**Ainda pendente:** Baileys versus Cloud API, hospedagem da Evolution, versão, titularidade/número e associação por tenant, requisitos de templates/janela/custos, configuração exata de eventos, verificação de autenticidade do webhook para a versão escolhida e autoridade do histórico/status entre Evolution e Chatwoot.
+
+**Estado e limites:** Evolution API escolhida como provedor documental; nenhum serviço foi conectado, provisionado ou configurado. Nenhum número, credencial, workflow, webhook, Supabase, código, deploy ou produção foi alterado. A especificação completa permanece PROPOSTA; sua aprovação ainda é necessária antes de tratá-la como normativa, sem substituir gates e autorizações operacionais.
+
+## Baileys definido para a fase inicial com Evolution API — 2026-11-14
+
+O responsável escolheu utilizar Evolution API com Baileys/WhatsApp Web inicialmente. A especificação foi atualizada para refletir a decisão, incluir os testes de pareamento QR, sessão, reconexão, duplicidade e desvinculação, e manter o adaptador de domínio pronto para reavaliar uma migração futura para WhatsApp Cloud API oficial. A documentação da Evolution alerta que Baileys pode ter limitações frente às APIs oficiais.
+
+**Ainda pendente:** hospedagem e versão da Evolution, titularidade/associação do número por tenant, requisitos de webhook e segurança da sessão, homologação e decisão operacional sobre eventual migração para Cloud API. Nada foi provisionado, conectado ou pareado.
+
+**Estado e limites:** a escolha de Baileys é uma decisão de arquitetura para esta proposta; não aprova o documento completo nem autoriza ativação. Nenhuma credencial, workflow, webhook, Supabase, código, deploy ou produção foi alterado.
+
+## Avaliação somente leitura do VPS para futura hospedagem da Evolution API — 2026-11-14
+
+Consulta Hostinger somente leitura: VPS KVM 2 em execução, 2 vCPU, 8 GB RAM e disco de 100 GB. Métricas de 2026-11-07 a 2026-11-14 (328 amostras): CPU média 4,28%, máximo 20,3%; RAM média ~3,15 GB, máximo ~3,83 GB; uso de disco médio ~13,95 GB, máximo ~17,03 GB. Esses agregados sugerem folga, mas não demonstram capacidade para hospedar Evolution com segurança sem conhecer distribuição por serviço, limites, armazenamento de sessão, backups e picos.
+
+A tentativa somente leitura de listar projetos/containers via endpoint Docker Manager falhou com retorno “installed operating system does not support Docker Manager”; portanto não foi possível verificar os workloads atuais por esse conector. O servidor informa Ubuntu 24.04 com Easypanel, mas isso não substitui inventário dos serviços existentes.
+
+**Próximo passo sobre hospedagem:** antes de co-localizar Evolution com ERP/n8n/Chatwoot, revisar pelo Easypanel ou monitoramento disponível o uso por projeto, limites de memória/CPU, persistência de sessão e backup. Se não houver evidência suficiente, manter a Evolution em serviço/host isolado. Nenhuma mudança de infraestrutura foi feita.
 
 
-## Continuação — revisão da especificação técnica do SaaS de atendimento — 2026-11-15
+## Verificação informada da instalação Evolution API — 2026-11-14
 
-**Fontes/estado conferidos:** `main` em `d7da5ba1b1f614ec5aa307ef05bdba199e51a468`; branch isolada `spec/atendimento-saas-mvp` em `e3bcd5ef5eb0d6a273d5472ae9ba79f96791e5b1`. O PR #1 da ADR-0020 está fechado e merged em `0525fe67a5113cbb8527c29ff2e434589e99ae84`, usando o head esperado; não foi refeito. A comparação aponta que a branch da especificação ainda não foi integrada e divergiu da `main` em quatro commits recentes de documentação. A revisão não abriu nem mesclou PR.
+O responsável informou que a Evolution API já está instalada no domínio [evo.winservicers.com](https://evo.winservicers.com). Essa informação atualiza a pendência anterior de hospedagem: a instalação foi confirmada pela resposta pública da raiz HTTPS, sem autenticação.
 
-**Revisão documental:** `documentacao/ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md` contém requisitos funcionais, tenancy/autorização, onboarding, modelo lógico proposto, contratos REST, integração n8n/Evolution/Baileys/Chatwoot, segurança, plano de testes e gates. Confirma as deliberações do responsável: Chatwoot transitório; Baileys inicialmente; identidades/workflows por perfil; perfil write-only sem criação de cadastro de cliente; nenhum servidor MCP do ERP existente. O smoke test de entrada está descrito como evidência pontual, não como homologação.
+**Verificações somente leitura:** a tentativa de abrir o domínio pelo conector de navegação retornou erro interno sem resposta HTTP; em seguida, uma requisição pública GET à raiz retornou HTTP 200, conteúdo JSON, mensagem de serviço ativo e versão 2.3.7. A verificação confirma o endpoint público da Evolution API e a versão anunciada por ele, sem autenticação. A aba de navegador aberta em evolution-leads-roi.huvyyz.easypanel.host exibiu o sistema Winservice Leads & ROI, não a API Evolution; não foi tratada como evidência da instalação da API.
 
-**Estado:** documento ainda **PROPOSTA**, aguardando revisão e aprovação explícita do responsável. Decisões ainda pendentes incluem retenção/privacidade antes de dados reais, fonte autoritativa e contrato de handoff Chatwoot, prazo e processo de emissão/rotação e escopos finais de credenciais, além de autenticação/idempotência/retries/reconexão em homologação. A lista de ocorrências Evolution está na [documentação oficial de credenciais a rotacionar](REGISTRO_CREDENCIAIS_A_ROTACIONAR.md); nenhum valor secreto foi armazenado.
+**Estado documental:** Evolution API com Baileys continua a escolha inicial aprovada para a proposta; Chatwoot transitório e workflows/credenciais separados por perfil também permanecem registrados. Devem ser confirmados em homologação a URL/API e versão implantadas, se Baileys está ativo, armazenamento persistente e protegido da sessão, reconexão, autenticação/autenticidade do webhook, mapeamento canal→tenant e procedimento de revogação. O nome do domínio e a informação de instalação não implicam autorização para alterar serviço.
 
-**Verificação/limites desta continuação:** revisão de documentação e metadados do GitHub somente. Nenhum teste automatizado, alteração de workflow, Supabase, código, Evolution/Chatwoot, credencial, deploy ou produção foi executado.
+**Limites:** não houve login administrativo, leitura de segredos, configuração, criação de instância, pareamento QR, alteração de n8n/Supabase/código, deploy ou ação de produção. A especificação inteira permanece PROPOSTA; decisão sobre o provedor/modo já está registrada para sua elaboração.
 
-**Próximo passo:** revisão humana do documento integral. Se aprovado explicitamente, registrar o estado aprovado no artefato normativo e preparar PR da branch; a aprovação documental não autoriza implementação, alterações operacionais ou deploy.
-
-
-## Aprovação explícita da especificação técnica do atendimento — 2026-11-15
-
-O responsável aprovou explicitamente a especificação técnica integral do MVP do SaaS de atendimento. O documento foi atualizado para estado **APROVADA** na branch isolada `spec/atendimento-saas-mvp`, commit `613c62fc9f54c81d1208dce70f793457709c56e4`. Permanecem pendentes sua integração documental à `main` e as decisões/gates de implementação descritos no próprio documento.
-
-A aprovação é do documento. Ela não encerra os gates G0–G8 nem autoriza implementação, alteração Supabase/workflows/credenciais, provisionamento, deploy ou produção. Próximo passo documental: preparar PR para integrar a especificação, revisar o diff/mergeabilidade e aguardar autorização específica para merge.
+**Próximo passo:** realizar inspeção não invasiva da página/versão e, em ambiente de homologação, fechar checklist de Baileys e webhooks antes de integrar qualquer workflow. Nenhuma credencial deve ser compartilhada em conversa.
 
 
-## PR #2 da especificação aprovada — sincronizado e pronto para revisão — 2026-11-15
+**Evidência técnica adicional — 2026-11-14:** consulta pública GET a https://evo.winservicers.com/ retornou HTTP 200; a resposta JSON foi filtrada para status 200, mensagem “Welcome to the Evolution API, it is working!” e versão 2.3.7. A requisição foi somente leitura. Não foram consultados endpoints administrativos, instâncias, chaves, tokens ou configurações.
 
-Foi aberto o [PR #2 — docs: aprovar especificação técnica do MVP de atendimento SaaS](https://github.com/lucasfaborges94/erp-winservice-dev-docs/pull/2), da branch `spec/atendimento-saas-mvp` para `main`. A branch foi sincronizada com a base `81fe108b28cfb8c90034f3fc5c393ed762337d9a` por merge commit apenas na branch. A API REST do GitHub confirmou o PR aberto, não merged, `mergeable=true`, `mergeable_state=clean`, base `81fe108b28cfb8c90034f3fc5c393ed762337d9a` e head `ebc8f5469c2f8a8bd41de112b5da9c1fb50819bd`.
 
-O diff contém quatro arquivos documentais: Leia-me, continuidade, contexto atual e a nova especificação. O registro de credenciais já existe na base e foi preservado na branch sincronizada. Nenhuma mudança de código/Supabase/workflows/credenciais/deploy/produção; nenhum teste automatizado foi executado. O merge do PR à `main` não foi realizado e aguarda autorização específica.
+## Inspeção n8n da integração Evolution API — 2026-11-14
+
+Após autorização do responsável para usar o n8n em consultas à API, foi feita inspeção somente leitura do contexto, da credencial e do workflow de conexão.
+
+**Evidências:** o n8n lista uma credencial acessível chamada “Evolution API” (tipo evolutionApi), mas a workflow ativa “Testa conexao Evolution Api” não tem credenciais associadas aos seus nós. O nó Set dessa workflow contém uma chave API literal; o valor foi omitido deste registro e não deve ser repetido. O grafo também referencia um destino chamado “HTTP Request” ausente na lista de nós. A execução histórica mais recente consultada falhou com “Destination node not found”; o contexto reportava 24 execuções falhas dessa workflow. Portanto, ela não fornece uma consulta funcional à instância.
+
+**Resultado:** não executei workflow nem fiz nova chamada autenticada. A API continua confirmada publicamente em HTTP 200, versão anunciada 2.3.7. Essa leitura da raiz não confirma instâncias ou conexão Baileys.
+
+**Segurança e limite de autorização:** a credencial salva não é usada pelo verificador existente, e há um token literal na workflow. Recomenda-se revogar/rotacionar esse token e remover seu uso literal, adotando a credencial n8n. A autorização do responsável permite consultas; não autoriza modificar ou criar workflows. Nenhuma alteração no n8n foi feita.
+
+**Próximo passo:** obter autorização explícita para corrigir a workflow de verificação (somente chamadas GET usando a credencial salva) ou para criar uma workflow temporária de consulta. Depois, consultar estado da instância e indicadores não sensíveis de conexão Baileys, sem listar QR codes, tokens ou dados pessoais.
+
+
+## Consulta autenticada de estado da instância Evolution pelo n8n — 2026-11-14
+
+Após autorização do responsável para criar workflows de consulta na pasta pessoal do n8n, foi criado [Codex | Evolution — consulta de estado (somente leitura)](https://workflows.winservicers.com/workflow/XUpP8XNYsmCS5UHo), na pasta evolution. É manual, permanece inativo e tem apenas um Manual Trigger e uma chamada HTTP GET autenticada com a credencial salva “Evolution API”. O endpoint consultado foi /instance/connectionState/winservice_principal.
+
+**Resultado verificado:** execução manual 9941900 terminou com sucesso. A resposta da API identificou a instância winservice_principal e `state: close`. A raiz pública continua respondendo HTTP 200 e anunciando versão 2.3.7. Portanto, endpoint e credencial funcionam; a instância não estava conectada ao WhatsApp durante a consulta. Esse estado não confirma qual integração/modo está configurado.
+
+**Escopo:** consulta somente leitura, sem ativação do workflow, pareamento QR, envio/leitura de mensagens, alteração de instância, chamada a `fetchInstances` ou acesso a tokens/telefones.
+
+**Verificação do workflow antigo:** “Testa conexao Evolution Api” continua ativo e não foi modificado. A definição contém destino de conexão ausente; a execução histórica falhou com `Destination node not found`. A credencial salva “Evolution API” não estava vinculada a esse workflow; havia uma chave literal num nó Set. O valor foi omitido. Recomenda-se revogar/rotacionar essa chave e migrar o workflow antigo para o gerenciador de credenciais antes de qualquer uso. A ferramenta oficial e a documentação do Evolution mostram que fetchInstances pode retornar credenciais de instância; por isso, a consulta foi limitada ao endpoint de estado.
+
+**Próximo passo:** desconectar/fechar é o estado atual; para validar Baileys será necessário verificar o modo de integração por uma fonte segura de configuração ou por teste controlado que não persista tokens/dados na execução. A especificação continua PROPOSTA. Não houve alteração no workflow antigo, Supabase, código ou produção.
+
+## Verificação do fluxo Evolution API → Chatwoot e atualização da especificação — 2026-11-15
+
+**Contexto consultado:** Fonte da Verdade, protocolo de atuação GitHub, Leia-me, Charter, roadmap, escopo, stack, status, governança, contexto, continuidade, ADR-0012, ADR-0017, ADR-0019, ADR-0020 e especificação técnica de autenticação/contexto/RLS. PR #1 de documentação consultado diretamente. O HEAD de `main` verificado é o merge commit `0525fe67a5113cbb8527c29ff2e434589e99ae84`; PR #1 está fechado e merged. A branch `spec/atendimento-saas-mvp` já existia e continha a especificação PROPOSTA, portanto foi preservada e atualizada sem reescrever seu histórico.
+
+**PR #1 / ADR-0020:** o GitHub retorna `state=closed`, `merged=true`, head esperado `6bb0aed249bd63f275ef84dfc84a0498f78ce973`, base `ef94715cd03d7d385daffb3df9dc061bbc9f8eae` e merge commit `0525fe67a5113cbb8527c29ff2e434589e99ae84`. O merge já estava concluído; não foi repetido. Não há reviews/checks associados no snapshot consultado; a aprovação arquitetural está registrada na ADR e no histórico de decisão, não como GitHub review.
+
+**Revisão do diff da PR:** somente `documentacao/02_DECISOES_ARQUITETURA.md` e `documentacao/decisoes/ADR-0020-atendimento-saas-backend-compartilhado.md` (115 adições, 2 remoções); nenhuma alteração de código, Supabase, workflows ou produção. O head retornado pelo GitHub coincide com o SHA esperado da proposta. A integração documental está segura e já foi efetivada no commit de merge acima.
+
+**Verificações somente leitura em 2026-11-15:**
+- No Evolution Manager, a instância correta `51981459630` aparece conectada; a versão indicada pela interface é 2.3.7. A chamada autenticada de 2026-11-14 para `winservice_principal` consultou outra instância e retornou `close`; ela não representa o canal correto.
+- A instância correta tem integração Chatwoot habilitada e campos de conexão preenchidos. O webhook de eventos está ligado, o envio Base64 está ligado e os eventos visíveis aparecem selecionados. Segredos não foram lidos nem registrados.
+- No Chatwoot, o inbox correspondente é um Canal da API e sua URL de webhook aponta para a rota `/chatwoot/webhook/51981459630` no domínio da Evolution. O segredo do webhook estava preenchido e foi mantido oculto.
+- O responsável iniciou um teste de entrada do número pessoal; a prévia `Oii` apareceu atualizada no inbox correto sob o contato salvo como `Amor`. A conversa não foi aberta. O responsável confirmou que o fluxo já funciona. Isso comprova uma entrega de entrada naquele momento, não autenticação, resiliência, segurança ou funcionamento sob falha.
+- O Evolution Manager não permite concluir sozinho se o modo Baileys está efetivamente ativo nem identificar o digest/tag da imagem.
+- A tela do n8n nativo no Evolution não mostrou sessões; isso não atesta ausência de workflows n8n independentes.
+
+**Nota de segurança:** a captura do Easypanel compartilhada em 2026-11-14 expunha visualmente a chave administrativa e mostrava `AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES=true`. Nenhuma configuração ou chave foi alterada; o responsável pretende rotacionar a chave após o término desta conversa. O valor não foi persistido. A issue upstream [#2677](https://github.com/evolution-foundation/evolution-api/issues/2677) relata que na versão 2.3.7 `GET /instance/fetchInstances` pode continuar retornando o campo `token` mesmo com a opção de exposição desativada. O endpoint não foi chamado nesta verificação; não confiar nessa opção como proteção até verificar uma versão corrigida.
+
+**Artefato atualizado:** `documentacao/ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md` na branch `spec/atendimento-saas-mvp`. Foram incorporados o status real da instância, a integração Chatwoot observada, o smoke test de entrada e a pendência de segurança. A especificação permanece **PROPOSTA**, sem aprovação integral.
+
+**Limites:** atualização documental apenas. Nenhuma alteração no Supabase, workflows n8n, código, Evolution, Chatwoot, configuração, credenciais ou produção. Não foi usado `fetchInstances`; nenhum QR code, conteúdo da conversa, token ou segredo foi aberto/registrado. Nenhum teste automatizado foi executado.
+
+**Pendências:** revisar esta especificação e aprová-la explicitamente antes de tratá-la como normativa; resolver retenção/privacidade, validade/emissão/rotação de credenciais, escopos finais, fonte autoritativa e contrato de handoff; validar Baileys, imagem, webhook, retries, idempotência, rotação/revogação e limites em homologação. A rotação da chave administrativa permanece ação do responsável após esta conversa.
+
+**Próxima ação:** concluir verificação dos links/arquivos da branch e entregar a especificação para revisão, mantendo-a separada da `main`. Nenhuma implementação ou deploy está autorizado por esta especificação.
+
+
+## Aprovação da especificação, registro de credenciais e preparação do PR — 2026-11-15
+
+Após a revisão, o responsável aprovou explicitamente a especificação técnica integral. O documento foi atualizado para **APROVADA** na branch `spec/atendimento-saas-mvp`; essa aprovação documental não encerra decisões pendentes nem autoriza implementação ou operações.
+
+O PR #2 foi aberto para integração documental à `main`. Na criação, o GitHub retornou `mergeable=false`; a branch ainda não continha quatro commits recentes da `main`, incluindo o registro de credenciais e as atualizações de continuidade/contexto. A branch foi sincronizada com a `main` por merge commit `488fa6b433488e716d54c1aefa750a0cced3939a`, preservando a `main` (parent `81fe108b28cfb8c90034f3fc5c393ed762337d9a`). Após as atualizações documentais, a consulta REST do PR #2 confirmou `mergeable=true`, `mergeable_state=clean`, base `81fe108b28cfb8c90034f3fc5c393ed762337d9a`; o PR permanece aberto e não merged.
+
+O registro de credenciais a rotacionar está em [REGISTRO_CREDENCIAIS_A_ROTACIONAR.md](REGISTRO_CREDENCIAIS_A_ROTACIONAR.md). Ele contém metadados, não os valores. Duas ocorrências Evolution seguem pendentes, e a relação entre elas ainda não foi confirmada.
+
+**Limites:** nenhuma implementação, Supabase, workflow, credencial, Evolution/Chatwoot, deploy ou produção foi alterada. Nenhum teste automatizado foi executado.
+
+
+## Atualização da continuidade em main — 2026-11-15
+
+Após a sincronização inicial, a continuidade oficial em `main` recebeu um registro do PR #2, com snapshot no head `ebc8f5469c2f8a8bd41de112b5da9c1fb50819bd` e base `81fe108b28cfb8c90034f3fc5c393ed762337d9a`; naquele momento o GitHub informava `mergeable=true` e `mergeable_state=clean`. A atualização de contexto em `main` repetiu esse estado como resumo operacional. A branch foi sincronizada com a `main` pelo merge commit `aa83feea2df87b0c18a75c64b76fe930608423c7`, cuja base inclui os dois commits documentais recentes. A API do GitHub confirmou o PR #2 aberto, não merged, `mergeable=true` e `mergeable_state=clean` no head `aa83feea2df87b0c18a75c64b76fe930608423c7` e base `24133d919ac0ede32ccc63dd378d4ba23a713f48`.

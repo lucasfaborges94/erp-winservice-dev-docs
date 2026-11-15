@@ -1,3 +1,21 @@
+### Estado mais recente — especificação do SaaS de atendimento (2026-11-15)
+
+**Fontes e branches:** repositório oficial `lucasfaborges94/erp-winservice-dev-docs`; `main` atualizada até `81fe108b28cfb8c90034f3fc5c393ed762337d9a`. O PR #1 da ADR-0020 está fechado e merged com head esperado `6bb0aed249bd63f275ef84dfc84a0498f78ce973`; o diff revisado contém somente o índice de ADRs e a ficha da ADR-0020 (115 adições/2 remoções). A especificação permanece na branch isolada `spec/atendimento-saas-mvp`, sem merge. A aprovação foi registrada no commit `613c62fc9f54c81d1208dce70f793457709c56e4`; depois a branch foi sincronizada com a `main` pelo merge commit `488fa6b433488e716d54c1aefa750a0cced3939a`.
+
+**Estado e decisões:** ADR-0020 aprovada; `documentacao/ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md` foi aprovada explicitamente pelo responsável em 2026-11-15; integração documental à main ainda pendente. Para a proposta do piloto: Evolution API com Baileys escolhido pelo responsável; Chatwoot transitório; identidade de serviço n8n→API via credencial opaca; workflows e credenciais separados por perfil; perfil write-only sem criação de cadastro; caminho REST inicial; MCP do ERP ainda não existe.
+
+**Verificação operacional em 2026-11-15:** a instância correta Evolution `51981459630` apareceu conectada no Manager, versão 2.3.7. A integração Chatwoot estava habilitada; o inbox Canal da API correspondente aponta para a rota Evolution dessa instância. Um teste de entrada iniciado pelo responsável apareceu no Chatwoot como prévia `Oii`, sob o contato salvo como `Amor`. Nenhuma conversa foi aberta. Isso confirma um recebimento naquele momento; o Manager não confirmou modo Baileys nem a imagem do container. A consulta anterior `close` era para `winservice_principal`, outra instância.
+
+**Segurança:** ocorrências de credenciais Evolution e estado de rotação estão em [REGISTRO_CREDENCIAIS_A_ROTACIONAR.md](REGISTRO_CREDENCIAIS_A_ROTACIONAR.md); valores omitidos. `fetchInstances` não foi usado. A issue upstream #2677 relata que Evolution API 2.3.7 pode devolver o token da instância mesmo com `AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES=false`; não confiar nessa flag até correção verificada. A captura de Easypanel compartilhada pelo responsável mostrava a chave administrativa, cuja rotação ele pretende fazer após esta conversa. Há também registro anterior de uma chave literal em workflow n8n; o workflow não foi alterado e a recomendação de rotação permanece. Não presumir que seja a mesma credencial. Segredos omitidos.
+
+**Gates e limites:** G0/G1 continuam parciais conforme a última evidência de 2026-11-09; não foram revalidados contra Supabase nesta sessão. Nenhuma alteração no Supabase, workflows n8n, código, Evolution, Chatwoot, deploy ou produção. Nenhum teste automatizado foi executado.
+
+**Documentos preparados no PR #2:** especificação técnica, índice Leia-me, continuidade e contexto. O registro de credenciais, já criado na main, também foi incluído na branch sincronizada.
+
+**PR #2:** aberto; reconsulta do GitHub informa mergeable=true e mergeable_state=clean, com base 81fe108b28cfb8c90034f3fc5c393ed762337d9a. O PR permanece não merged; aguardar autorização específica para merge. Próximos passos técnicos; retenção/privacidade, emissão/validade/rotação e escopos das credenciais; fonte autoritativa para mensagens/status e contrato de handoff; homologação do modo Baileys, webhook, idempotência, retries, reconexão e limites. Manter a especificação separada da `main`; não implementar/deploy até gates e autorizações operacionais.
+
+---
+
 
 
 ### Revisão dos arquivos do scaffold após remoção de Mau — 2026-11-09
@@ -118,30 +136,10 @@ A especificação técnica de autenticação, empresa ativa, autorização, cont
 **Próxima ação:** obter backup restaurável e realizar ensaio de restauração isolado; preparar baseline SQL reconciliada e registrar parâmetros não secretos do pooler. Não executar DDL/DML, migrations, ajustes de segurança ou deploy sem autorização operacional específica e gates concluídos.
 
 
-## Segurança operacional — credenciais a rotacionar — 2026-11-15
+### Atualização após aprovação explícita — 2026-11-15
 
-- Registro persistente: [REGISTRO_CREDENCIAIS_A_ROTACIONAR.md](REGISTRO_CREDENCIAIS_A_ROTACIONAR.md).
-- Há duas ocorrências Evolution API pendentes, vistas em 2026-11-14: chave de autenticação visível no ambiente do Easypanel e valor literal no nó Set do workflow n8n “Testa conexao Evolution Api”. Não se confirmou se são a mesma chave; valores secretos não foram registrados.
-- Tratar ambas como comprometidas até confirmar relação, rotacionar/revogar, atualizar consumidores e provar que a credencial antiga foi invalidada.
-- Nenhuma rotação, alteração no n8n/Easypanel, Supabase, código ou deploy ocorreu nesta sessão. Próxima ação: responsável rotaciona a chave Evolution conforme a janela combinada; depois remover literal do workflow, armazenar a nova credencial no gerenciador de credenciais do n8n e validar invalidação/funcionamento, sem registrar o valor.
+A especificação técnica integral foi aprovada pelo responsável. O PR #2 para integração documental está aberto, não merged; após sincronizar a branch com a main, a consulta REST atual retorna `mergeable=true` e `mergeable_state=clean`. A especificação continua isolada até integração. Pendências de retenção/privacidade, credencial de serviço, fonte autoritativa Chatwoot e homologação permanecem abertas. O registro de credenciais está ligado acima e não guarda valores secretos. Nenhuma alteração operacional ou teste automatizado foi realizado.
 
-## Estado mais recente — revisão da especificação do SaaS de atendimento — 2026-11-15
+### Snapshot da main após publicação do PR #2 — 2026-11-15
 
-- **ADR-0020:** aprovada e integrada à main pelo PR #1, merge commit 0525fe67a5113cbb8527c29ff2e434589e99ae84.
-- **Especificação técnica:** [ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md](https://github.com/lucasfaborges94/erp-winservice-dev-docs/blob/spec%2Fatendimento-saas-mvp/documentacao/ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md) na branch isolada spec/atendimento-saas-mvp, HEAD e3bcd5ef5eb0d6a273d5472ae9ba79f96791e5b1. Revisão confirmou cobertura de requisitos, tenancy, onboarding, modelo de dados proposto, REST, n8n/WhatsApp, segurança, testes e gates. Estado permanece **PROPOSTA**, sem PR ou merge.
-- Deliberações refletidas: Evolution API com Baileys inicialmente; Chatwoot transitório e disponível; credenciais e workflows separados por perfil; perfil write-only sem criar cadastro de cliente; não existe MCP do ERP.
-- Teste manual observado: mensagem de entrada Oii apareceu no inbox Chatwoot correto sob o contato Amor. É evidência pontual de entrega, não homologação.
-- Exposições Evolution pendentes: consulte [REGISTRO_CREDENCIAIS_A_ROTACIONAR.md](REGISTRO_CREDENCIAIS_A_ROTACIONAR.md); o registro não contém valores secretos. Tratar as ocorrências como comprometidas até rotação e validação da invalidação das credenciais anteriores.
-- **Próximo passo:** revisão e aprovação explícita da especificação integral. Depois disso, preparar PR para revisão; não iniciar implementação, alterações Supabase/workflows, deploy ou produção sem autorizações e gates correspondentes.
-## Aprovação da especificação técnica do atendimento — 2026-11-15
-
-- O responsável aprovou explicitamente o documento técnico integral do MVP.
-- Documento atualizado para estado APROVADA na branch isolada spec/atendimento-saas-mvp, commit 613c62fc9f54c81d1208dce70f793457709c56e4.
-- A integração à main ainda está pendente; a aprovação documental não fecha gates nem autoriza alterações Supabase/workflows/credenciais, implementação, deploy ou produção.
-- Próximo passo: preparar PR documental, revisar diff/mergeabilidade e aguardar autorização específica para merge.
-## PR #2 — especificação técnica de atendimento aprovada — 2026-11-15
-
-- PR #2 aberto da branch spec/atendimento-saas-mvp para main; aprovado documentalmente, ainda não integrado.
-- O GitHub confirmou mergeable=true e mergeable_state=clean após sincronização da branch com a base 81fe108b28cfb8c90034f3fc5c393ed762337d9a.
-- Diff: quatro arquivos de documentação. Nenhum teste automatizado ou alteração operacional foi feito.
-- O merge à main aguarda autorização específica. A aprovação do documento não encerra os gates nem autoriza implementação, mudanças em Supabase/workflows/credenciais, deploy ou produção.
+A continuidade e o contexto na main registraram o PR #2 aberto e limpo em snapshots anteriores. A branch foi sincronizada com a main pelo merge commit aa83feea2df87b0c18a75c64b76fe930608423c7, que inclui os dois commits documentais recentes. Reconsulta REST confirmou o PR aberto, não merged, mergeable=true e mergeable_state=clean no head aa83feea2df87b0c18a75c64b76fe930608423c7/base 24133d919ac0ede32ccc63dd378d4ba23a713f48. Nenhuma mudança operacional.
