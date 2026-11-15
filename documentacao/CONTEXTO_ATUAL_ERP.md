@@ -133,3 +133,9 @@ A especificação técnica de autenticação, empresa ativa, autorização, cont
 - Teste manual observado: mensagem de entrada Oii apareceu no inbox Chatwoot correto sob o contato Amor. É evidência pontual de entrega, não homologação.
 - Exposições Evolution pendentes: consulte [REGISTRO_CREDENCIAIS_A_ROTACIONAR.md](REGISTRO_CREDENCIAIS_A_ROTACIONAR.md); o registro não contém valores secretos. Tratar as ocorrências como comprometidas até rotação e validação da invalidação das credenciais anteriores.
 - **Próximo passo:** revisão e aprovação explícita da especificação integral. Depois disso, preparar PR para revisão; não iniciar implementação, alterações Supabase/workflows, deploy ou produção sem autorizações e gates correspondentes.
+## Aprovação da especificação técnica do atendimento — 2026-11-15
+
+- O responsável aprovou explicitamente o documento técnico integral do MVP.
+- Documento atualizado para estado APROVADA na branch isolada spec/atendimento-saas-mvp, commit 613c62fc9f54c81d1208dce70f793457709c56e4.
+- A integração à main ainda está pendente; a aprovação documental não fecha gates nem autoriza alterações Supabase/workflows/credenciais, implementação, deploy ou produção.
+- Próximo passo: preparar PR documental, revisar diff/mergeabilidade e aguardar autorização específica para merge.
