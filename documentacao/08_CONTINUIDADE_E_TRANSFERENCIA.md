@@ -179,3 +179,16 @@ O responsável solicitou manter um arquivo com credenciais que precisem ser rota
 O registro esclarece que a lista não reduz o risco: ambas permanecem pendentes e devem ser tratadas como comprometidas até rotação/revogação, invalidação comprovada da credencial antiga e atualização dos consumidores. A rotação da chave Evolution foi previamente indicada pelo responsável para depois desta conversa.
 
 **Limites desta sessão:** nenhuma chave foi rotacionada, revogada, copiada para documentação ou alterada no n8n/Easypanel. Não houve alteração em Supabase, workflows, código, deploy ou produção. O arquivo contém somente metadados não secretos e ações pendentes.
+
+
+## Continuação — revisão da especificação técnica do SaaS de atendimento — 2026-11-15
+
+**Fontes/estado conferidos:** `main` em `d7da5ba1b1f614ec5aa307ef05bdba199e51a468`; branch isolada `spec/atendimento-saas-mvp` em `e3bcd5ef5eb0d6a273d5472ae9ba79f96791e5b1`. O PR #1 da ADR-0020 está fechado e merged em `0525fe67a5113cbb8527c29ff2e434589e99ae84`, usando o head esperado; não foi refeito. A comparação aponta que a branch da especificação ainda não foi integrada e divergiu da `main` em quatro commits recentes de documentação. A revisão não abriu nem mesclou PR.
+
+**Revisão documental:** `documentacao/ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md` contém requisitos funcionais, tenancy/autorização, onboarding, modelo lógico proposto, contratos REST, integração n8n/Evolution/Baileys/Chatwoot, segurança, plano de testes e gates. Confirma as deliberações do responsável: Chatwoot transitório; Baileys inicialmente; identidades/workflows por perfil; perfil write-only sem criação de cadastro de cliente; nenhum servidor MCP do ERP existente. O smoke test de entrada está descrito como evidência pontual, não como homologação.
+
+**Estado:** documento ainda **PROPOSTA**, aguardando revisão e aprovação explícita do responsável. Decisões ainda pendentes incluem retenção/privacidade antes de dados reais, fonte autoritativa e contrato de handoff Chatwoot, prazo e processo de emissão/rotação e escopos finais de credenciais, além de autenticação/idempotência/retries/reconexão em homologação. A lista de ocorrências Evolution está na [documentação oficial de credenciais a rotacionar](REGISTRO_CREDENCIAIS_A_ROTACIONAR.md); nenhum valor secreto foi armazenado.
+
+**Verificação/limites desta continuação:** revisão de documentação e metadados do GitHub somente. Nenhum teste automatizado, alteração de workflow, Supabase, código, Evolution/Chatwoot, credencial, deploy ou produção foi executado.
+
+**Próximo passo:** revisão humana do documento integral. Se aprovado explicitamente, registrar o estado aprovado no artefato normativo e preparar PR da branch; a aprovação documental não autoriza implementação, alterações operacionais ou deploy.
