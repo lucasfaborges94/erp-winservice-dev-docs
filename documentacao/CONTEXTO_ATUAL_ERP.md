@@ -142,4 +142,4 @@ A especificação técnica integral foi aprovada pelo responsável. O PR #2 para
 
 ### Snapshot da main após publicação do PR #2 — 2026-11-15
 
-A continuidade e o contexto na main registraram o PR #2 como aberto e limpo no head ebc8f5469c2f8a8bd41de112b5da9c1fb50819bd, base 81fe108b28cfb8c90034f3fc5c393ed762337d9a. Dois commits documentais subsequentes atualizaram a main; esta branch será sincronizada com eles antes da revisão final. Não houve merge do PR nem mudança operacional.
+A continuidade e o contexto na main registraram o PR #2 aberto e limpo em snapshots anteriores. A branch foi sincronizada com a main pelo merge commit aa83feea2df87b0c18a75c64b76fe930608423c7, que inclui os dois commits documentais recentes. Reconsulta REST confirmou o PR aberto, não merged, mergeable=true e mergeable_state=clean no head aa83feea2df87b0c18a75c64b76fe930608423c7/base 24133d919ac0ede32ccc63dd378d4ba23a713f48. Nenhuma mudança operacional.
