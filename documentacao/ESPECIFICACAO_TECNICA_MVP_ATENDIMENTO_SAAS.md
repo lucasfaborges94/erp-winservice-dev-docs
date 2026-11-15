@@ -1,10 +1,11 @@
 # Especificação técnica — MVP do SaaS de atendimento automatizado
 
-**Estado:** APROVADA pelo responsável em 2026-11-15 — pendente de integração à main. A aprovação documental não autoriza implementação, alterações Supabase/workflows, provisionamento, deploy ou produção.  
+**Estado:** APROVADA pelo responsável em 2026-11-15 e integrada à main pelo PR #2, merge commit 1700b68eeb7b9a20d060a65ab5a8789b8744fd3b. A aprovação documental não autoriza implementação, alterações Supabase/workflows, provisionamento, deploy ou produção.  
 **Elaboração:** 2026-11-14  
 **Aprovação explícita:** 2026-11-15  
 **Base documental:** ADR-0020 aprovada; ADR-0017 e ADR-0019; especificação de autenticação, contexto transacional e RLS  
-**Branch:** `spec/atendimento-saas-mvp`  
+**Branch de elaboração/aprovação:** `spec/atendimento-saas-mvp`  
+**Branch de referência atual:** `main`  
 **Escopo deste documento:** especificação documental. Não autoriza implementação, migrations, alterações Supabase/n8n/WhatsApp, provisionamento, deploy ou acesso a produção.
 
 **Estado atual informado pelo responsável:** o ERP ainda não possui servidor MCP. Para o MVP proposto, os contratos REST da API NestJS são o caminho inicial. MCP é uma possível camada futura, opcional e sujeita a decisão/implementação próprias; exemplos de perfis MCP nesta especificação são arquiteturais, não descrevem componente existente nem pré-requisito atual.
@@ -89,7 +90,7 @@ O princípio de identidade de serviço do n8n perante a API REST do ERP e o mode
 
 ### 1.6. Aprovação explícita do responsável — 2026-11-15
 
-O responsável aprovou explicitamente a especificação técnica integral. A aprovação valida este documento como especificação de produto/arquitetura, preservando as decisões e parâmetros listados como pendentes. Até a integração do documento à main, a versão aprovada permanece nesta branch de revisão.
+O responsável aprovou explicitamente a especificação técnica integral. A aprovação valida este documento como especificação de produto/arquitetura, preservando as decisões e parâmetros listados como pendentes. O documento foi integrado à main pelo PR #2, merge commit `1700b68eeb7b9a20d060a65ab5a8789b8744fd3b`.
 
 A aprovação não encerra gates G0–G8 nem autoriza implementação, migrations, mudanças em Supabase, workflows, credenciais, Evolution/Chatwoot, deploy ou produção. Cada operação continua sujeita às aprovações e evidências específicas previstas neste documento.
 
@@ -419,7 +420,7 @@ A aprovação desta especificação não fecha gates nem libera acesso a banco/p
 - Decisões pendentes e conflito de roadmap estão destacados.
 - Modelo de dados e endpoints estão marcados como propostas, sem afirmar existência física.
 - Requisitos de tenancy, segurança, testes e gates são rastreáveis às ADRs vigentes.
-- Documento revisado e aprovado explicitamente pelo responsável em 2026-11-15; a integração à main permanece pendente.
+- Documento revisado e aprovado explicitamente pelo responsável em 2026-11-15; integração à main concluída pelo PR #2, merge commit `1700b68eeb7b9a20d060a65ab5a8789b8744fd3b`.
 - Nenhum conteúdo desta branch muda estado de ADR, roadmap, banco, workflows, código ou produção.
 
 ## 14. Referências
