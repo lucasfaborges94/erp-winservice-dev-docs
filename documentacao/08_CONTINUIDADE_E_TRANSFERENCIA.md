@@ -218,3 +218,17 @@ A especificação na branch spec/atendimento-saas-mvp foi atualizada com essas d
 Referências oficiais: https://supabase.com/docs/guides/getting-started/api-keys ; https://supabase.com/docs/guides/auth/users ; https://supabase.com/docs/guides/auth/oauth-server .
 
 **Próximo passo:** responsável confirmar se aceita o princípio recomendado (identidade técnica n8n perante a API, sem token de usuário humano e sem acesso direto ao banco). Depois definir formato/issuer e detalhes de claims, rotação e escopo durante revisão de segurança; isso não autoriza implementação nem alteração operacional.
+
+## Modelo de múltiplos agentes, identidades e workflows — proposta — 2026-11-14
+
+O responsável perguntou como suportar agentes MCP do ERP com perfis diferentes (ex.: leitura/escrita versus escrita restrita), e se cada identidade de serviço representa agente ou workflow, ou se um workflow roteia para agentes distintos.
+
+**Desenho proposto registrado na especificação:** agente é um principal lógico/capability profile; identidade de serviço autentica o processo e mapeia ao perfil e tenant; workflow n8n é unidade de execução/orquestração, não autoridade por si só; MCP/API valida token e autoriza ação/ferramenta e recurso. Recomenda-se identidade por perfil de capacidade e credenciais separadas para perfis com privilégios diferentes. Para o piloto, workflows distintos por perfil são o caminho mais simples de auditar; roteador compartilhado é possível apenas com origem/principal validados e subworkflows com credenciais separadas. Não confiar em agent_id enviado pelo prompt/payload e não compartilhar credencial global com união de escopos.
+
+“Escrita” deve representar mutações enumeradas (por exemplo, criar qualificação ou handoff), não write genérico. Operações devem validar o objeto/tenant no servidor; leitura contextual mínima pode ser necessária e deve ser explicitamente limitada.
+
+**MCP:** documentação oficial consultada informa que o servidor protegido valida tokens emitidos para seu recurso, aplica scopes e rejeita tokens destinados a outro recurso; tokens não devem ser retransmitidos a uma API upstream como credenciais. Referência: https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization . A documentação n8n informa que editores de workflows compartilhados podem usar credenciais presentes nos workflows: https://docs.n8n.io/workflows/sharing/ .
+
+**Estado:** texto incluído em documentacao/ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md na branch de proposta. São recomendações, não decisão aprovada. O responsável ainda não confirmou a identidade técnica de serviço nem o modelo de escopos. Nenhum servidor MCP, workflow, API, Supabase ou produção foi alterado; nenhuma credencial foi criada.
+
+**Próximo passo:** o responsável confirmar o princípio de identidades por perfil de capacidade e escolher se deseja começar com workflows separados (recomendado para piloto) ou um roteador autenticado; manter a escolha do mecanismo de token/issuer sujeita à revisão de segurança.
