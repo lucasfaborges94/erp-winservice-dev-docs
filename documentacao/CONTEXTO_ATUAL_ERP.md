@@ -1,8 +1,8 @@
 ### Estado mais recente — especificação do SaaS de atendimento (2026-11-15)
 
-**Fontes e branches:** repositório oficial `lucasfaborges94/erp-winservice-dev-docs`; `main` atualizada até `81fe108b28cfb8c90034f3fc5c393ed762337d9a`. O PR #1 da ADR-0020 está fechado e merged com head esperado `6bb0aed249bd63f275ef84dfc84a0498f78ce973`; o diff revisado contém somente o índice de ADRs e a ficha da ADR-0020 (115 adições/2 remoções). A especificação permanece na branch isolada `spec/atendimento-saas-mvp`, sem merge. A aprovação foi registrada no commit `613c62fc9f54c81d1208dce70f793457709c56e4`; depois a branch foi sincronizada com a `main` pelo merge commit `488fa6b433488e716d54c1aefa750a0cced3939a`.
+**Fontes e branches:** repositório oficial `lucasfaborges94/erp-winservice-dev-docs`; `main` recebeu o PR #2 pelo merge commit `1700b68eeb7b9a20d060a65ab5a8789b8744fd3b`. O PR #1 da ADR-0020 está fechado e merged com head esperado `6bb0aed249bd63f275ef84dfc84a0498f78ce973`; seu diff continha somente o índice de ADRs e a ficha da ADR-0020 (115 adições/2 remoções). A especificação técnica aprovada foi integrada à main pelo PR #2; a branch de elaboração/aprovação foi `spec/atendimento-saas-mvp`.
 
-**Estado e decisões:** ADR-0020 aprovada; `documentacao/ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md` foi aprovada explicitamente pelo responsável em 2026-11-15; integração documental à main ainda pendente. Para a proposta do piloto: Evolution API com Baileys escolhido pelo responsável; Chatwoot transitório; identidade de serviço n8n→API via credencial opaca; workflows e credenciais separados por perfil; perfil write-only sem criação de cadastro; caminho REST inicial; MCP do ERP ainda não existe.
+**Estado e decisões:** ADR-0020 aprovada; `documentacao/ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md` foi aprovada explicitamente pelo responsável em 2026-11-15 e integrada pelo PR #2. Para a proposta do piloto: Evolution API com Baileys escolhido pelo responsável; Chatwoot transitório; identidade de serviço n8n→API via credencial opaca; workflows e credenciais separados por perfil; perfil write-only sem criação de cadastro; caminho REST inicial; MCP do ERP ainda não existe.
 
 **Verificação operacional em 2026-11-15:** a instância correta Evolution `51981459630` apareceu conectada no Manager, versão 2.3.7. A integração Chatwoot estava habilitada; o inbox Canal da API correspondente aponta para a rota Evolution dessa instância. Um teste de entrada iniciado pelo responsável apareceu no Chatwoot como prévia `Oii`, sob o contato salvo como `Amor`. Nenhuma conversa foi aberta. Isso confirma um recebimento naquele momento; o Manager não confirmou modo Baileys nem a imagem do container. A consulta anterior `close` era para `winservice_principal`, outra instância.
 
@@ -10,9 +10,9 @@
 
 **Gates e limites:** G0/G1 continuam parciais conforme a última evidência de 2026-11-09; não foram revalidados contra Supabase nesta sessão. Nenhuma alteração no Supabase, workflows n8n, código, Evolution, Chatwoot, deploy ou produção. Nenhum teste automatizado foi executado.
 
-**Documentos preparados no PR #2:** especificação técnica, índice Leia-me, continuidade e contexto. O registro de credenciais, já criado na main, também foi incluído na branch sincronizada.
+**Documentos integrados pelo PR #2:** especificação técnica, índice Leia-me, continuidade e contexto. O registro de credenciais já existia na main e foi preservado.
 
-**PR #2:** aberto; reconsulta do GitHub informa mergeable=true e mergeable_state=clean, com base 81fe108b28cfb8c90034f3fc5c393ed762337d9a. O PR permanece não merged; aguardar autorização específica para merge. Próximos passos técnicos; retenção/privacidade, emissão/validade/rotação e escopos das credenciais; fonte autoritativa para mensagens/status e contrato de handoff; homologação do modo Baileys, webhook, idempotência, retries, reconexão e limites. Manter a especificação separada da `main`; não implementar/deploy até gates e autorizações operacionais.
+**PR #2:** fechado e merged; merge commit 1700b68eeb7b9a20d060a65ab5a8789b8744fd3b; main foi verificada apontando para esse SHA. Próximos passos técnicos; retenção/privacidade, emissão/validade/rotação e escopos das credenciais; fonte autoritativa para mensagens/status e contrato de handoff; homologação do modo Baileys, webhook, idempotência, retries, reconexão e limites. Manter a especificação separada da `main`; não implementar/deploy até gates e autorizações operacionais.
 
 ---
 
@@ -143,3 +143,8 @@ A especificação técnica integral foi aprovada pelo responsável. O PR #2 para
 ### Snapshot da main após publicação do PR #2 — 2026-11-15
 
 A continuidade e o contexto na main registraram o PR #2 aberto e limpo em snapshots anteriores. A branch foi sincronizada com a main pelo merge commit aa83feea2df87b0c18a75c64b76fe930608423c7, que inclui os dois commits documentais recentes. Reconsulta REST confirmou o PR aberto, não merged, mergeable=true e mergeable_state=clean no head aa83feea2df87b0c18a75c64b76fe930608423c7/base 24133d919ac0ede32ccc63dd378d4ba23a713f48. Nenhuma mudança operacional.
+
+
+## Estado após merge do PR #2 — 2026-11-15
+
+A especificação técnica aprovada está na main. A aprovação é documental e não conclui gates G0–G8 nem autoriza implementação ou mudanças em Supabase, n8n, credenciais, Evolution/Chatwoot, código, deploy ou produção. Permanecem decisões de retenção/privacidade, credencial de serviço, autoridade do histórico/handoff e homologação das integrações. O registro de credenciais continua em REGISTRO_CREDENCIAIS_A_ROTACIONAR.md, sem valores secretos. Nenhum teste automatizado foi executado.
