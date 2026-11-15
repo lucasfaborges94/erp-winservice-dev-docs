@@ -426,3 +426,12 @@ Após a sincronização inicial, a continuidade oficial em `main` recebeu um reg
 Após autorização explícita do responsável, o PR #2 foi revalidado como aberto, não draft, não merged, `mergeable=true`, `mergeable_state=clean`; head esperado `25099014fae6610191cd0ea09a9d53370481da9e`, base `24133d919ac0ede32ccc63dd378d4ba23a713f48`. O merge foi executado com método merge e `expected_head_sha` igual ao head verificado. O GitHub retornou `merged=true`, commit `1700b68eeb7b9a20d060a65ab5a8789b8744fd3b`.
 
 A verificação pós-merge confirmou PR #2 fechado/merged e a referência `main` apontando para o mesmo commit. O diff integrado contém quatro arquivos documentais: Leia-me, continuidade, contexto atual e a especificação técnica aprovada. A especificação permanece documental; aprovação não libera implementação nem encerra gates. Nenhum teste automatizado, alteração Supabase, workflow, código, credencial, deploy ou produção foi realizado.
+
+
+## Plano proposto de prontidão para implementação — 2026-11-15
+
+A partir da especificação técnica aprovada e integrada à main pelo PR #2, foi criada a branch de revisão `plan/atendimento-saas-readiness`, baseada na main `66aaf6062842a6fecf3e85908d909e07fa5bf27f`. O arquivo `documentacao/PLANO_PRONTIDAO_IMPLEMENTACAO_ATENDIMENTO.md` organiza as etapas de segurança de credenciais, decisões antes de dados reais, G0–G8, critérios de parada e autorizações necessárias.
+
+**Estado:** PROPOSTA, não aprovada. É somente planejamento documental; não inicia correções de credenciais, operações Supabase, workflows, código, deploy ou produção. Nenhum teste automatizado foi executado.
+
+**Próxima ação:** responsável revisar/ajustar/aprovar o plano. Antes de qualquer piloto com dados reais, resolver retenção/privacidade, handoff/fonte autoritativa e ciclo de vida das credenciais. A rotação Evolution registrada como pendente permanece ação do responsável.
