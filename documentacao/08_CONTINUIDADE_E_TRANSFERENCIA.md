@@ -319,3 +319,11 @@ O responsável escolheu a Evolution API como camada de integração WhatsApp do 
 **Ainda pendente:** Baileys versus Cloud API, hospedagem da Evolution, versão, titularidade/número e associação por tenant, requisitos de templates/janela/custos, configuração exata de eventos, verificação de autenticidade do webhook para a versão escolhida e autoridade do histórico/status entre Evolution e Chatwoot.
 
 **Estado e limites:** Evolution API escolhida como provedor documental; nenhum serviço foi conectado, provisionado ou configurado. Nenhum número, credencial, workflow, webhook, Supabase, código, deploy ou produção foi alterado. A especificação completa permanece PROPOSTA; sua aprovação ainda é necessária antes de tratá-la como normativa, sem substituir gates e autorizações operacionais.
+
+## Baileys definido para a fase inicial com Evolution API — 2026-11-14
+
+O responsável escolheu utilizar Evolution API com Baileys/WhatsApp Web inicialmente. A especificação foi atualizada para refletir a decisão, incluir os testes de pareamento QR, sessão, reconexão, duplicidade e desvinculação, e manter o adaptador de domínio pronto para reavaliar uma migração futura para WhatsApp Cloud API oficial. A documentação da Evolution alerta que Baileys pode ter limitações frente às APIs oficiais.
+
+**Ainda pendente:** hospedagem e versão da Evolution, titularidade/associação do número por tenant, requisitos de webhook e segurança da sessão, homologação e decisão operacional sobre eventual migração para Cloud API. Nada foi provisionado, conectado ou pareado.
+
+**Estado e limites:** a escolha de Baileys é uma decisão de arquitetura para esta proposta; não aprova o documento completo nem autoriza ativação. Nenhuma credencial, workflow, webhook, Supabase, código, deploy ou produção foi alterado.
