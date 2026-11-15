@@ -139,3 +139,9 @@ A especificação técnica de autenticação, empresa ativa, autorização, cont
 - Documento atualizado para estado APROVADA na branch isolada spec/atendimento-saas-mvp, commit 613c62fc9f54c81d1208dce70f793457709c56e4.
 - A integração à main ainda está pendente; a aprovação documental não fecha gates nem autoriza alterações Supabase/workflows/credenciais, implementação, deploy ou produção.
 - Próximo passo: preparar PR documental, revisar diff/mergeabilidade e aguardar autorização específica para merge.
+## PR #2 — especificação técnica de atendimento aprovada — 2026-11-15
+
+- PR #2 aberto da branch spec/atendimento-saas-mvp para main; aprovado documentalmente, ainda não integrado.
+- O GitHub confirmou mergeable=true e mergeable_state=clean após sincronização da branch com a base 81fe108b28cfb8c90034f3fc5c393ed762337d9a.
+- Diff: quatro arquivos de documentação. Nenhum teste automatizado ou alteração operacional foi feito.
+- O merge à main aguarda autorização específica. A aprovação do documento não encerra os gates nem autoriza implementação, mudanças em Supabase/workflows/credenciais, deploy ou produção.
