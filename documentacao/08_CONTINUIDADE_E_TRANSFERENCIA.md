@@ -170,3 +170,12 @@ Nenhuma tabela, policy RLS, função, trigger, dado ou configuração do projeto
 **Pendências G1:** prova de validação JWT Supabase na API, mapeamento Auth→ERP ponta a ponta e fluxo de provisionamento comprovado.
 
 **Próxima ação acionável:** obter backup restaurável e preparar ensaio de restauração isolado, sem tocar no projeto principal. Após evidenciar G0, implementar a prova G1 de forma isolada na API, com testes de tokens válidos/inválidos e mapeamento de identidade. Não iniciar endpoints de negócio antes dos gates.
+
+
+## Continuação — registro de credenciais Evolution para rotação — 2026-11-15
+
+O responsável solicitou manter um arquivo com credenciais que precisem ser rotacionadas ao final das conversas. Foi criado [REGISTRO_CREDENCIAIS_A_ROTACIONAR.md](REGISTRO_CREDENCIAIS_A_ROTACIONAR.md) na `main`, com metadados de duas constatações sobre a Evolution API feitas em 2026-11-14: (1) chave global visível nas variáveis de ambiente do Easypanel; (2) chave literal encontrada no nó Set do workflow n8n “Testa conexao Evolution Api”. Os valores foram omitidos. Ainda não foi confirmado se são a mesma credencial, por isso estão registrados separadamente.
+
+O registro esclarece que a lista não reduz o risco: ambas permanecem pendentes e devem ser tratadas como comprometidas até rotação/revogação, invalidação comprovada da credencial antiga e atualização dos consumidores. A rotação da chave Evolution foi previamente indicada pelo responsável para depois desta conversa.
+
+**Limites desta sessão:** nenhuma chave foi rotacionada, revogada, copiada para documentação ou alterada no n8n/Easypanel. Não houve alteração em Supabase, workflows, código, deploy ou produção. O arquivo contém somente metadados não secretos e ações pendentes.
