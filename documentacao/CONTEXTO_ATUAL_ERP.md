@@ -124,3 +124,12 @@ A especificação técnica de autenticação, empresa ativa, autorização, cont
 - Há duas ocorrências Evolution API pendentes, vistas em 2026-11-14: chave de autenticação visível no ambiente do Easypanel e valor literal no nó Set do workflow n8n “Testa conexao Evolution Api”. Não se confirmou se são a mesma chave; valores secretos não foram registrados.
 - Tratar ambas como comprometidas até confirmar relação, rotacionar/revogar, atualizar consumidores e provar que a credencial antiga foi invalidada.
 - Nenhuma rotação, alteração no n8n/Easypanel, Supabase, código ou deploy ocorreu nesta sessão. Próxima ação: responsável rotaciona a chave Evolution conforme a janela combinada; depois remover literal do workflow, armazenar a nova credencial no gerenciador de credenciais do n8n e validar invalidação/funcionamento, sem registrar o valor.
+
+## Estado mais recente — revisão da especificação do SaaS de atendimento — 2026-11-15
+
+- **ADR-0020:** aprovada e integrada à main pelo PR #1, merge commit 0525fe67a5113cbb8527c29ff2e434589e99ae84.
+- **Especificação técnica:** [ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md](https://github.com/lucasfaborges94/erp-winservice-dev-docs/blob/spec%2Fatendimento-saas-mvp/documentacao/ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md) na branch isolada spec/atendimento-saas-mvp, HEAD e3bcd5ef5eb0d6a273d5472ae9ba79f96791e5b1. Revisão confirmou cobertura de requisitos, tenancy, onboarding, modelo de dados proposto, REST, n8n/WhatsApp, segurança, testes e gates. Estado permanece **PROPOSTA**, sem PR ou merge.
+- Deliberações refletidas: Evolution API com Baileys inicialmente; Chatwoot transitório e disponível; credenciais e workflows separados por perfil; perfil write-only sem criar cadastro de cliente; não existe MCP do ERP.
+- Teste manual observado: mensagem de entrada Oii apareceu no inbox Chatwoot correto sob o contato Amor. É evidência pontual de entrega, não homologação.
+- Exposições Evolution pendentes: consulte [REGISTRO_CREDENCIAIS_A_ROTACIONAR.md](REGISTRO_CREDENCIAIS_A_ROTACIONAR.md); o registro não contém valores secretos. Tratar as ocorrências como comprometidas até rotação e validação da invalidação das credenciais anteriores.
+- **Próximo passo:** revisão e aprovação explícita da especificação integral. Depois disso, preparar PR para revisão; não iniciar implementação, alterações Supabase/workflows, deploy ou produção sem autorizações e gates correspondentes.
