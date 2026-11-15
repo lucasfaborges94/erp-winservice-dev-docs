@@ -199,3 +199,10 @@ O registro esclarece que a lista não reduz o risco: ambas permanecem pendentes 
 O responsável aprovou explicitamente a especificação técnica integral do MVP do SaaS de atendimento. O documento foi atualizado para estado **APROVADA** na branch isolada `spec/atendimento-saas-mvp`, commit `613c62fc9f54c81d1208dce70f793457709c56e4`. Permanecem pendentes sua integração documental à `main` e as decisões/gates de implementação descritos no próprio documento.
 
 A aprovação é do documento. Ela não encerra os gates G0–G8 nem autoriza implementação, alteração Supabase/workflows/credenciais, provisionamento, deploy ou produção. Próximo passo documental: preparar PR para integrar a especificação, revisar o diff/mergeabilidade e aguardar autorização específica para merge.
+
+
+## PR #2 da especificação aprovada — sincronizado e pronto para revisão — 2026-11-15
+
+Foi aberto o [PR #2 — docs: aprovar especificação técnica do MVP de atendimento SaaS](https://github.com/lucasfaborges94/erp-winservice-dev-docs/pull/2), da branch `spec/atendimento-saas-mvp` para `main`. A branch foi sincronizada com a base `81fe108b28cfb8c90034f3fc5c393ed762337d9a` por merge commit apenas na branch. A API REST do GitHub confirmou o PR aberto, não merged, `mergeable=true`, `mergeable_state=clean`, base `81fe108b28cfb8c90034f3fc5c393ed762337d9a` e head `ebc8f5469c2f8a8bd41de112b5da9c1fb50819bd`.
+
+O diff contém quatro arquivos documentais: Leia-me, continuidade, contexto atual e a nova especificação. O registro de credenciais já existe na base e foi preservado na branch sincronizada. Nenhuma mudança de código/Supabase/workflows/credenciais/deploy/produção; nenhum teste automatizado foi executado. O merge do PR à `main` não foi realizado e aguarda autorização específica.
