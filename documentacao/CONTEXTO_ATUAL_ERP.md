@@ -2,6 +2,8 @@
 
 A ADR-0020 aprovada permanece na `main` (`0525fe67a5113cbb8527c29ff2e434589e99ae84`). A especificação de atendimento segue isolada na branch `spec/atendimento-saas-mvp`, em estado PROPOSTA e pendente de aprovação explícita.
 
+Avaliação de hospedagem (somente leitura, 2026-11-14): VPS Hostinger KVM 2 com 2 vCPU/8 GB RAM/100 GB; métricas dos últimos 7 dias com CPU média 4,28% (pico 20,3%), RAM média ~3,15 GB (pico ~3,83 GB) e disco máximo ~17,03 GB usado. Endpoint Docker Manager não suportou o sistema informado; workloads por projeto não foram verificados. Isso não basta para aprovar co-localização da Evolution; revisar Easypanel/monitoramento antes.
+
 Deliberações registradas para a proposta: Evolution API com Baileys/WhatsApp Web selecionada para início, mantendo adaptador de domínio para possível migração futura; hospedagem/versão pendentes; Chatwoot transitório informado como disponível; telefone sozinho não identifica cliente; identidade de serviço própria n8n→API; piloto com workflows e credenciais separados por perfil; perfil write-only sem criação de cadastro de cliente.
 
 Modelo opaco de credencial de serviço aprovado para a proposta: token de alta entropia emitido pela API ERP, armazenado como hash e vinculado a perfil/escopos/tenant no servidor, com expiração, rotação e revogação. O prazo de validade, autoridade de emissão e escopos finais permanecem pendentes; até 90 dias é apenas sugestão. Nenhum token, chave Supabase, workflow, alteração de código/banco ou deploy foi criado/realizado. O ERP ainda não possui MCP; REST é o caminho inicial proposto. Gates G0/G1 continuam parciais segundo evidência de 2026-11-09 e precisam de revalidação.
