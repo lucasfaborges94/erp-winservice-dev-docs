@@ -28,8 +28,8 @@ A direção arquitetural aprovada na ADR-0020 é reutilizar a API NestJS e o Sup
 A lista abaixo identifica o que ainda está pendente e o que já foi confirmado pelo responsável durante a revisão. As confirmações não aprovam a especificação inteira.
 
 1. **Prioridade e fronteira de produto:** a decisão de alto nível já está registrada na ADR-0020: o atendimento terá plano de entrega próprio, preservando a prioridade de Operação do ERP e sem tornar WhatsApp/n8n parte automática do MVP operacional. Fica pendente detalhar a fronteira técnica de releases, módulos e operação na API compartilhada, sem reabrir a decisão já aprovada.
-2. **Canal/provedor WhatsApp:** o responsável escolheu a Evolution API como camada de integração do MVP e Baileys/WhatsApp Web como modo inicial. O domínio permanece protegido por adaptador para permitir eventual migração para Cloud API oficial sem assumir equivalência de comportamento. Uma consulta pública GET à raiz de evo.winservicers.com retornou HTTP 200 e anunciou Evolution API 2.3.7 em 2026-11-14. A verificação não revela onde o serviço está hospedado, a imagem/tag efetiva, nem se Baileys está ativo. Permanecem pendentes hospedagem operacional, confirmação da versão do artefato implantado e política de atualização, titularidade e associação do número por tenant, segurança de webhook, regras de operação e homologação. Se houver migração futura para Cloud API, validar custos, templates, janela e requisitos Meta.
-3. **Inbox humana:** decisão confirmada: Chatwoot transitório, já disponível segundo informação do responsável, conforme ADR-0007. Permanecem pendentes os detalhes do contrato de integração e a autoridade para status/mensagens durante a transferência.
+2. **Canal/provedor WhatsApp:** o responsável escolheu a Evolution API com Baileys/WhatsApp Web para o início, mantendo um adaptador de domínio para possível migração futura para a Cloud API oficial. A instalação em `evo.winservicers.com` foi confirmada pelo responsável; a raiz pública respondeu HTTP 200 e o Evolution Manager informou versão 2.3.7. Em 2026-11-15, a instância correta `51981459630` foi observada como conectada. Isso não comprova a imagem/tag implantada nem, por si só, o modo Baileys efetivamente usado. Permanecem pendentes a confirmação técnica do modo e da imagem, política de atualização, isolamento/associação de números por tenant, autenticação do webhook, retenção e recuperação da sessão e homologação. Uma migração futura para Cloud API exige nova avaliação de custos, templates, janela e requisitos Meta.
+3. **Inbox humana:** Chatwoot transitório, conforme ADR-0007, está configurado e em uso. Em 2026-11-15, a ligação do canal e o recebimento de uma mensagem de teste foram verificados. Permanecem pendentes, para a arquitetura futura, o contrato API/n8n, a fonte autoritativa de status/histórico e o comportamento de transferência/retomada.
 4. **Identidade de cliente:** decisão confirmada: não associar automaticamente um cliente existente apenas pelo telefone. Pedir confirmação quando houver ambiguidade e encaminhar ao humano quando a identidade não puder ser confirmada; regras para números compartilhados e prevenção de duplicidade devem seguir esse princípio.
 5. **Modelo SaaS:** decidir onboarding self-service ou assistido, aprovação/verificação de empresas, planos, limites, cobrança, suspensão, suporte e retenção. Billing não integra o MVP funcional salvo aprovação específica.
 6. **Modelo de configuração:** decidir quem publica/aprova regras comerciais, versionamento, validade temporal, auditoria e rollback de uma configuração por tenant.
@@ -77,6 +77,14 @@ O responsável confirmou expressamente as seguintes direções para esta propost
 - Um número de telefone sozinho não autoriza associação automática a um cadastro existente. Quando a identidade estiver ambígua, solicitar confirmação ou transferir ao humano.
 
 O princípio de identidade de serviço do n8n perante a API REST do ERP e o modelo de credencial opaca foram aprovados pelo responsável para esta proposta. A credencial não será token de usuário humano do Supabase Auth, chave de API Supabase/OpenAI nem credencial de banco. Permanecem pendentes o prazo de validade, o procedimento autorizado de emissão/rotação, escopos e vínculo tenant/canal finais. O responsável também concordou com workflows separados por perfil para o piloto, cada um usando identidade/credencial própria; um roteador eventual apenas encaminha e não detém permissões amplas. A especificação inteira continua em estado PROPOSTA até aprovação explícita posterior.
+
+### 1.5. Verificação operacional — 2026-11-15 (evidência, sem nova aprovação)
+
+- O Evolution Manager, versão 2.3.7, mostrou a instância `51981459630` como conectada. A consulta anterior de 2026-11-14 que retornou `close` era para `winservice_principal`, outra instância; ela não descreve o canal deste MVP.
+- A instância correta tem integração Chatwoot habilitada e campos de conexão preenchidos. Seu webhook está ativo, configurado por eventos, com envio de mídia Base64 habilitado; todos os eventos visíveis estavam selecionados. O inbox correspondente no Chatwoot é um Canal da API e aponta para a rota de webhook dessa instância. Segredos não foram lidos nem registrados.
+- O responsável iniciou um teste de entrada; a prévia `Oii` apareceu no inbox correto, sob o contato salvo como `Amor`, com horário atualizado. A conversa não foi aberta. Isso confirma uma entrega de entrada Evolution→Chatwoot no momento do teste, não o comportamento completo de falhas, autenticação, reconexão ou segurança.
+- A verificação pelo Manager não identificou de forma independente o modo Baileys nem a imagem do container.
+- Uma captura do Easypanel compartilhada em 2026-11-14 mostrava `AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES=true` e a chave administrativa visível. Nenhuma configuração foi alterada; o responsável pretende rotacionar a chave ao final da conversa. O valor não deve ser registrado.
 
 ## 2. Escopo funcional
 
@@ -314,7 +322,7 @@ A documentação da Evolution configura webhooks por instância com seleção ex
 
 Credenciais Evolution (chave administrativa da API e token por instância, conforme modo/versão) são distintas da identidade de serviço n8n→ERP. Devem ficar em armazenamento seguro, com escopo e rotação próprios, sem exposição ao modelo, em payloads/logs ou exports de workflow. A chamada externa recebida deve passar por autenticação de webhook suportada pela versão escolhida ou camada protetora adicional; validar autenticidade, replay, formato, tamanho e idempotência antes de persistir/processar. O mecanismo exato de assinatura/autenticação do webhook deve ser confirmado na homologação.
 
-A Evolution possui integração nativa com Chatwoot, mas essa opção não está selecionada aqui: o Chatwoot permanece inbox transitório para handoff conforme a decisão já registrada. Antes de integrar, definir qual sistema mantém o histórico/status autoritativo para evitar duplicação ou conflito.
+**Integração Chatwoot — estado atual verificado:** a integração nativa Evolution→Chatwoot está habilitada para a instância `51981459630`; a configuração correspondente está preenchida e o webhook do inbox no Chatwoot aponta para a rota da Evolution. O teste de mensagem descrito acima confirmou a entrega de entrada. Esse é o caminho transitório atualmente em uso, não uma decisão de dependência permanente. Antes de acrescentar ou substituir o fluxo por API/n8n, definir fonte autoritativa para histórico/status, deduplicação, handoff e retomada, evitando eventos ou respostas duplicadas.
 
 1. O provedor entrega webhook à API ou a uma entrada técnica controlada. A API valida assinatura, canal ativo, tenant, tamanho, timestamp/replay e idempotência antes de aceitar o evento.
 2. A API registra evento e conversa com estado consistente. n8n recebe apenas um evento normalizado e tenant-scoped, via credencial de serviço limitada.
@@ -336,11 +344,12 @@ A Evolution possui integração nativa com Chatwoot, mas essa opção não está
 - Auditoria append-only para publicação de regras, mudanças de canal, handoff, ações de agente e acessos administrativos.
 - Observabilidade com correlation ID ponta a ponta; métricas agregadas e tenant-safe: eventos aceitos/duplicados, falha/retry, latência, handoffs, taxa de resposta sem regra e indisponibilidade por dependência. Não registrar conteúdo integral por padrão.
 - Limites de autonomia da ADR-0012 aplicados no backend; negação segura em identidade ambígua, configuração ausente, tenant desconhecido ou falha de autorização.
+- Evolution API 2.3.7: não depender de `AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES=false` para proteger tokens de instância; o relato upstream #2677 indica que `GET /instance/fetchInstances` ainda pode retornar o campo `token` nessa versão. Não usar esse endpoint até confirmar correção na versão efetivamente implantada. A captura de configuração compartilhada pelo responsável mostrava o sinalizador ligado e a chave administrativa visível; rotação permanece pendente por iniciativa do responsável, sem persistir o valor neste documento.
 - Threat model antes da implementação: cross-tenant IDOR, prompt injection, replay, spoofing, exfiltração em logs, credencial comprometida, duplicidade/ordenação e negação de serviço/custo.
 
 ## 11. Plano de testes proposto
 
-Nenhum teste foi executado como parte desta especificação. Antes de implementação/ativação, preparar evidências automatizadas com dados sintéticos e ambientes isolados.
+Não foram executados testes automatizados como parte desta especificação. Em 2026-11-15 foi observado um smoke test manual iniciado pelo responsável: a prévia `Oii` apareceu no inbox Chatwoot correto sob o contato `Amor`. Isso é evidência de uma entrega de entrada naquele momento, não substitui testes automatizados ou homologação. Antes de implementação/ativação, preparar evidências automatizadas com dados sintéticos e ambientes isolados.
 
 ### 11.1 Funcionais
 
@@ -392,6 +401,8 @@ Estado documental consultado na continuidade mais recente disponível (2026-11-0
 | G6 — Integrações | provedor, webhook, máquina-a-máquina, idempotência, secrets, retry e monitoramento validados em homologação; credenciais com escopo/perfil/tenant e ciclo de rotação/revogação testados | Aprovação técnica/operacional e ativação por tenant |
 | G7 — Piloto Winservice | canal de teste, regras publicadas, handoff, suporte, pausa e métricas acordadas | Autorização operacional específica antes de produção |
 | G8 — Comercialização | critérios de suporte, limites, billing, privacidade e onboarding multi-tenant aprovados | Revisão do responsável antes de abrir a novos tenants |
+
+**Estado atual de G6:** integração Evolution/Chatwoot foi verificada parcialmente por inspeção de configuração e um smoke test de entrada. G6 continua **NÃO CONCLUÍDO**: permanecem pendentes autenticidade do webhook, replay/idempotência, rotação/revogação, limites, retries, monitoramento, reconexão, ordenação, duplicidade e homologação dos perfis de serviço.
 
 A conclusão desta especificação não fecha gates nem libera acesso a banco/produção. Aprovação do documento, se concedida, também não autoriza execução operacional sem autorização específica.
 
