@@ -116,3 +116,11 @@ A especificação técnica de autenticação, empresa ativa, autorização, cont
 **Gates:** G0 permanece parcial; faltam backup restaurável, baseline SQL reconciliada, verificação de pooler/conexão e ensaio de restauração. G1 permanece parcial; validação JWT ponta a ponta e provisionamento ainda não comprovados. G2–G5 não iniciados.
 
 **Próxima ação:** obter backup restaurável e realizar ensaio de restauração isolado; preparar baseline SQL reconciliada e registrar parâmetros não secretos do pooler. Não executar DDL/DML, migrations, ajustes de segurança ou deploy sem autorização operacional específica e gates concluídos.
+
+
+## Segurança operacional — credenciais a rotacionar — 2026-11-15
+
+- Registro persistente: [REGISTRO_CREDENCIAIS_A_ROTACIONAR.md](REGISTRO_CREDENCIAIS_A_ROTACIONAR.md).
+- Há duas ocorrências Evolution API pendentes, vistas em 2026-11-14: chave de autenticação visível no ambiente do Easypanel e valor literal no nó Set do workflow n8n “Testa conexao Evolution Api”. Não se confirmou se são a mesma chave; valores secretos não foram registrados.
+- Tratar ambas como comprometidas até confirmar relação, rotacionar/revogar, atualizar consumidores e provar que a credencial antiga foi invalidada.
+- Nenhuma rotação, alteração no n8n/Easypanel, Supabase, código ou deploy ocorreu nesta sessão. Próxima ação: responsável rotaciona a chave Evolution conforme a janela combinada; depois remover literal do workflow, armazenar a nova credencial no gerenciador de credenciais do n8n e validar invalidação/funcionamento, sem registrar o valor.
