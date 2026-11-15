@@ -200,3 +200,21 @@ Foi feita revisão de consistência da especificação na branch spec/atendiment
 **Estado:** especificação permanece PROPOSTA. Nenhuma decisão foi aprovada ou assumida pelo responsável; não houve implementação, operação em Supabase/n8n/WhatsApp, testes, deploy ou alteração de produção.
 
 **Próximo passo:** obter deliberação explícita sobre os quatro pontos de integração e sobre retenção/privacidade para piloto; então revisar a especificação e submetê-la à aprovação explícita sem confundir aprovação documental com autorização operacional.
+
+## Deliberações sobre canal/handoff/identidade e esclarecimento de token do agente — 2026-11-14
+
+O responsável confirmou: (1) adaptador WhatsApp independente do provedor; o fornecedor específico continua pendente; (2) Chatwoot como inbox transitório e informou que já está disponível; (3) telefone sozinho não basta para associar cliente, pedindo confirmação em caso ambíguo ou transferindo ao humano.
+
+A especificação na branch spec/atendimento-saas-mvp foi atualizada com essas deliberações, sem aprovar a especificação completa. A disponibilidade do Chatwoot é uma informação do responsável, não uma verificação técnica do ambiente nesta sessão.
+
+**Pergunta pendente do responsável:** se o agente/n8n deve ser identificado por token de usuário emitido pelo Supabase Auth.
+
+**Esclarecimento técnico consultado em documentação oficial Supabase (2026-11-14):** o access token Supabase Auth identifica um usuário Auth e usa a role authenticated; a API key identifica o componente/aplicação, e a secret key/service_role concede acesso elevado com bypass RLS. O OAuth 2.1 Server do Supabase documenta Authorization Code com PKCE e autenticação/aprovação do usuário. Logo, não tratar um token humano como credencial de serviço unattended nem confundir chave secret/service_role com identidade do agente.
+
+**Recomendação registrada como PROPOSTA:** n8n autentica-se na API NestJS como identidade técnica de serviço; token/credencial com audiência da API, escopo mínimo, expiração, rotação e revogação; o servidor resolve tenant pelo canal e permissões configuradas. A API aplica o contexto de banco/RLS sob a role de runtime aprovada. Conta dedicada no Supabase Auth só deve ser considerada se for deliberadamente modelada como principal não humano, sem impersonar colaborador, e com associação/autorização/RLS próprias.
+
+**Ainda não decidido:** se a credencial será token opaco/API key rotacionável, JWT de serviço ou provedor OAuth máquina-a-máquina; identidade e escopo tenant-scoped; propagação segura do ator até RLS. Nenhuma credencial foi criada, Supabase alterado ou workflow modificado.
+
+Referências oficiais: https://supabase.com/docs/guides/getting-started/api-keys ; https://supabase.com/docs/guides/auth/users ; https://supabase.com/docs/guides/auth/oauth-server .
+
+**Próximo passo:** responsável confirmar se aceita o princípio recomendado (identidade técnica n8n perante a API, sem token de usuário humano e sem acesso direto ao banco). Depois definir formato/issuer e detalhes de claims, rotação e escopo durante revisão de segurança; isso não autoriza implementação nem alteração operacional.
