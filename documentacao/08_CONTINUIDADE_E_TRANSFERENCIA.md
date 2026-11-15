@@ -414,3 +414,8 @@ O PR #2 foi aberto para integração documental à `main`. Na criação, o GitHu
 O registro de credenciais a rotacionar está em [REGISTRO_CREDENCIAIS_A_ROTACIONAR.md](REGISTRO_CREDENCIAIS_A_ROTACIONAR.md). Ele contém metadados, não os valores. Duas ocorrências Evolution seguem pendentes, e a relação entre elas ainda não foi confirmada.
 
 **Limites:** nenhuma implementação, Supabase, workflow, credencial, Evolution/Chatwoot, deploy ou produção foi alterada. Nenhum teste automatizado foi executado.
+
+
+## Atualização da continuidade em main — 2026-11-15
+
+Após a sincronização inicial, a continuidade oficial em `main` recebeu um registro do PR #2, com snapshot no head `ebc8f5469c2f8a8bd41de112b5da9c1fb50819bd` e base `81fe108b28cfb8c90034f3fc5c393ed762337d9a`; naquele momento o GitHub informava `mergeable=true` e `mergeable_state=clean`. A atualização de contexto em `main` repetiu esse estado como resumo operacional. A branch será sincronizada com os dois commits documentais novos de `main`; o merge do PR #2 continua pendente e não foi executado.
