@@ -2,7 +2,7 @@
 
 A ADR-0020 aprovada permanece na `main` (`0525fe67a5113cbb8527c29ff2e434589e99ae84`). A especificação de atendimento segue isolada na branch `spec/atendimento-saas-mvp`, em estado PROPOSTA e pendente de aprovação explícita.
 
-Deliberações registradas para a proposta: Evolution API selecionada como camada WhatsApp, mantendo adaptador de domínio desacoplado; modo Cloud API oficial versus Baileys e hospedagem pendentes; Chatwoot transitório informado como disponível; telefone sozinho não identifica cliente; identidade de serviço própria n8n→API; piloto com workflows e credenciais separados por perfil; perfil write-only sem criação de cadastro de cliente.
+Deliberações registradas para a proposta: Evolution API com Baileys/WhatsApp Web selecionada para início, mantendo adaptador de domínio para possível migração futura; hospedagem/versão pendentes; Chatwoot transitório informado como disponível; telefone sozinho não identifica cliente; identidade de serviço própria n8n→API; piloto com workflows e credenciais separados por perfil; perfil write-only sem criação de cadastro de cliente.
 
 Modelo opaco de credencial de serviço aprovado para a proposta: token de alta entropia emitido pela API ERP, armazenado como hash e vinculado a perfil/escopos/tenant no servidor, com expiração, rotação e revogação. O prazo de validade, autoridade de emissão e escopos finais permanecem pendentes; até 90 dias é apenas sugestão. Nenhum token, chave Supabase, workflow, alteração de código/banco ou deploy foi criado/realizado. O ERP ainda não possui MCP; REST é o caminho inicial proposto. Gates G0/G1 continuam parciais segundo evidência de 2026-11-09 e precisam de revalidação.
 
