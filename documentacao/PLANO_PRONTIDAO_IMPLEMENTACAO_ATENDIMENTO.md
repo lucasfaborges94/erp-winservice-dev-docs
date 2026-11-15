@@ -1,12 +1,12 @@
-# Plano proposto de prontidão para implementação — Atendimento SaaS
+# Plano de prontidão para implementação — Atendimento SaaS
 
-**Estado:** PROPOSTA — sem aprovação explícita  
+**Estado:** APROVADO pelo responsável em 2026-11-15 — integração documental à main pendente.  
 **Data:** 2026-11-15  
 **Base:** especificação aprovada do MVP de atendimento, ADR-0020 e gates G0–G8  
 **Branch:** `plan/atendimento-saas-readiness`  
 **Objetivo:** transformar os gates aprovados em uma sequência de trabalho verificável e segura.
 
-> Este plano organiza trabalho futuro. Não aprova decisões que a especificação deixou pendentes e não autoriza implementação, alterações no Supabase/n8n/Evolution/Chatwoot, credenciais, deploy ou produção. Cada operação requer escopo e autorização próprios.
+> O responsável aprovou este plano em 2026-11-15. A aprovação valida a sequência e os critérios documentais; não aprova decisões que a especificação deixou pendentes nem autoriza implementação, alterações no Supabase/n8n/Evolution/Chatwoot, credenciais, deploy ou produção. Cada operação requer escopo e autorização próprios.
 
 ## 1. Estado inicial verificado
 
@@ -101,4 +101,4 @@ A aprovação deste plano, se concedida, significa apenas aceite da ordem e dos 
 
 ## 7. Próxima ação recomendada
 
-Revisar esta sequência e, se adequada, aprovar o plano. O primeiro trabalho operacional continua sendo a rotação/revogação das credenciais Evolution pendentes pelo responsável; em paralelo, documentar retenção/privacidade e contrato de handoff antes de qualquer tráfego com conversas reais. G0/G1 só devem ser revalidados em escopo autorizado e ambiente apropriado.
+O responsável aprovou esta sequência em 2026-11-15. Próximo passo documental: integrar o plano à main por PR, sem merge automático. O primeiro trabalho operacional continua sendo a rotação/revogação das credenciais Evolution pendentes pelo responsável; em paralelo, documentar retenção/privacidade e contrato de handoff antes de qualquer tráfego com conversas reais. G0/G1 só devem ser revalidados em escopo autorizado e ambiente apropriado.
