@@ -303,3 +303,9 @@ O responsável aprovou o modelo opaco recomendado para autenticar os workflows n
 **Pontos ainda pendentes:** prazo máximo de validade (até 90 dias permanece sugestão, não aprovado); autoridade e fluxo administrativo de emissão/rotação; escopos exatos e granularidade final de tenant/canal; auditoria e secrets manager. OAuth 2.0 Client Credentials continua alternativa futura, caso o emissor correspondente venha a ser especificado, sem ser requisito do piloto.
 
 **Estado e limites:** a especificação continua PROPOSTA. Nenhuma credencial, workflow, alteração Supabase, código, migration, deploy ou operação de produção foi realizada.
+
+## Revisão final de consistência da decisão de credencial — 2026-11-14
+
+Na passada final da especificação, foram alinhados trechos históricos que ainda descreviam como pendente a escolha entre API key opaca, JWT ou OAuth. O texto agora registra como aprovada para a proposta a credencial opaca emitida pela API do ERP, armazenada como hash, com escopo server-side, expiração, rotação e revogação. O prazo, a autoridade/procedimento de emissão, os escopos exatos e o vínculo tenant/canal permanecem pendentes.
+
+**Estado seguinte:** pacote documental consistente para revisão do responsável. A especificação inteira continua PROPOSTA e só se torna normativa com aprovação explícita do documento completo. Nenhum código, credencial, workflow, banco ou produção foi alterado.
