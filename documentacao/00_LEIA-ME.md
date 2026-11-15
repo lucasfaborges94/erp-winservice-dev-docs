@@ -34,6 +34,7 @@ Esta documentação é a referência persistente para planejar, especificar, des
     ├── MODELO_LOGICO_DADOS_OPERACAO.md
     ├── BASE_CONHECIMENTO_ERP.md
     ├── ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md
+    ├── PLANO_PRONTIDAO_IMPLEMENTACAO_ATENDIMENTO.md
     ├── RASCUNHO.md
     └── decisoes/
         ├── ADR-TEMPLATE.md
@@ -59,6 +60,8 @@ Esta documentação é a referência persistente para planejar, especificar, des
 15. [Identidade visual e paleta semântica](IDENTIDADE_VISUAL_E_PALETA.md) — proposta de cores semânticas para textos, botões, fundos e cards; inclui regra explícita de contraste para o título do card secundário.
 16. [Rascunho](RASCUNHO.md) — ideias e propostas ainda não aprovadas.
 
+**Plano de prontidão (proposta, branch de revisão):** [Plano de prontidão para implementação do Atendimento SaaS](PLANO_PRONTIDAO_IMPLEMENTACAO_ATENDIMENTO.md) — sequência sugerida de gates e evidências; não aprovado e não autoriza operações.
+
 **Especificação aprovada e integrada:** [Especificação técnica do MVP de atendimento SaaS](ESPECIFICACAO_TECNICA_MVP_ATENDIMENTO_SAAS.md) — aprovada pelo responsável e integrada à main pelo PR #2 em 2026-11-15. Não autoriza implementação ou alterações operacionais.
 
 ## Regras essenciais
@@ -80,6 +83,8 @@ Esta documentação é a referência persistente para planejar, especificar, des
 Esses arquivos são fotografias técnicas daquela data, não garantia de que o ambiente continua idêntico.
 
 ## Histórico deste arquivo
+
+- 2026-11-15 — inclusão do plano proposto de prontidão do Atendimento SaaS na branch de revisão.
 
 - 2026-11-15 — atualização do estado da especificação de atendimento após aprovação e integração do PR #2.
 
