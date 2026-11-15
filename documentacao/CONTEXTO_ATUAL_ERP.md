@@ -139,3 +139,7 @@ A especificação técnica de autenticação, empresa ativa, autorização, cont
 ### Atualização após aprovação explícita — 2026-11-15
 
 A especificação técnica integral foi aprovada pelo responsável. O PR #2 para integração documental está aberto, não merged; após sincronizar a branch com a main, a consulta REST atual retorna `mergeable=true` e `mergeable_state=clean`. A especificação continua isolada até integração. Pendências de retenção/privacidade, credencial de serviço, fonte autoritativa Chatwoot e homologação permanecem abertas. O registro de credenciais está ligado acima e não guarda valores secretos. Nenhuma alteração operacional ou teste automatizado foi realizado.
+
+### Snapshot da main após publicação do PR #2 — 2026-11-15
+
+A continuidade e o contexto na main registraram o PR #2 como aberto e limpo no head ebc8f5469c2f8a8bd41de112b5da9c1fb50819bd, base 81fe108b28cfb8c90034f3fc5c393ed762337d9a. Dois commits documentais subsequentes atualizaram a main; esta branch será sincronizada com eles antes da revisão final. Não houve merge do PR nem mudança operacional.
