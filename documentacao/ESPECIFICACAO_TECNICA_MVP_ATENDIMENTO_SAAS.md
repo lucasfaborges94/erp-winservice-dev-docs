@@ -136,6 +136,34 @@ A autenticação técnica do n8n/agente permanece pendente. O responsável pergu
 11. Aplicar rate limit por canal/tenant, limites de concorrência e proteção contra replay, abuso e custo inesperado.
 12. Toda mutação deve gerar auditoria com ator (humano/agente/sistema), tenant, operação, entidade, correlação e resultado, sem armazenar segredos ou conteúdo desnecessário.
 
+### 4.1. Múltiplos agentes, identidades de serviço e workflows — proposta
+
+Os conceitos abaixo são distintos; o número de workflows não define, por si só, o número de identidades.
+
+- **Agente:** papel lógico com objetivo, limites de autonomia e conjunto de capacidades; deve aparecer como ator identificável na auditoria.
+- **Identidade de serviço:** principal técnico apresentado pelo n8n ao MCP/API. Deve mapear a um perfil de autorização explícito, com escopo mínimo e tenant permitido. Recomenda-se uma identidade por perfil de capacidade (por exemplo, consulta e escrita; criação limitada), não necessariamente uma identidade por workflow.
+- **Workflow:** implementação/orquestração no n8n. Um workflow de propósito fixo usa credencial correspondente ao perfil do agente. Vários workflows podem compartilhar uma identidade somente se tiverem a mesma fronteira de confiança e exatamente o mesmo conjunto de permissões; separar credenciais quando os privilégios diferirem.
+- **Servidor MCP/API:** valida a credencial, a audiência, o emissor, validade e escopos; autoriza cada ferramenta/ação no servidor e envia ao backend um contexto de ator verificado. A disponibilidade de uma ferramenta no prompt ou no workflow não concede permissão.
+
+**Exemplo de perfis, sujeito a decisão:**
+
+| Perfil | Capacidades possíveis | Limites |
+|---|---|---|
+| Consulta | `conversation:read`, `customer:read`, `service_rules:read` | Sem mutações; sempre tenant-scoped |
+| Escrita restrita | `qualification:create`, `handoff:create` ou outras mutações explicitamente enumeradas | Sem leitura ampla; só grava na conversa autorizada recebida pelo contexto do servidor |
+| Leitura e escrita | Conjunto de leitura e mutações estritamente necessário à função | Sem exclusão; sem acesso genérico ao ERP ou a outros tenants |
+
+“Somente escrita” deve ser definido por operações concretas, não por um privilégio amplo `write`. Se uma operação precisar consultar contexto para validar a gravação, conceder apenas a leitura mínima daquele contexto ou fazer a validação dentro da própria operação autorizada. IDs fornecidos pelo modelo não bastam para selecionar tenant/cliente/conversa.
+
+**Roteamento n8n:** para o primeiro piloto, a opção mais simples de auditar é separar workflows por perfil de agente, cada qual com credencial própria. Um workflow roteador também é possível se o principal recebido for autenticado/derivado de fonte confiável, a seleção for validada no servidor e cada subworkflow use a credencial do perfil de destino. Nunca confiar em um campo `agent_id` vindo de mensagem, modelo ou payload não autenticado; não dar ao roteador uma credencial global com a união de todas as permissões.
+
+**Separação de tokens:** um token para o MCP deve ter audiência daquele servidor. O MCP valida e aplica os escopos; ele não deve encaminhar o mesmo token como credencial para a API upstream. Se chamar a API, usar credencial/contexto próprio do backend ou mecanismo de delegação aprovado, preservando o ator original para auditoria. A autorização por ferramenta/entidade permanece no servidor/API, além do controle do transporte MCP.
+
+**Operação n8n:** credenciais pertencem à configuração de segurança do n8n, não são identidade garantida pelo nome do workflow. Rever quem pode editar/compartilhar workflows e usar credenciais, pois editores de workflows compartilhados podem usar credenciais presentes nos nós conforme a documentação do n8n.
+
+Referências normativas/técnicas: [ADR-0017](decisoes/ADR-0017-tenancy-compartilhada-autorizacao-multiempresa.md) exige identidade técnica e menor privilégio; [especificação de autorização MCP](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization) define validação de tokens destinados ao recurso MCP, scopes e rejeição de tokens para outro recurso; [documentação n8n sobre compartilhamento](https://docs.n8n.io/workflows/sharing/) descreve acesso de editores às credenciais usadas nos workflows compartilhados.
+
+Esta seção é uma proposta de desenho e não aprova o mecanismo de credenciais, perfis finais, ferramentas MCP nem qualquer alteração de workflow.
 ## 5. Onboarding proposto
 
 Estado de onboarding por tenant: `draft → validating → ready_for_review → active`; falha retorna a `draft` ou `needs_attention`. A ativação exige revisão conforme política que o responsável ainda deve decidir.
