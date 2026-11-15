@@ -409,7 +409,7 @@ Após autorização do responsável para criar workflows de consulta na pasta pe
 
 Após a revisão, o responsável aprovou explicitamente a especificação técnica integral. O documento foi atualizado para **APROVADA** na branch `spec/atendimento-saas-mvp`; essa aprovação documental não encerra decisões pendentes nem autoriza implementação ou operações.
 
-O PR #2 foi aberto para integração documental à `main`. Na criação, o GitHub retornou `mergeable=false`; a branch ainda não continha quatro commits recentes da `main`, incluindo o registro de credenciais e as atualizações de continuidade/contexto. Para preparar uma revisão limpa, a branch será sincronizada com a `main` por merge commit, sem integrar o PR à `main`; depois, a mergeabilidade e o diff serão rechecados.
+O PR #2 foi aberto para integração documental à `main`. Na criação, o GitHub retornou `mergeable=false`; a branch ainda não continha quatro commits recentes da `main`, incluindo o registro de credenciais e as atualizações de continuidade/contexto. A branch foi sincronizada com a `main` por merge commit `488fa6b433488e716d54c1aefa750a0cced3939a`, preservando a `main` (parent `81fe108b28cfb8c90034f3fc5c393ed762337d9a`). Reconsulta REST do PR #2 confirmou `mergeable=true`, `mergeable_state=clean`, base `81fe108b28cfb8c90034f3fc5c393ed762337d9a`, head `488fa6b433488e716d54c1aefa750a0cced3939a`; permanece aberto e não merged.
 
 O registro de credenciais a rotacionar está em [REGISTRO_CREDENCIAIS_A_ROTACIONAR.md](REGISTRO_CREDENCIAIS_A_ROTACIONAR.md). Ele contém metadados, não os valores. Duas ocorrências Evolution seguem pendentes, e a relação entre elas ainda não foi confirmada.
 
