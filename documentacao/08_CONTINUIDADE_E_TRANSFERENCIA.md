@@ -293,3 +293,13 @@ A proposta acrescenta modelo lógico de identidade/credencial, casos negativos d
 **Pendências de deliberação:** aceitar/ajustar o formato opaco recomendado, prazo máximo de validade e autoridade/procedimento de emissão; definir retenção e privacidade antes de dados reais; revisar e aprovar explicitamente a especificação completa. G0/G1 permanecem parciais na última evidência datada de 2026-11-09 e devem ser revalidados antes de execução técnica.
 
 **Limites:** nenhuma chave Supabase/API/OpenAI, credencial n8n, workflow, migration, alteração de banco, código, deploy ou acesso de produção foi criado ou modificado.
+
+## Modelo opaco de credencial de serviço aprovado para a proposta — 2026-11-14
+
+O responsável aprovou o modelo opaco recomendado para autenticar os workflows n8n perante a API ERP: segredo aleatório de alta entropia emitido pela API, guardado no ERP somente como hash, associado no servidor ao perfil/escopos e tenant permitidos, com expiração obrigatória, rotação e revogação imediata. O segredo seria exibido uma única vez e enviado por HTTPS no header Bearer. Não é chave Supabase, token de usuário Supabase Auth ou chave OpenAI.
+
+**Escopo da aprovação:** aprovação desta direção de arquitetura para inclusão na proposta. Não aprova a especificação técnica completa nem autoriza emissão de credencial/implementação.
+
+**Pontos ainda pendentes:** prazo máximo de validade (até 90 dias permanece sugestão, não aprovado); autoridade e fluxo administrativo de emissão/rotação; escopos exatos e granularidade final de tenant/canal; auditoria e secrets manager. OAuth 2.0 Client Credentials continua alternativa futura, caso o emissor correspondente venha a ser especificado, sem ser requisito do piloto.
+
+**Estado e limites:** a especificação continua PROPOSTA. Nenhuma credencial, workflow, alteração Supabase, código, migration, deploy ou operação de produção foi realizada.
