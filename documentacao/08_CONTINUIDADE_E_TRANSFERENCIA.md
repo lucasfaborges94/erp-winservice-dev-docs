@@ -186,3 +186,17 @@ Nenhuma tabela, policy RLS, função, trigger, dado ou configuração do projeto
 **Limites:** nenhuma operação Supabase, alteração de workflow n8n, código, deploy, produção, testes ou execução de integração foi realizada. Não foi aberto PR da especificação nem ela foi integrada à main. A API permanece, conforme a fonte documental consultada, no scaffold sem autenticação, tenancy ou módulos de negócio.
 
 **Próximo passo:** revisão do documento e deliberação explícita do responsável sobre decisões pendentes e aceite da especificação. Até essa aprovação, manter a branch como proposta; após aprovação, atualizar seu estado por revisão documental apropriada. Implementação continua condicionada aos gates de segurança e autorizações operacionais específicas.
+
+## Revisão inicial da especificação SaaS de atendimento — 2026-11-14
+
+Foi feita revisão de consistência da especificação na branch spec/atendimento-saas-mvp contra a ADR-0020 aprovada e as ADRs-0017/0019.
+
+**Correção documental:** a ADR-0020 já decide em alto nível que o atendimento terá plano de entrega próprio, preservando a prioridade do MVP Operação e sem incorporar automaticamente WhatsApp/n8n ao MVP operacional. A especificação foi corrigida: o item deixa de pedir nova confirmação dessa decisão e mantém pendente apenas o detalhamento das fronteiras de módulos, releases e operação da API compartilhada.
+
+**Recomendações registradas como não aprovadas:** contrato de WhatsApp independente do provedor; avaliar Chatwoot transitório para handoff se disponibilidade operacional for confirmada; não associar cliente só por telefone sem confirmação; identidade n8n mínima e separada por ambiente; publicar regras por versões imutáveis; iniciar com catálogos tenant-scoped; definir retenção antes de dados reais; deixar billing/auto-onboarding fora do piloto inicial.
+
+**Decisões necessárias para fechar contratos de integração:** provedor/canal WhatsApp, inbox humano, política de confirmação de identidade e identidade máquina-a-máquina. Retenção e privacidade precisam ser definidas antes do piloto com dados reais. Billing e SLO comercial podem aguardar a etapa de comercialização.
+
+**Estado:** especificação permanece PROPOSTA. Nenhuma decisão foi aprovada ou assumida pelo responsável; não houve implementação, operação em Supabase/n8n/WhatsApp, testes, deploy ou alteração de produção.
+
+**Próximo passo:** obter deliberação explícita sobre os quatro pontos de integração e sobre retenção/privacidade para piloto; então revisar a especificação e submetê-la à aprovação explícita sem confundir aprovação documental com autorização operacional.
