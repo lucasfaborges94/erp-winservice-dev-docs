@@ -339,12 +339,15 @@ A tentativa somente leitura de listar projetos/containers via endpoint Docker Ma
 
 ## Verificação informada da instalação Evolution API — 2026-11-14
 
-O responsável informou que a Evolution API já está instalada no domínio [evo.winservicers.com](https://evo.winservicers.com). Essa informação atualiza a pendência anterior de hospedagem: a instalação foi reportada, mas não foi confirmada tecnicamente nesta sessão.
+O responsável informou que a Evolution API já está instalada no domínio [evo.winservicers.com](https://evo.winservicers.com). Essa informação atualiza a pendência anterior de hospedagem: a instalação foi confirmada pela resposta pública da raiz HTTPS, sem autenticação.
 
-**Verificações somente leitura:** a tentativa de abrir o domínio pelo conector de navegação retornou erro interno sem resposta HTTP, o que não permite concluir se o serviço está disponível ou indisponível. A aba de navegador aberta em evolution-leads-roi.huvyyz.easypanel.host exibiu o sistema Winservice Leads & ROI, não a API Evolution; não foi tratada como evidência da instalação da API.
+**Verificações somente leitura:** a tentativa de abrir o domínio pelo conector de navegação retornou erro interno sem resposta HTTP; em seguida, uma requisição pública GET à raiz retornou HTTP 200, conteúdo JSON, mensagem de serviço ativo e versão 2.3.7. A verificação confirma o endpoint público da Evolution API e a versão anunciada por ele, sem autenticação. A aba de navegador aberta em evolution-leads-roi.huvyyz.easypanel.host exibiu o sistema Winservice Leads & ROI, não a API Evolution; não foi tratada como evidência da instalação da API.
 
 **Estado documental:** Evolution API com Baileys continua a escolha inicial aprovada para a proposta; Chatwoot transitório e workflows/credenciais separados por perfil também permanecem registrados. Devem ser confirmados em homologação a URL/API e versão implantadas, se Baileys está ativo, armazenamento persistente e protegido da sessão, reconexão, autenticação/autenticidade do webhook, mapeamento canal→tenant e procedimento de revogação. O nome do domínio e a informação de instalação não implicam autorização para alterar serviço.
 
 **Limites:** não houve login administrativo, leitura de segredos, configuração, criação de instância, pareamento QR, alteração de n8n/Supabase/código, deploy ou ação de produção. A especificação inteira permanece PROPOSTA; decisão sobre o provedor/modo já está registrada para sua elaboração.
 
 **Próximo passo:** realizar inspeção não invasiva da página/versão e, em ambiente de homologação, fechar checklist de Baileys e webhooks antes de integrar qualquer workflow. Nenhuma credencial deve ser compartilhada em conversa.
+
+
+**Evidência técnica adicional — 2026-11-14:** consulta pública GET a https://evo.winservicers.com/ retornou HTTP 200; a resposta JSON foi filtrada para status 200, mensagem “Welcome to the Evolution API, it is working!” e versão 2.3.7. A requisição foi somente leitura. Não foram consultados endpoints administrativos, instâncias, chaves, tokens ou configurações.
