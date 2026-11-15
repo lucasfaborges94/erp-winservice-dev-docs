@@ -403,3 +403,14 @@ Após autorização do responsável para criar workflows de consulta na pasta pe
 **Pendências:** revisar esta especificação e aprová-la explicitamente antes de tratá-la como normativa; resolver retenção/privacidade, validade/emissão/rotação de credenciais, escopos finais, fonte autoritativa e contrato de handoff; validar Baileys, imagem, webhook, retries, idempotência, rotação/revogação e limites em homologação. A rotação da chave administrativa permanece ação do responsável após esta conversa.
 
 **Próxima ação:** concluir verificação dos links/arquivos da branch e entregar a especificação para revisão, mantendo-a separada da `main`. Nenhuma implementação ou deploy está autorizado por esta especificação.
+
+
+## Aprovação da especificação, registro de credenciais e preparação do PR — 2026-11-15
+
+Após a revisão, o responsável aprovou explicitamente a especificação técnica integral. O documento foi atualizado para **APROVADA** na branch `spec/atendimento-saas-mvp`; essa aprovação documental não encerra decisões pendentes nem autoriza implementação ou operações.
+
+O PR #2 foi aberto para integração documental à `main`. Na criação, o GitHub retornou `mergeable=false`; a branch ainda não continha quatro commits recentes da `main`, incluindo o registro de credenciais e as atualizações de continuidade/contexto. Para preparar uma revisão limpa, a branch será sincronizada com a `main` por merge commit, sem integrar o PR à `main`; depois, a mergeabilidade e o diff serão rechecados.
+
+O registro de credenciais a rotacionar está em [REGISTRO_CREDENCIAIS_A_ROTACIONAR.md](REGISTRO_CREDENCIAIS_A_ROTACIONAR.md). Ele contém metadados, não os valores. Duas ocorrências Evolution seguem pendentes, e a relação entre elas ainda não foi confirmada.
+
+**Limites:** nenhuma implementação, Supabase, workflow, credencial, Evolution/Chatwoot, deploy ou produção foi alterada. Nenhum teste automatizado foi executado.
